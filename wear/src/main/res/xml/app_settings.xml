@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <PreferenceCategory android:title="@string/setting_preference_category_title" />
+
+    <SwitchPreference
+        android:defaultValue="true"
+        android:key="@string/temp_unit"
+        android:summaryOff="@string/wc_setting_leading_zero_summary_off"
+        android:summaryOn="@string/wc_setting_leading_zero_summary_on"
+        android:title="@string/temp_unit_pref_title" />
+
+</PreferenceScreen>

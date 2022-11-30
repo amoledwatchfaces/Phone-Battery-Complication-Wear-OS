@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Translator: amoledwatchfaces -->
+<resources lang="en" country="US">
+    <!-- Do not translate translatable="false" lines -->
+    <string name="app_name">Phone Battery Complication</string> <!-- Does not need to be translated, but it's recommended -->
+
+    <string name="settings">SETTINGS</string>
+    <string name="setup1">HOW TO SET UP?</string>
+    <string name="setup2">1. Install phone app [Link]</string>
+    <string name="setup3">2. Customize your watch face\n3. Add complication</string>
+    <string name="arrow" translatable="false">…</string>
+    <string name="install_companion">Install phone companion app!</string>
+
+    <!-- Phone Battery Complication strings -->
+    <string name="phone_battery_preview_desc">Phone Battery level</string>
+    <string name="phone_battery_at">Phone Battery level at&#160;</string>
+    <string name="phone_battery_long_text">Phone Battery:&#160;</string>
+
+    <!-- Watch Battery Complication strings -->
+    <string name="watch_battery_at">Watch Battery level at&#160;</string>
+    <string name="watch_battery_text">Watch Battery level</string>
+
+    <!-- Watch Battery Temperature Complication strings -->
+    <string name="temp_battery_at">Watch Battery Temperature at&#160;</string>
+    <string name="temp_battery_text">Watch Battery Temperature</string>
+
+    <!-- Watch Battery Voltage Complication strings -->
+    <string name="voltage_battery_at">Watch Battery Voltage at&#160;</string>
+    <string name="voltage_battery_text">Watch Battery Voltage</string>
+    <string name="voltage_volts">Volts</string>
+
+    <!-- Temperature Units Preferences -->
+    <string name="setting_preference_category_title">Watch Battery Temperature Complication</string>
+    <string name="temp_unit_pref_title">Temperature unit</string>
+
+    <!-- DO NOT TRANSLATE -->
+    <string name="temp_unit" translatable="false">temp_unit</string>
+    <string name="wc_setting_leading_zero_summary_on" translatable="false">°C</string>
+    <string name="wc_setting_leading_zero_summary_off" translatable="false">°F</string>
+    <string name="app_icon_content_description" translatable="false">App Icon</string>
+    <string name="key_pref_connected" translatable="false">key_pref_connected</string>
+    <string name="key_pref_battery_complication_id" translatable="false">key_pref_battery_complication_id</string>
+    <string name="key_pref_battery_complication_activated" translatable="false">key_pref_battery_complication_activated</string>
+    <string name="key_pref_mobile_battery_level" translatable="false">key_pref_mobile_battery_level</string>
+    <string name="key_pref_watch_battery_level" translatable="false">key_pref_watch_battery_level</string>
+    <string name="key_pref_after_mobile_result" translatable="false">key_pref_after_mobile_result</string>
+    <string name="key_pref_has_mobile_app" translatable="false">key_pref_has_mobile_app</string>
+    <string name="key_pref_watch_charging" translatable="false">key_pref_watch_charging</string>
+</resources>
