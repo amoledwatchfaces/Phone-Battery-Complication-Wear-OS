@@ -15,7 +15,6 @@ import java.text.DecimalFormat
 
 class WatchVoltageComplicationService : SuspendingComplicationDataSourceService() {
 
-
     override fun onComplicationActivated(
         complicationInstanceId: Int,
         type: ComplicationType)
@@ -35,7 +34,6 @@ class WatchVoltageComplicationService : SuspendingComplicationDataSourceService(
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         Log.d(TAG, "Update: ${request.complicationInstanceId}")
-
 
         val complicationPendingIntent = TempVoltageTapBroadcastReceiver.getToggleIntent(
             this,

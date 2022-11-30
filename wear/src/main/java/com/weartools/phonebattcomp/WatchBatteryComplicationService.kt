@@ -27,13 +27,27 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         return PendingIntent.getActivity(this, 0, batteryIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    override fun getPreviewData(type: ComplicationType): ComplicationData {
-        return ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(text = "35%").build(),
-            contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_text)).build())
-            .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
-            .setTapAction(null)
-            .build()
+    override fun getPreviewData(type: ComplicationType): ComplicationData? {
+        return when (type) {
+
+            ComplicationType.RANGED_VALUE -> RangedValueComplicationData.Builder(
+                value = 35f,
+                min = 0f,
+                max = 100f,
+                contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_text)).build())
+                .setText(PlainComplicationText.Builder(text = "35%").build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                .setTapAction(null)
+                .build()
+
+            ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
+                text = PlainComplicationText.Builder(text = "35%").build(),
+                contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_text)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                .setTapAction(null)
+                .build()
+            else -> {null}
+        }
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {

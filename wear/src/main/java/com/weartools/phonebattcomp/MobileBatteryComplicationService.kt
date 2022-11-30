@@ -12,7 +12,6 @@ import androidx.wear.watchface.complications.datasource.SuspendingComplicationDa
 
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
-
     override fun onComplicationActivated(
         complicationInstanceId: Int,
         type: ComplicationType)
@@ -30,23 +29,38 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             .putBoolean(getString(R.string.key_pref_battery_complication_activated), true)
             .putInt(getString(R.string.key_pref_battery_complication_id), complicationInstanceId).apply()
 
-        if (!hasResult && isWatchConnected) {
-            //TODO: NEW WAY
-            SendMessageService.sndMSG(this,"/request_battery")
-        } else {
-            editor.putBoolean(getString(R.string.key_pref_after_mobile_result), false)
-        }
+        if (!hasResult && isWatchConnected) { SendMessageService.sndMSG(this,"/request_battery") }
+        else { editor.putBoolean(getString(R.string.key_pref_after_mobile_result), false) }
         editor.apply()
-
     }
 
-    override fun getPreviewData(type: ComplicationType): ComplicationData {
-        return ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(text = "86%").build(),
-            contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
-            .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
-            .setTapAction(null)
-            .build()
+    override fun getPreviewData(type: ComplicationType): ComplicationData? {
+        return when (type) {
+
+            ComplicationType.RANGED_VALUE -> RangedValueComplicationData.Builder(
+                value = 86f,
+                min = 0f,
+                max = 100f,
+                contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
+                .setText(PlainComplicationText.Builder(text = "86%").build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                .setTapAction(null)
+                .build()
+
+            ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
+                text = PlainComplicationText.Builder(text = "86%").build(),
+                contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                .setTapAction(null)
+                .build()
+
+            ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
+                text = PlainComplicationText.Builder(text = "86%").build(),
+                contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
+                .setTapAction(null)
+                .build()
+            else -> {null}
+        }
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
