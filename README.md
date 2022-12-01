@@ -12,15 +12,15 @@ Wear OS complication for Phone Battery level (%). Add to any watch face!
 
 <b>OR</b>
 
-Download the package (.apk) to side-load from <a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication/releases">HERE</a>
+Download the package (.apk) to side-load from <a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/releases">HERE</a>
 
 ## Help us with translations:
 
-<a href="https://github.com/amoledwatchfaces/Complications-Suite-Wear-OS/tree/master/Store-listings">STORE LISTINGS</a>
+<a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/Store-listings">STORE LISTINGS</a>
 
-<a href="https://github.com/amoledwatchfaces/Complications-Suite-Wear-OS/tree/master/mobile/src/main/res">MOBILE APP</a>
+<a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/mobile/src/main/res">MOBILE APP</a>
 
-<a href="https://github.com/amoledwatchfaces/Complications-Suite-Wear-OS/tree/master/wear/src/main/res">WEAR APP</a>
+<a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/wear/src/main/res">WEAR APP</a>
 
 ## License
 
