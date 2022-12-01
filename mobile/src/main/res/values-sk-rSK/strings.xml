@@ -3,7 +3,7 @@
 <!-- Translator: amoledwatchfaces -->
 <resources lang="sk" country="SK">
     <!-- Do not translate translatable="false" lines -->
-    <string name="app_name">Batéria telefónu - komplikácia</string> <!-- Does not need to be translated, but it's recommended -->
+    <string name="app_name">Batéria telefónu - voliteľný prvok</string> <!-- Does not need to be translated, but it's recommended -->
 
     <!-- Make sure \n\n is in the same position -->
     <string name="message_checking">Táto sprievodná aplikácia pomáha posielať hodnoty batérie telefónu do hodiniek.\n\nKontrolujú sa zariadenia Wear OS…\n\nZapnite pripojenie Bluetooth, pripojte svoje zariadenie Wear OS a obnovte túto aplikáciu.</string>
