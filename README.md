@@ -4,7 +4,7 @@ Wear OS complication for Phone Battery level (%). Add to any watch face!
 
 ## Preview
 
-<img src="https://user-images.githubusercontent.com/92080649/204494337-e3e877e7-44ad-4398-95c9-52a33e669b24.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/92080649/204494770-ccb779ac-2b9e-4768-983b-016681bb8397.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/92080649/204494791-e9dd80ec-feb4-4b94-a9a2-5d5e140f2332.png" width=25% height=25%>
+<img src="https://user-images.githubusercontent.com/92080649/205101967-7264833c-1376-4e5d-bed4-934ec11e17e4.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/92080649/205102051-7055d61e-0855-4b1d-90dc-b2ee1b9019e3.png" width=25% height=25%>
 
 ## Release
 
