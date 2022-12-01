@@ -21,7 +21,6 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
     {
         super.onComplicationActivated(complicationInstanceId, type)
         Log.d(TAG, "activated: $complicationInstanceId")
-
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData {
