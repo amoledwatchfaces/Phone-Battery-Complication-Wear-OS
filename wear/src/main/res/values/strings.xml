@@ -47,4 +47,5 @@
     <string name="key_pref_after_mobile_result" translatable="false">key_pref_after_mobile_result</string>
     <string name="key_pref_has_mobile_app" translatable="false">key_pref_has_mobile_app</string>
     <string name="key_pref_watch_charging" translatable="false">key_pref_watch_charging</string>
+    <string name="key_pref_last_update" translatable="false">0</string>
 </resources>

@@ -42,6 +42,7 @@ class MobileBatteryListener : WearableListenerService() {
             editor.putBoolean(getString(R.string.key_pref_has_mobile_app), true)
             editor.putBoolean(getString(R.string.key_pref_after_mobile_result), true)
             editor.putBoolean(getString(R.string.key_pref_connected), true)
+            editor.putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
             editor.apply()
             updateBatteryComplication(this)
         }

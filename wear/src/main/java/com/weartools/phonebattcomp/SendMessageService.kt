@@ -53,8 +53,12 @@ class SendMessageService {
 
     companion object {
         private val TAG = SendMsgToPhone::class.java.simpleName
-        fun sndMSG(context: Context,path: String) {
+        fun sndMSG(context: Context,path: String, lastUpdateTime: Long) {
+            if (System.currentTimeMillis() - lastUpdateTime >= 5000) {
             SendMsgToPhone().SendThread(context,path).start()
+            }
+            else
+                Log.e(TAG, "Too many updates")
         }
     }
 }

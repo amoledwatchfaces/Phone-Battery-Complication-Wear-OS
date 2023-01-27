@@ -24,7 +24,7 @@ Download the package (.apk) to side-load from <a href="https://github.com/amoled
 
 ## License
 
-    Complications Suite - Wear OS
+    Phone Battery Complication - Wear OS
     Copyright 2022 amoledwatchfaces™
     support@amoledwatchfaces.com
 

@@ -40,12 +40,13 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val editor = preferences.edit()
         val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
         val isWatchConnected = preferences.getBoolean(getString(R.string.key_pref_connected), true)
+            val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
 
         editor
             .putBoolean(getString(R.string.key_pref_battery_complication_activated), true)
             .putInt(getString(R.string.key_pref_battery_complication_id), complicationInstanceId).apply()
 
-        if (!hasResult && isWatchConnected) { SendMessageService.sndMSG(this,"/request_battery") }
+        if (!hasResult && isWatchConnected) { SendMessageService.sndMSG(this,"/request_battery", lastUpdateTime) }
         else { editor.putBoolean(getString(R.string.key_pref_after_mobile_result), false) }
         editor.apply()
     }
@@ -88,6 +89,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
         val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
         val isWatchConnected = preferences.getBoolean(getString(R.string.key_pref_connected), false)
+        val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
+
         val level = preferences.getInt(getString(R.string.key_pref_mobile_battery_level), 0)
         val level2: String = if (level==0) "-" else "$level%"
 
@@ -97,7 +100,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             request.complicationInstanceId
         )
 
-        if (!hasResult) { SendMessageService.sndMSG(this,"/request_battery") }
+        if (!hasResult) { SendMessageService.sndMSG(this,"/request_battery", lastUpdateTime) }
         else { editor.putBoolean(getString(R.string.key_pref_after_mobile_result), false) }
         editor.apply()
 
@@ -145,6 +148,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
     companion object {
         private val TAG = MobileBatteryComplicationService::class.java.simpleName
+
         @JvmStatic
         fun updateBatteryComplication(context: Context?) {
             Log.d(TAG, "Updating Phone Battery Complication")
