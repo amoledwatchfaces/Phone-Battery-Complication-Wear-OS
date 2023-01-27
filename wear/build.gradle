@@ -23,6 +23,7 @@ android {
     buildFeatures {
         viewBinding true
     }
+    namespace 'com.weartools.phonebattcomp'
 }
 
 dependencies {

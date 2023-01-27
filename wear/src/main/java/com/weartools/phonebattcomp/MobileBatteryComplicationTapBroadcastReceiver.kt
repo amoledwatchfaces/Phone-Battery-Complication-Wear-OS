@@ -39,11 +39,10 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
         val result = goAsync()
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
         val hasMobileApp = preferences.getBoolean(context.getString(R.string.key_pref_has_mobile_app), false)
+        val lastUpdateTime = preferences.getLong(context.getString(R.string.key_pref_last_update), 0)
 
         scope.launch {
             try {
-                Log.d(TAG, "UPDATING BATTERY COMPLICATION")
-                MobileBatteryComplicationService.updateBatteryComplication(context = context)
                         if (!hasMobileApp) {
                             openAppStoreOnPhone(context = context)
                             Log.d(TAG, "OPENING APP ON PHONE IF NEEDED")
@@ -53,9 +52,11 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
                                 Toast.LENGTH_LONG
                             ).show()
                             }
-            } finally {
-                result.finish()
+                        else
+                            Log.d(TAG, "UPDATING BATTERY COMPLICATION")
+                            SendMessageService.sndMSG(context,"/request_battery", lastUpdateTime)
             }
+            finally { result.finish() }
         }
     }
 
