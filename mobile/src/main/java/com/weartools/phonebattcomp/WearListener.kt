@@ -21,7 +21,6 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
 import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.SendMessageToWearService.Companion.sndMSGWear
@@ -44,7 +43,6 @@ class WearListener : WearableListenerService() {
             return 100 * level / scale
         }
 
-    override fun onDataChanged(dataEvents: DataEventBuffer) {}
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
         Log.e("capability", capabilityInfo.name)

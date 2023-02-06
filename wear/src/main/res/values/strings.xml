@@ -36,12 +36,10 @@
 
     <!-- DO NOT TRANSLATE -->
     <string name="temp_unit" translatable="false">temp_unit</string>
-    <string name="wc_setting_leading_zero_summary_on" translatable="false">°C</string>
-    <string name="wc_setting_leading_zero_summary_off" translatable="false">°F</string>
+    <string name="temp_unit_C" translatable="false">°C</string>
+    <string name="temp_unit_F" translatable="false">°F</string>
     <string name="app_icon_content_description" translatable="false">App Icon</string>
     <string name="key_pref_connected" translatable="false">key_pref_connected</string>
-    <string name="key_pref_battery_complication_id" translatable="false">key_pref_battery_complication_id</string>
-    <string name="key_pref_battery_complication_activated" translatable="false">key_pref_battery_complication_activated</string>
     <string name="key_pref_mobile_battery_level" translatable="false">key_pref_mobile_battery_level</string>
     <string name="key_pref_watch_battery_level" translatable="false">key_pref_watch_battery_level</string>
     <string name="key_pref_after_mobile_result" translatable="false">key_pref_after_mobile_result</string>

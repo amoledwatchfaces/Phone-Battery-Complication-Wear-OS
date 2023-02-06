@@ -38,10 +38,8 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
 
         val result = goAsync()
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val hasMobileApp =
-            preferences.getBoolean(context.getString(R.string.key_pref_has_mobile_app), false)
-        val lastUpdateTime =
-            preferences.getLong(context.getString(R.string.key_pref_last_update), 0)
+        val hasMobileApp = preferences.getBoolean(context.getString(R.string.key_pref_has_mobile_app), false)
+        val lastUpdateTime = preferences.getLong(context.getString(R.string.key_pref_last_update), 0)
 
         scope.launch {
             try {
@@ -83,8 +81,8 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
             complicationId: Int
         ): PendingIntent {
             val intent = Intent(context, MobileBatteryComplicationTapBroadcastReceiver::class.java)
-            intent.putExtra(EXTRA_DATA_SOURCE_COMPONENT, dataSource)
-            intent.putExtra(EXTRA_COMPLICATION_ID, complicationId)
+            .putExtra(EXTRA_DATA_SOURCE_COMPONENT, dataSource)
+            .putExtra(EXTRA_COMPLICATION_ID, complicationId)
 
 
             return PendingIntent.getBroadcast(
