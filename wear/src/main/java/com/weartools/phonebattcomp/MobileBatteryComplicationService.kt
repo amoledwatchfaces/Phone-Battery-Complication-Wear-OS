@@ -39,14 +39,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     {
         super.onComplicationActivated(complicationInstanceId, type)
         Log.d(TAG, "Activated: $complicationInstanceId")
-
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
-        val isWatchConnected = preferences.getBoolean(getString(R.string.key_pref_connected), true)
-        val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
-
-        if (!hasResult && isWatchConnected) { sendPhoneBatteryRequest(lastUpdateTime) }
-        else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {

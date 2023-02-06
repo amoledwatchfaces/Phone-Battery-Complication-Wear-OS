@@ -24,7 +24,6 @@ import android.util.Log
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 
-
 private const val REQUEST_PATH = "/request"
 private const val REQUEST_KEY = "request"
 private const val BATTERY_PATH = "/battery_level"
@@ -42,15 +41,10 @@ class WearListener : WearableListenerService() {
                     val requestTime = dataMapItem.dataMap.getLong(REQUEST_KEY)
                     Log.v(TAG, "Received Phone Battery request with updateTime: $requestTime")
                     val level = batteryLevel
-                    sendBatteryLevel(level)
-                } else {
-                    Log.e(TAG, "Unrecognized path: $path")
-                }
-            } else if (event.type == DataEvent.TYPE_DELETED) {
-                Log.v(TAG, "Data deleted : " + event.dataItem.toString())
-            } else {
-                Log.e(TAG, "Unknown data event Type = " + event.type)
-            }
+                    sendBatteryLevel(level) }
+                else { Log.e(TAG, "Unrecognized path: $path") } }
+            else if (event.type == DataEvent.TYPE_DELETED) { Log.v(TAG, "Data deleted : " + event.dataItem.toString()) }
+            else { Log.e(TAG, "Unknown data event Type = " + event.type) }
         }
     }
 
@@ -72,16 +66,5 @@ class WearListener : WearableListenerService() {
         dataItemTask
             .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery level ($level) was successful: $dataItem") }
             .addOnFailureListener { e -> Log.e(TAG,"Sending phone battery level FAILED with error: $e") }
-    }
-
-    override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
-        super.onCapabilityChanged(capabilityInfo)
-        Log.e("capability", capabilityInfo.name)
-        if (capabilityInfo.nodes.size == 0) {
-            Log.e("WearListener", "No devices")
-        }
-        for (node in capabilityInfo.nodes) {
-            Log.e("WearListener", node.displayName + " : " + node.isNearby)
-        }
     }
 }
