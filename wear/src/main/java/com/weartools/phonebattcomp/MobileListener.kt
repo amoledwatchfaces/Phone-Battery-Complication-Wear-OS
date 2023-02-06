@@ -16,29 +16,39 @@
  */
 package com.weartools.phonebattcomp
 
+import android.content.ContentValues
 import android.util.Log
 import androidx.preference.PreferenceManager
-import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.MessageEvent
-import com.google.android.gms.wearable.WearableListenerService
+import com.google.android.gms.wearable.*
 import com.weartools.phonebattcomp.MobileBatteryComplicationService.Companion.updateBatteryComplication
 
-class MobileBatteryListener : WearableListenerService() {
+private const val BATTERY_PATH = "/battery_level"
+private const val BATTERY_KEY= "battery_level"
 
-    override fun onMessageReceived(messageEvent: MessageEvent) {
+class MobileListener : WearableListenerService() {
 
-        val path = messageEvent.path
-        Log.d(TAG, path)
-        if (path.startsWith("/battery_level")) {
-            val level = path.replace("\\D".toRegex(), "").toInt()
-            val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-            preferences.edit().putInt(getString(R.string.key_pref_mobile_battery_level), level)
-                              .putBoolean(getString(R.string.key_pref_has_mobile_app), true)
-                              .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
-                              .putBoolean(getString(R.string.key_pref_connected), true)
-                              .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
-                              .apply()
-            updateBatteryComplication(this)
+    override fun onDataChanged(dataEventBuffer: DataEventBuffer) {
+        for (event in dataEventBuffer) {
+            if (event.type == DataEvent.TYPE_CHANGED) {
+                val path = event.dataItem.uri.path
+                if (path == BATTERY_PATH) {
+                    val dataMapItem = DataMapItem.fromDataItem(event.dataItem)
+                    val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
+                    Log.d(TAG, "Received Phone Battery Level: $level")
+                    val preferences = PreferenceManager.getDefaultSharedPreferences(this)
+                    preferences.edit().putInt(getString(R.string.key_pref_mobile_battery_level), level)
+                        .putBoolean(getString(R.string.key_pref_has_mobile_app), true)
+                        .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
+                        .putBoolean(getString(R.string.key_pref_connected), true)
+                        .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
+                        .apply()
+                    updateBatteryComplication(this)
+
+                }
+                else { Log.e(ContentValues.TAG, "Unrecognized path: $path") }
+            }
+            else if (event.type == DataEvent.TYPE_DELETED) { Log.v(ContentValues.TAG, "Data deleted : " + event.dataItem.toString()) }
+            else { Log.e(ContentValues.TAG, "Unknown data event Type = " + event.type) }
         }
     }
 
@@ -68,6 +78,6 @@ class MobileBatteryListener : WearableListenerService() {
     }
 
     companion object {
-        private val TAG = MobileBatteryListener::class.java.simpleName
+        private val TAG = MobileListener::class.java.simpleName
     }
 }

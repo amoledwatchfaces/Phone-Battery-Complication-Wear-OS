@@ -26,6 +26,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import androidx.wear.remote.interactions.RemoteActivityHelper
+import com.weartools.phonebattcomp.MobileBatteryComplicationService.Companion.updateBatteryComplication
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -39,7 +40,6 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
         val result = goAsync()
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
         val hasMobileApp = preferences.getBoolean(context.getString(R.string.key_pref_has_mobile_app), false)
-        val lastUpdateTime = preferences.getLong(context.getString(R.string.key_pref_last_update), 0)
 
         scope.launch {
             try {
@@ -53,7 +53,7 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
                     ).show()
                 } else
                     Log.d(TAG, "UPDATING BATTERY COMPLICATION")
-                SendMessageService.sndMSG(context, "/request_battery", lastUpdateTime)
+                updateBatteryComplication(context = context)
             } finally {
                 result.finish()
             }
