@@ -45,15 +45,11 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
             try {
                 if (!hasMobileApp) {
                     openAppStoreOnPhone(context = context)
-                    Log.d(TAG, "OPENING APP ON PHONE IF NEEDED")
-                    Toast.makeText(
-                        context,
-                        context.getString(R.string.install_companion),
-                        Toast.LENGTH_LONG
-                    ).show()
+                    Log.d(TAG, "Opening Play Store Listing!")
+                    Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()
+                    updateBatteryComplication(context = context)
                 } else
-                    Log.d(TAG, "UPDATING BATTERY COMPLICATION")
-                updateBatteryComplication(context = context)
+                    updateBatteryComplication(context = context)
             } finally {
                 result.finish()
             }

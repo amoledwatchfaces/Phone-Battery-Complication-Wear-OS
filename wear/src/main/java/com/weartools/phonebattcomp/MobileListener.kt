@@ -57,16 +57,10 @@ class MobileListener : WearableListenerService() {
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         val editor = preferences.edit()
         if (capabilityInfo.nodes.size > 0) {
-            for (node in capabilityInfo.nodes) {
-                if (node.isNearby) {
+
                     editor.putBoolean(getString(R.string.key_pref_connected), true)
                           .putBoolean(getString(R.string.key_pref_after_mobile_result), false)
-                          .apply() }
-                else {
-                    editor.putBoolean(getString(R.string.key_pref_after_mobile_result), false)
                           .apply()
-                     }
-            }
         }
         else {
             editor.putBoolean(getString(R.string.key_pref_connected), false)
