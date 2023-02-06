@@ -25,30 +25,28 @@ import androidx.wear.watchface.complications.data.*
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
+
+private const val REQUEST_PATH = "/request"
+private const val REQUEST_KEY = "request"
 
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
-    override fun onComplicationActivated(
-        complicationInstanceId: Int,
-        type: ComplicationType)
-        {
+    override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType)
+    {
         super.onComplicationActivated(complicationInstanceId, type)
-
-        Log.d(TAG, "activated: $complicationInstanceId")
+        Log.d(TAG, "Activated: $complicationInstanceId")
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = preferences.edit()
         val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
         val isWatchConnected = preferences.getBoolean(getString(R.string.key_pref_connected), true)
-            val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
+        val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
 
-        editor
-            .putBoolean(getString(R.string.key_pref_battery_complication_activated), true)
-            .putInt(getString(R.string.key_pref_battery_complication_id), complicationInstanceId).apply()
-
-        if (!hasResult && isWatchConnected) { SendMessageService.sndMSG(this,"/request_battery", lastUpdateTime) }
-        else { editor.putBoolean(getString(R.string.key_pref_after_mobile_result), false) }
-        editor.apply()
+        if (!hasResult && isWatchConnected) { sendPhoneBatteryRequest(lastUpdateTime) }
+        else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
@@ -84,13 +82,9 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         Log.d(TAG, "Update: ${request.complicationInstanceId}")
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = preferences.edit()
-        editor.putInt(getString(R.string.key_pref_battery_complication_id), request.complicationInstanceId)
-
         val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
         val isWatchConnected = preferences.getBoolean(getString(R.string.key_pref_connected), false)
         val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
-
         val level = preferences.getInt(getString(R.string.key_pref_mobile_battery_level), 0)
         val level2: String = if (level==0) "-" else "$level%"
 
@@ -100,9 +94,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             request.complicationInstanceId
         )
 
-        if (!hasResult) { SendMessageService.sndMSG(this,"/request_battery", lastUpdateTime) }
-        else { editor.putBoolean(getString(R.string.key_pref_after_mobile_result), false) }
-        editor.apply()
+        if (!hasResult) { sendPhoneBatteryRequest(lastUpdateTime) }
+        else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
 
          return when (request.complicationType) {
 
@@ -137,13 +130,26 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         }
     }
 
+    private fun sendPhoneBatteryRequest (lastUpdateTime: Long) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastUpdateTime >= 5000) {
+            val dataMap = PutDataMapRequest.create(REQUEST_PATH)
+            dataMap.dataMap.putLong(REQUEST_KEY, currentTime)
+            val request = dataMap.asPutDataRequest()
+            request.setUrgent()
+
+            val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
+            dataItemTask
+                .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
+                .addOnFailureListener { e -> Log.e(TAG,"Sending Phone Battery request failed with error: $e") }
+        }
+        else
+            Log.e(TAG, "Too many updates")
+    }
+
     override fun onComplicationDeactivated(complicationInstanceId: Int) {
         super.onComplicationDeactivated(complicationInstanceId)
         Log.d(TAG, "Deactivated: $complicationInstanceId")
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val editor = preferences.edit()
-        editor.putBoolean(getString(R.string.key_pref_battery_complication_activated), false)
-        editor.apply()
     }
 
     companion object {
@@ -156,5 +162,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             val req = ComplicationDataSourceUpdateRequester.create(context,componentName)
             req.requestUpdateAll()
         }
+
     }
 }

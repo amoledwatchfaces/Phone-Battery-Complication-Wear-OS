@@ -16,23 +16,41 @@
  */
 package com.weartools.phonebattcomp
 
+import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
-import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.DataEventBuffer
-import com.google.android.gms.wearable.MessageEvent
-import com.google.android.gms.wearable.WearableListenerService
-import com.weartools.phonebattcomp.SendMessageToWearService.Companion.sndMSGWear
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.wearable.*
+
+
+private const val REQUEST_PATH = "/request"
+private const val REQUEST_KEY = "request"
+private const val BATTERY_PATH = "/battery_level"
+private const val BATTERY_KEY= "battery_level"
 
 class WearListener : WearableListenerService() {
-    override fun onMessageReceived(messageEvent: MessageEvent) {
-        val path = messageEvent.path
-        Log.d("WearListener", path)
-        if (path.contains("/request_battery")) {
-            val level = batteryLevel
-            sndMSGWear(this, "/battery_level/$level")
+
+    override fun onDataChanged(dataEventBuffer: DataEventBuffer) {
+
+        for (event in dataEventBuffer) {
+            if (event.type == DataEvent.TYPE_CHANGED) {
+                val path = event.dataItem.uri.path
+                if (path == REQUEST_PATH) {
+                    val dataMapItem = DataMapItem.fromDataItem(event.dataItem)
+                    val requestTime = dataMapItem.dataMap.getLong(REQUEST_KEY)
+                    Log.v(TAG, "Received Phone Battery request with updateTime: $requestTime")
+                    val level = batteryLevel
+                    sendBatteryLevel(level)
+                } else {
+                    Log.e(TAG, "Unrecognized path: $path")
+                }
+            } else if (event.type == DataEvent.TYPE_DELETED) {
+                Log.v(TAG, "Data deleted : " + event.dataItem.toString())
+            } else {
+                Log.e(TAG, "Unknown data event Type = " + event.type)
+            }
         }
     }
 
@@ -44,7 +62,18 @@ class WearListener : WearableListenerService() {
             return 100 * level / scale
         }
 
-    override fun onDataChanged(dataEvents: DataEventBuffer) {}
+    private fun sendBatteryLevel (level: Int) {
+        val dataMap = PutDataMapRequest.create(BATTERY_PATH)
+        dataMap.dataMap.putInt(BATTERY_KEY, level)
+        val request = dataMap.asPutDataRequest()
+        request.setUrgent()
+
+        val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
+        dataItemTask
+            .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery level ($level) was successful: $dataItem") }
+            .addOnFailureListener { e -> Log.e(TAG,"Sending phone battery level FAILED with error: $e") }
+    }
+
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
         Log.e("capability", capabilityInfo.name)

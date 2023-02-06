@@ -20,8 +20,8 @@
     <SwitchPreference
         android:defaultValue="true"
         android:key="@string/temp_unit"
-        android:summaryOff="@string/wc_setting_leading_zero_summary_off"
-        android:summaryOn="@string/wc_setting_leading_zero_summary_on"
+        android:summaryOff="@string/temp_unit_F"
+        android:summaryOn="@string/temp_unit_C"
         android:title="@string/temp_unit_pref_title" />
 
 </PreferenceScreen>
