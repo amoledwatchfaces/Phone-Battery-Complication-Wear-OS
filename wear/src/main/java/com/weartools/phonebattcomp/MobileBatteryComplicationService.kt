@@ -25,6 +25,13 @@ import androidx.wear.watchface.complications.data.*
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
+
+private const val REQUEST_PATH = "/request"
+private const val REQUEST_KEY = "request"
 
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
@@ -32,14 +39,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     {
         super.onComplicationActivated(complicationInstanceId, type)
         Log.d(TAG, "Activated: $complicationInstanceId")
-
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
-        val isWatchConnected = preferences.getBoolean(getString(R.string.key_pref_connected), true)
-        val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
-
-        if (!hasResult && isWatchConnected) { SendMessageService.sndMSG(this,"/request_battery", lastUpdateTime) }
-        else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
@@ -87,7 +86,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             request.complicationInstanceId
         )
 
-        if (!hasResult) { SendMessageService.sndMSG(this,"/request_battery", lastUpdateTime) }
+        if (!hasResult) { sendPhoneBatteryRequest(lastUpdateTime) }
         else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
 
          return when (request.complicationType) {
@@ -123,6 +122,23 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         }
     }
 
+    private fun sendPhoneBatteryRequest (lastUpdateTime: Long) {
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastUpdateTime >= 5000) {
+            val dataMap = PutDataMapRequest.create(REQUEST_PATH)
+            dataMap.dataMap.putLong(REQUEST_KEY, currentTime)
+            val request = dataMap.asPutDataRequest()
+            request.setUrgent()
+
+            val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
+            dataItemTask
+                .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
+                .addOnFailureListener { e -> Log.e(TAG,"Sending Phone Battery request failed with error: $e") }
+        }
+        else
+            Log.e(TAG, "Too many updates")
+    }
+
     override fun onComplicationDeactivated(complicationInstanceId: Int) {
         super.onComplicationDeactivated(complicationInstanceId)
         Log.d(TAG, "Deactivated: $complicationInstanceId")
@@ -138,5 +154,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             val req = ComplicationDataSourceUpdateRequester.create(context,componentName)
             req.requestUpdateAll()
         }
+
     }
 }
