@@ -10,8 +10,8 @@ android {
         applicationId "com.weartools.phonebattcomp"
         minSdk 27
         targetSdk 33
-        versionCode 96
-        versionName "1.9.6"
+        versionCode 98
+        versionName "1.9.8"
     }
 
     buildTypes {
@@ -28,7 +28,7 @@ android {
 
 dependencies {
     //Implicit pending intent solution
-    implementation 'androidx.work:work-runtime:2.7.1'
+    implementation 'androidx.work:work-runtime:2.8.0'
     //implementation 'androidx.fragment:fragment-ktx:1.5.4'
 
     implementation 'androidx.wear.watchface:watchface-complications-data-source-ktx:1.1.1'
