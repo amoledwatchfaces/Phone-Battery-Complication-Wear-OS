@@ -46,7 +46,7 @@
             </intent-filter>
         </service>
         <service
-            android:name="com.weartools.phonebattcomp.MobileBatteryComplicationService"
+            android:name="com.weartools.phonebattcomp.complication.MobileBatteryComplicationService"
             android:icon="@drawable/ic_phone_icon"
             android:label="@string/phone_battery_preview_desc"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -59,7 +59,7 @@
                 android:value="RANGED_VALUE,SHORT_TEXT,LONG_TEXT"/>
         </service>
         <service
-            android:name="com.weartools.phonebattcomp.WatchBatteryComplicationService"
+            android:name="com.weartools.phonebattcomp.complication.WatchBatteryComplicationService"
             android:icon="@drawable/ic_watch"
             android:label="@string/watch_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -72,7 +72,7 @@
                 android:value="RANGED_VALUE,SHORT_TEXT"/>
         </service>
         <service
-            android:name="com.weartools.phonebattcomp.WatchTempComplicationService"
+            android:name="com.weartools.phonebattcomp.complication.WatchTempComplicationService"
             android:icon="@drawable/ic_temp"
             android:label="@string/temp_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -85,7 +85,7 @@
                 android:value="SHORT_TEXT"/>
         </service>
         <service
-            android:name="com.weartools.phonebattcomp.WatchVoltageComplicationService"
+            android:name="com.weartools.phonebattcomp.complication.WatchVoltageComplicationService"
             android:icon="@drawable/ic_voltage"
             android:label="@string/voltage_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -98,8 +98,7 @@
                 android:value="SHORT_TEXT"/>
         </service>
 
-        <receiver android:name=".MobileBatteryComplicationTapBroadcastReceiver" />
-        <receiver android:name=".TempVoltageTapBroadcastReceiver" />
+        <receiver android:name=".complication.ComplicationTapBroadcastReceiver" />
 
         <activity
             android:name="com.weartools.phonebattcomp.MainActivity"

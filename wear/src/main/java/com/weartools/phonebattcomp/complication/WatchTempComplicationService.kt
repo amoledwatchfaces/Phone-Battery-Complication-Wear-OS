@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weartools.phonebattcomp
+package com.weartools.phonebattcomp.complication
 
 import android.content.ComponentName
 import android.content.Context
@@ -28,6 +28,7 @@ import androidx.wear.watchface.complications.data.*
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.weartools.phonebattcomp.R
 
 class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
 
@@ -43,34 +44,33 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
         return ShortTextComplicationData.Builder(
             text = PlainComplicationText.Builder(text = "35°").build(),
             contentDescription = PlainComplicationText.Builder(text = getString(R.string.temp_battery_text)).build())
-            .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_temp)).build())
+            .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                R.drawable.ic_temp
+            )).build())
             .setTapAction(null)
             .build()
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
-        Log.d(TAG, "Update: ${request.complicationInstanceId}")
+        val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
+        val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
+        Log.d(TAG, "Updating Watch Temp Complication")
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         val tempunit = preferences.getBoolean(getString(R.string.temp_unit), true)
         val temp = (this.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))!!.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0)) / 10
 
-        val complicationPendingIntent = TempVoltageTapBroadcastReceiver.getToggleIntent(
-            this,
-            ComponentName(this,javaClass),
-            request.complicationInstanceId
-        )
-
         val level = if (tempunit) temp else temp*9/5+32
         val unit = if (tempunit) "°C" else "°F"
-
 
         return when (request.complicationType) {
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = "$level$unit").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.temp_battery_at)+level+unit).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_temp)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_temp
+                )).build())
                 .setTapAction(complicationPendingIntent)
                 .build()
 

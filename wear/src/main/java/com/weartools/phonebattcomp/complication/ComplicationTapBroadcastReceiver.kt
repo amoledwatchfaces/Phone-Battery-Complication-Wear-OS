@@ -14,11 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weartools.phonebattcomp
+package com.weartools.phonebattcomp.complication
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
-import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -26,36 +25,43 @@ import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
 import androidx.wear.remote.interactions.RemoteActivityHelper
-import com.weartools.phonebattcomp.MobileBatteryComplicationService.Companion.updateBatteryComplication
+import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
+import com.weartools.phonebattcomp.MainActivity
+import com.weartools.phonebattcomp.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
 
-class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
+class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onReceive(context: Context, intent: Intent) {
-
+        val args = intent.getArgs()
         val result = goAsync()
         val preferences = PreferenceManager.getDefaultSharedPreferences(context)
         val hasMobileApp = preferences.getBoolean(context.getString(R.string.key_pref_has_mobile_app), false)
 
         scope.launch {
             try {
-                if (!hasMobileApp) {
+                if (args.providerComponent.toString() == "ComponentInfo{com.weartools.phonebattcomp/com.weartools.phonebattcomp.complication.MobileBatteryComplicationService}" && (!hasMobileApp)){
                     openAppStoreOnPhone(context = context)
                     Log.d(TAG, "Opening Play Store Listing!")
                     Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()
-                    updateBatteryComplication(context = context)
-                } else
-                    updateBatteryComplication(context = context)
+                    ComplicationDataSourceUpdateRequester
+                        .create(context = context, complicationDataSourceComponent = args.providerComponent)
+                        .requestUpdate(args.complicationInstanceId)
+                }
+                else {
+                ComplicationDataSourceUpdateRequester
+                    .create(context = context, complicationDataSourceComponent = args.providerComponent)
+                    .requestUpdate(args.complicationInstanceId)
+                }
             } finally {
                 result.finish()
             }
         }
     }
-
     fun openAppStoreOnPhone(context: Context) {
         val remoteActivityHelper = RemoteActivityHelper(context)
         val intentAndroid = Intent(Intent.ACTION_VIEW)
@@ -65,28 +71,25 @@ class MobileBatteryComplicationTapBroadcastReceiver : BroadcastReceiver() {
     }
 
     companion object {
-        private val TAG = MobileBatteryComplicationTapBroadcastReceiver::class.java.simpleName
-        private const val EXTRA_DATA_SOURCE_COMPONENT =
-            "com.example.android.wearable.complicationsdatasource.action.DATA_SOURCE_COMPONENT"
-        private const val EXTRA_COMPLICATION_ID =
-            "com.example.android.wearable.complicationsdatasource.action.COMPLICATION_ID"
-
+        private val TAG = ComplicationTapBroadcastReceiver::class.java.simpleName
+        private const val EXTRA_ARGS = "arguments"
         fun getToggleIntent(
             context: Context,
-            dataSource: ComponentName,
-            complicationId: Int
+            args: ComplicationToggleArgs
         ): PendingIntent {
-            val intent = Intent(context, MobileBatteryComplicationTapBroadcastReceiver::class.java)
-            .putExtra(EXTRA_DATA_SOURCE_COMPONENT, dataSource)
-            .putExtra(EXTRA_COMPLICATION_ID, complicationId)
-
+            val intent = Intent(context, ComplicationTapBroadcastReceiver::class.java).apply {
+                putExtra(EXTRA_ARGS, args)
+            }
 
             return PendingIntent.getBroadcast(
                 context,
-                complicationId,
+                args.complicationInstanceId,
                 intent,
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
+        private fun Intent.getArgs(): ComplicationToggleArgs = requireNotNull(
+            extras?.getParcelable(EXTRA_ARGS)
+        )
     }
 }

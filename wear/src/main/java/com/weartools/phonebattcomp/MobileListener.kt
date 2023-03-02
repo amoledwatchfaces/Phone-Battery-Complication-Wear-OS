@@ -16,17 +16,19 @@
  */
 package com.weartools.phonebattcomp
 
+import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.util.Log
 import androidx.preference.PreferenceManager
 import com.google.android.gms.wearable.*
-import com.weartools.phonebattcomp.MobileBatteryComplicationService.Companion.updateBatteryComplication
+import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService.Companion.updateBatteryComplication
 
 private const val BATTERY_PATH = "/battery_level"
 private const val BATTERY_KEY= "battery_level"
 
 class MobileListener : WearableListenerService() {
 
+    @SuppressLint("VisibleForTests")
     override fun onDataChanged(dataEventBuffer: DataEventBuffer) {
         for (event in dataEventBuffer) {
             if (event.type == DataEvent.TYPE_CHANGED) {

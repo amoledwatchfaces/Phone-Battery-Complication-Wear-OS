@@ -14,8 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weartools.phonebattcomp
+package com.weartools.phonebattcomp.complication
 
+import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Icon
@@ -29,6 +30,7 @@ import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import com.weartools.phonebattcomp.R
 
 private const val REQUEST_PATH = "/request"
 private const val REQUEST_KEY = "request"
@@ -50,14 +52,18 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 max = 100f,
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
                 .setText(PlainComplicationText.Builder(text = "86%").build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_phone_icon
+                )).build())
                 .setTapAction(null)
                 .build()
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = "86%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_phone_icon
+                )).build())
                 .setTapAction(null)
                 .build()
 
@@ -71,7 +77,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
-        Log.d(TAG, "Update: ${request.complicationInstanceId}")
+        val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
+        val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
 
         val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
@@ -79,12 +86,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
         val level = preferences.getInt(getString(R.string.key_pref_mobile_battery_level), 0)
         val level2: String = if (level==0) "-" else "$level%"
-
-        val complicationPendingIntent = MobileBatteryComplicationTapBroadcastReceiver.getToggleIntent(
-            this,
-            ComponentName(this,javaClass),
-            request.complicationInstanceId
-        )
 
         if (!hasResult) { sendPhoneBatteryRequest(lastUpdateTime) }
         else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
@@ -98,8 +99,12 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                     .setText(PlainComplicationText.Builder(text = level2).build())
                     .setMonochromaticImage(
-                        if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build()}
-                        else { MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_disconnected)).build()})
+                        if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                            R.drawable.ic_phone_icon
+                        )).build()}
+                        else { MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                            R.drawable.ic_phone_disconnected
+                        )).build()})
                     .setTapAction(complicationPendingIntent)
                     .build()
 
@@ -107,8 +112,12 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 text = PlainComplicationText.Builder(text = level2).build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                 .setMonochromaticImage(
-                    if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build()}
-                    else { MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_disconnected)).build()})
+                    if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                        R.drawable.ic_phone_icon
+                    )).build()}
+                    else { MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                        R.drawable.ic_phone_disconnected
+                    )).build()})
                 .setTapAction(complicationPendingIntent)
                 .build()
 
@@ -122,6 +131,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         }
     }
 
+    @SuppressLint("VisibleForTests")
     private fun sendPhoneBatteryRequest (lastUpdateTime: Long) {
         val currentTime = System.currentTimeMillis()
         if (currentTime - lastUpdateTime >= 5000) {

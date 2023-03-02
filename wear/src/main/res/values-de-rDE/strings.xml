@@ -5,11 +5,14 @@
     <!-- Do not translate translatable="false" lines -->
     <string name="app_name">Smartphone-Akku Komplikation</string> <!-- Does not need to be translated, but it's recommended -->
 
-    <string name="settings">EINSTELLUNGEN</string>
-    <string name="setup1">EINRICHTUNG</string>
-    <string name="setup2">1. Smartphone-App installieren: [Link]</string>
-    <string name="setup3">2. Watchface anpassen\n3. Komplikation hinzufügen</string>
+    <string name="settings">Einstellungen</string>
     <string name="install_companion">Bitte Smartphone-Begleitapp installieren!</string>
+    <string name="check_phone">Öffnen Sie den Play Store auf Ihrem Handy…</string>
+    <string name="install_chip">Handy-App</string>
+
+    <string name="faq">FAQ</string>
+    <string name="app_info">Über App</string>
+    <string name="version">Ausführung</string>
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Smartphone-Akkustand</string>

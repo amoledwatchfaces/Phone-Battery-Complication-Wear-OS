@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weartools.phonebattcomp
+package com.weartools.phonebattcomp.complication
 
 import android.app.PendingIntent
 import android.content.Intent
@@ -26,6 +26,7 @@ import android.util.Log
 import androidx.wear.watchface.complications.data.*
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.weartools.phonebattcomp.R
 
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
@@ -37,7 +38,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         Log.d(TAG, "activated: $complicationInstanceId")
 
     }
-    private fun openScreen(): PendingIntent? {
+    fun openScreen(): PendingIntent? {
         val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
         batteryIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         return PendingIntent.getActivity(this, 0, batteryIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
@@ -52,14 +53,18 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                 max = 100f,
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_text)).build())
                 .setText(PlainComplicationText.Builder(text = "35%").build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_watch
+                )).build())
                 .setTapAction(null)
                 .build()
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = "35%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_text)).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_watch
+                )).build())
                 .setTapAction(null)
                 .build()
             else -> {null}
@@ -67,8 +72,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
-        Log.d(TAG, "Update: ${request.complicationInstanceId}")
-
+        Log.d(TAG, "Updating Watch Battery Complication")
         val level = this.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))!!.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
 
         return when (request.complicationType) {
@@ -79,14 +83,18 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                 max = 100f,
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
                 .setText(PlainComplicationText.Builder(text = "$level%").build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_watch
+                )).build())
                 .setTapAction(openScreen())
                 .build()
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder (
                 text = PlainComplicationText.Builder(text = "$level%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_watch
+                )).build())
                 .setTapAction(openScreen())
                 .build()
 
@@ -102,6 +110,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
     companion object {
         private val TAG = WatchBatteryComplicationService::class.java.simpleName
     }
+
 }
 
 

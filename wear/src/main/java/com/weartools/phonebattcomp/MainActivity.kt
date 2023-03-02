@@ -16,45 +16,29 @@
  */
 package com.weartools.phonebattcomp
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
 import android.content.SharedPreferences
-import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceFragment
+import androidx.activity.ComponentActivity
+import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Devices
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.preference.PreferenceManager
-import androidx.wear.remote.interactions.RemoteActivityHelper
-import com.weartools.phonebattcomp.databinding.ActivityMainBinding
+import androidx.wear.compose.material.*
+import com.weartools.phonebattcomp.complication.WatchTempComplicationService
+import com.weartools.phonebattcomp.presentation.PhoneBatteryAppScreen
+import com.weartools.phonebattcomp.theme.PhoneBatteryAppTheme
 
-class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListener  {
-
-    private lateinit var binding: ActivityMainBinding
+class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener  {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
-
-        binding.textViewMain2.setOnClickListener {
-            openAppStoreOnPhone(this)
+        setContent {
+            PhoneBatteryApp()
         }
-
-        MobileBatteryComplicationService.updateBatteryComplication(this)
-    }
-
-    class UTCPreferenceFragment : PreferenceFragment() {
-        @Deprecated("Deprecated in Java")
-        override fun onCreate(savedInstanceState: Bundle?) {
-            super.onCreate(savedInstanceState)
-            addPreferencesFromResource(R.xml.app_settings)
-        }
-    }
-
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        // update complications for new settings
-        WatchTempComplicationService.updateComplication(this)
     }
 
     override fun onResume() {
@@ -71,15 +55,36 @@ class MainActivity : Activity(), SharedPreferences.OnSharedPreferenceChangeListe
             .unregisterOnSharedPreferenceChangeListener(this)
     }
 
-    fun openAppStoreOnPhone(context: Context) {
-        val remoteActivityHelper = RemoteActivityHelper(context)
-        val intentAndroid = Intent(Intent.ACTION_VIEW)
-            .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setData(Uri.parse(PLAY_STORE_APP_URI))
-        remoteActivityHelper.startRemoteActivity(intentAndroid,targetNodeId = null)
+
+    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        // update complications for new settings
+        WatchTempComplicationService.updateComplication(this)
     }
 
     companion object {
         const val PLAY_STORE_APP_URI = "market://details?id=com.weartools.phonebattcomp"
     }
+}
+
+@Composable
+fun PhoneBatteryApp() {
+    PhoneBatteryAppTheme {
+        val listState = rememberScalingLazyListState()
+        Scaffold(
+            modifier = Modifier.fillMaxSize(),
+            timeText = { TimeText(modifier = Modifier.scrollAway(listState)) },
+            positionIndicator = { PositionIndicator(scalingLazyListState = listState) }
+        ) {
+            PhoneBatteryAppScreen(
+                listState = listState
+            )
+        }
+    }
+}
+
+
+@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
+@Composable
+fun DefaultPreview() {
+    PhoneBatteryApp()
 }

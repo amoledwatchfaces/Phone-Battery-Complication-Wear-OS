@@ -6,10 +6,13 @@
     <string name="app_name">Batéria Telefónu - Voliteľný prvok</string> <!-- Does not need to be translated, but it's recommended -->
 
     <string name="settings">Nastavenia</string>
-    <string name="setup1">Ako nastaviť?</string>
-    <string name="setup2">1. Nainštaluj mobilnú apku [Link]</string>
-    <string name="setup3">2. Prispôsob ciferník\n3. Pridaj voliteľný prvok</string>
     <string name="install_companion">Nainštaluj mobilnú apku</string>
+    <string name="check_phone">Otváram Play Store na mobile…</string>
+    <string name="install_chip">Mobilná appka</string>
+
+    <string name="faq">FAQ</string>
+    <string name="app_info">O applikácii</string>
+    <string name="version">Verzia</string>
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Batéria telefónu</string>
