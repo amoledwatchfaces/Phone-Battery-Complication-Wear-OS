@@ -14,7 +14,7 @@
     <string name="app_info">About</string>
     <string name="faq">FAQ</string>
     <string name="version">Version</string>
-    <string name="version_number" translatable="false">v2.0.0</string>
+    <string name="version_number" translatable="false">v2.0.4</string>
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Phone Battery level</string>
