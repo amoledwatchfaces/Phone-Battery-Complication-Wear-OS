@@ -32,6 +32,7 @@ import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.rememberScalingLazyListState
 import androidx.wear.remote.interactions.RemoteActivityHelper
+import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainActivity
 import com.weartools.phonebattcomp.Pref
 import com.weartools.phonebattcomp.R
@@ -66,7 +67,7 @@ fun PhoneBatteryAppScreen(
         item {
             DialogChip(
                 text = stringResource(id = R.string.version),
-                title = stringResource(id = R.string.version_number),
+                title = BuildConfig.VERSION_NAME,
             )
         }
         item {
