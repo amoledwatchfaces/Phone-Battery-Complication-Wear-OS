@@ -1,12 +1,17 @@
 package com.weartools.phonebattcomp.presentation
 
+import androidx.compose.foundation.focusable
+import androidx.compose.foundation.gestures.animateScrollBy
+import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -20,6 +25,7 @@ import androidx.wear.compose.material.dialog.Dialog
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.theme.PhoneBatteryAppTheme
 import com.weartools.phonebattcomp.theme.wearColorPalette
+import kotlinx.coroutines.launch
 
 @Composable
 fun DialogChip(
@@ -166,6 +172,7 @@ fun SectionText(modifier: Modifier = Modifier, text: String) {
     )
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ListItemsWidget(
     titles: String,
@@ -174,9 +181,21 @@ fun ListItemsWidget(
     val state = remember { mutableStateOf(true) }
 
     PhoneBatteryAppTheme {
-        val listState = rememberScalingLazyListState()
+        val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+        val focusRequester = remember { FocusRequester() }
+        val coroutineScope = rememberCoroutineScope()
+        LaunchedEffect(Unit) {focusRequester.requestFocus()}
         Dialog(
-
+            modifier = Modifier
+                .onPreRotaryScrollEvent {
+                    coroutineScope.launch {
+                        listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with anymateScrollBy 0f + OnPreRotary?
+                        listState.animateScrollBy(0f)
+                    }
+                    true
+                }
+                .focusRequester(focusRequester)
+                .focusable(),
             showDialog = state.value,
             scrollState = listState,
             onDismissRequest = { callback.invoke(-1) }

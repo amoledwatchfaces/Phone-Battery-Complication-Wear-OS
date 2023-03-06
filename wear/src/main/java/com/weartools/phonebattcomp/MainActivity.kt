@@ -22,7 +22,11 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.preference.PreferenceManager
@@ -70,14 +74,15 @@ class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceCh
 fun PhoneBatteryApp() {
     PhoneBatteryAppTheme {
         val listState = rememberScalingLazyListState()
+        val focusRequester = remember { FocusRequester() }
+        val coroutineScope = rememberCoroutineScope()
+        LaunchedEffect(Unit) {focusRequester.requestFocus()}
         Scaffold(
             modifier = Modifier.fillMaxSize(),
             timeText = { TimeText(modifier = Modifier.scrollAway(listState)) },
             positionIndicator = { PositionIndicator(scalingLazyListState = listState) }
         ) {
-            PhoneBatteryAppScreen(
-                listState = listState
-            )
+            PhoneBatteryAppScreen(listState = listState, focusRequester = focusRequester, coroutineScope = coroutineScope)
         }
     }
 }

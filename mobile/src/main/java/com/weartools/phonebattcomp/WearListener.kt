@@ -16,6 +16,7 @@
  */
 package com.weartools.phonebattcomp
 
+import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.IntentFilter
@@ -31,6 +32,7 @@ private const val BATTERY_KEY= "battery_level"
 
 class WearListener : WearableListenerService() {
 
+    @SuppressLint("VisibleForTests")
     override fun onDataChanged(dataEventBuffer: DataEventBuffer) {
 
         for (event in dataEventBuffer) {
@@ -56,6 +58,7 @@ class WearListener : WearableListenerService() {
             return 100 * level / scale
         }
 
+    @SuppressLint("VisibleForTests")
     private fun sendBatteryLevel (level: Int) {
         val dataMap = PutDataMapRequest.create(BATTERY_PATH)
         dataMap.dataMap.putInt(BATTERY_KEY, level)
