@@ -15,8 +15,12 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -27,6 +31,10 @@
         android:theme="@style/AppThemeCustom"
         tools:targetApi="31">
 
+        <uses-library
+            android:name="com.google.android.wearable"
+            android:required="false"/>
+
         <service
             android:name=".WearListener"
             android:enabled="true"
@@ -34,17 +42,17 @@
 
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
-                <data android:host="*" android:scheme="wear" />
+                <data android:scheme="wear" android:host="*"  />
             </intent-filter>
 
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-                <data android:host="*" android:path="/request" android:scheme="wear" />
+                <data android:scheme="wear" android:host="*" android:path="/request"  />
             </intent-filter>
         </service>
 
         <activity
-            android:name="com.weartools.phonebattcomp.MainActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

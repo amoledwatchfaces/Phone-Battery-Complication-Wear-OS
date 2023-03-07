@@ -27,6 +27,7 @@ import androidx.preference.PreferenceManager
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import com.weartools.phonebattcomp.MainActivity
+import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -48,9 +49,7 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
                     openAppStoreOnPhone(context = context)
                     Log.d(TAG, "Opening Play Store Listing!")
                     Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()
-                    ComplicationDataSourceUpdateRequester
-                        .create(context = context, complicationDataSourceComponent = args.providerComponent)
-                        .requestUpdate(args.complicationInstanceId)
+                    MobileListener.sendPhoneBatteryRequest(0, context)
                 }
                 else {
                 ComplicationDataSourceUpdateRequester

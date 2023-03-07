@@ -17,8 +17,9 @@
   -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-feature android:name="android.hardware.type.watch" />
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
 
     <application
         android:allowBackup="true"
@@ -26,27 +27,31 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
+
         <uses-library
             android:name="com.google.android.wearable"
             android:required="true" />
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="false" />
+
         <service
-            android:name="com.weartools.phonebattcomp.MobileListener"
+            android:name=".MobileListener"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
-                <data android:scheme="wear" android:host="*"/>
+                <data android:host="*" android:scheme="wear" />
             </intent-filter>
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
-                <data android:scheme="wear" android:host="*" android:path="/battery_level"/>
+                <data android:scheme="wear" android:host="*" android:path="/battery-level" />
             </intent-filter>
         </service>
+
+
         <service
-            android:name="com.weartools.phonebattcomp.complication.MobileBatteryComplicationService"
+            android:name=".complication.MobileBatteryComplicationService"
             android:icon="@drawable/ic_phone_icon"
             android:label="@string/phone_battery_preview_desc"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -59,7 +64,7 @@
                 android:value="RANGED_VALUE,SHORT_TEXT,LONG_TEXT"/>
         </service>
         <service
-            android:name="com.weartools.phonebattcomp.complication.WatchBatteryComplicationService"
+            android:name=".complication.WatchBatteryComplicationService"
             android:icon="@drawable/ic_watch"
             android:label="@string/watch_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -72,7 +77,7 @@
                 android:value="RANGED_VALUE,SHORT_TEXT"/>
         </service>
         <service
-            android:name="com.weartools.phonebattcomp.complication.WatchTempComplicationService"
+            android:name=".complication.WatchTempComplicationService"
             android:icon="@drawable/ic_temp"
             android:label="@string/temp_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -85,7 +90,7 @@
                 android:value="SHORT_TEXT"/>
         </service>
         <service
-            android:name="com.weartools.phonebattcomp.complication.WatchVoltageComplicationService"
+            android:name=".complication.WatchVoltageComplicationService"
             android:icon="@drawable/ic_voltage"
             android:label="@string/voltage_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -101,7 +106,7 @@
         <receiver android:name=".complication.ComplicationTapBroadcastReceiver" />
 
         <activity
-            android:name="com.weartools.phonebattcomp.MainActivity"
+            android:name=".MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

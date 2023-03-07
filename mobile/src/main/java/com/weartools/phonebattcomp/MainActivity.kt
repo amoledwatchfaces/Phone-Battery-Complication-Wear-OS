@@ -268,7 +268,7 @@ class MainActivity : AppCompatActivity(), OnCapabilityChangedListener {
 
     companion object {
         private val TAG = MainActivity::class.java.simpleName
-        private const val CAPABILITY_WEAR_APP = "verify_remote_example_wear_app"
+        private const val CAPABILITY_WEAR_APP = "wear"
         private const val PLAY_STORE_APP_URI = "market://details?id=com.weartools.phonebattcomp"
     }
 }

@@ -16,7 +16,6 @@
  */
 package com.weartools.phonebattcomp.complication
 
-import android.annotation.SuppressLint
 import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Icon
@@ -26,14 +25,8 @@ import androidx.wear.watchface.complications.data.*
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import com.google.android.gms.tasks.Task
-import com.google.android.gms.wearable.DataItem
-import com.google.android.gms.wearable.PutDataMapRequest
-import com.google.android.gms.wearable.Wearable
+import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-
-private const val REQUEST_PATH = "/request"
-private const val REQUEST_KEY = "request"
 
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
@@ -87,7 +80,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val level = preferences.getInt(getString(R.string.key_pref_mobile_battery_level), 0)
         val level2: String = if (level==0) "-" else "$level%"
 
-        if (!hasResult) { sendPhoneBatteryRequest(lastUpdateTime) }
+        if (!hasResult) { MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext) }
         else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
 
          return when (request.complicationType) {
@@ -129,24 +122,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
-    }
-
-    @SuppressLint("VisibleForTests")
-    private fun sendPhoneBatteryRequest (lastUpdateTime: Long) {
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastUpdateTime >= 5000) {
-            val dataMap = PutDataMapRequest.create(REQUEST_PATH)
-            dataMap.dataMap.putLong(REQUEST_KEY, currentTime)
-            val request = dataMap.asPutDataRequest()
-            request.setUrgent()
-
-            val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
-            dataItemTask
-                .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
-                .addOnFailureListener { e -> Log.e(TAG,"Sending Phone Battery request failed with error: $e") }
-        }
-        else
-            Log.e(TAG, "Too many updates")
     }
 
     override fun onComplicationDeactivated(complicationInstanceId: Int) {

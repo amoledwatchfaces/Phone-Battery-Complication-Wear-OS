@@ -22,33 +22,55 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
+import kotlinx.coroutines.*
+import kotlinx.coroutines.tasks.await
 
 private const val REQUEST_PATH = "/request"
-private const val REQUEST_KEY = "request"
-private const val BATTERY_PATH = "/battery_level"
-private const val BATTERY_KEY= "battery_level"
+private const val REQUEST_KEY = "request-key"
+private const val BATTERY_PATH = "/battery-level"
+private const val BATTERY_KEY= "battery-key"
 
 class WearListener : WearableListenerService() {
 
-    @SuppressLint("VisibleForTests")
-    override fun onDataChanged(dataEventBuffer: DataEventBuffer) {
+    private val dataClient by lazy { Wearable.getDataClient(this) }
+    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
-        for (event in dataEventBuffer) {
-            if (event.type == DataEvent.TYPE_CHANGED) {
-                val path = event.dataItem.uri.path
-                if (path == REQUEST_PATH) {
-                    val dataMapItem = DataMapItem.fromDataItem(event.dataItem)
-                    val requestTime = dataMapItem.dataMap.getLong(REQUEST_KEY)
-                    Log.v(TAG, "Received Phone Battery request with updateTime: $requestTime")
-                    val level = batteryLevel
-                    sendBatteryLevel(level) }
-                else { Log.e(TAG, "Unrecognized path: $path") } }
-            else if (event.type == DataEvent.TYPE_DELETED) { Log.v(TAG, "Data deleted : " + event.dataItem.toString()) }
-            else { Log.e(TAG, "Unknown data event Type = " + event.type) }
+    @SuppressLint("VisibleForTests")
+    override fun onDataChanged(dataEvents: DataEventBuffer) {
+        super.onDataChanged(dataEvents)
+
+        dataEvents.forEach { dataEvent ->
+            when (dataEvent.type) {
+                DataEvent.TYPE_CHANGED -> {
+                    when (dataEvent.dataItem.uri.path) {
+                        REQUEST_PATH -> {
+                            scope.launch {
+                                try {
+                                    val level = batteryLevel
+                                    val request = PutDataMapRequest.create(BATTERY_PATH).apply {
+                                        dataMap.putInt(BATTERY_KEY, level)
+                                    }
+                                        .asPutDataRequest()
+                                        .setUrgent()
+
+                                    dataClient.putDataItem(request).await()
+                                    Log.d(TAG, "Message sent successfully")
+                                } catch (cancellationException: CancellationException) {
+                                    throw cancellationException
+                                } catch (exception: Exception) {
+                                    Log.d(TAG, "Message failed")
+                                }
+                            }
+                        }
+                    }
+                }
+                DataEvent.TYPE_DELETED -> { Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString()) }
+                else -> { Log.e(TAG, "Unknown data event Type = " + dataEvent.type) }
+            }
+            }
+
         }
-    }
 
     private val batteryLevel: Int
         get() {
@@ -58,16 +80,8 @@ class WearListener : WearableListenerService() {
             return 100 * level / scale
         }
 
-    @SuppressLint("VisibleForTests")
-    private fun sendBatteryLevel (level: Int) {
-        val dataMap = PutDataMapRequest.create(BATTERY_PATH)
-        dataMap.dataMap.putInt(BATTERY_KEY, level)
-        val request = dataMap.asPutDataRequest()
-        request.setUrgent()
-
-        val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
-        dataItemTask
-            .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery level ($level) was successful: $dataItem") }
-            .addOnFailureListener { e -> Log.e(TAG,"Sending phone battery level FAILED with error: $e") }
+    override fun onDestroy() {
+        super.onDestroy()
+        scope.cancel()
     }
 }
