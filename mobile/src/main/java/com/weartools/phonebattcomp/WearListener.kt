@@ -22,54 +22,44 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 import kotlinx.coroutines.*
-import kotlinx.coroutines.tasks.await
 
-private const val REQUEST_PATH = "/request"
-private const val REQUEST_KEY = "request-key"
 private const val BATTERY_PATH = "/battery-level"
 private const val BATTERY_KEY= "battery-key"
+private const val REQUEST_PATH = "/request"
 
 class WearListener : WearableListenerService() {
 
-    private val dataClient by lazy { Wearable.getDataClient(this) }
-    private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-
     @SuppressLint("VisibleForTests")
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-        super.onDataChanged(dataEvents)
+        if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
 
         dataEvents.forEach { dataEvent ->
             when (dataEvent.type) {
                 DataEvent.TYPE_CHANGED -> {
                     when (dataEvent.dataItem.uri.path) {
                         REQUEST_PATH -> {
-                            scope.launch {
-                                try {
                                     val level = batteryLevel
-                                    val request = PutDataMapRequest.create(BATTERY_PATH).apply {
-                                        dataMap.putInt(BATTERY_KEY, level)
-                                    }
+                                    val request = PutDataMapRequest.create(BATTERY_PATH).apply{
+                                        dataMap.putInt(BATTERY_KEY, level) }
                                         .asPutDataRequest()
                                         .setUrgent()
 
-                                    dataClient.putDataItem(request).await()
-                                    Log.d(TAG, "Message sent successfully")
-                                } catch (cancellationException: CancellationException) {
-                                    throw cancellationException
-                                } catch (exception: Exception) {
-                                    Log.d(TAG, "Message failed")
+                                    val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
+                                    dataItemTask
+                                        .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
+                                        .addOnFailureListener { e -> Log.e(TAG,"Sending request task failed!: $e") }
+                                        .addOnCompleteListener{task -> Log.d(TAG,"Sending request Task complete!: $task")}
+                                    }
                                 }
-                            }
                         }
-                    }
-                }
+
                 DataEvent.TYPE_DELETED -> { Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString()) }
                 else -> { Log.e(TAG, "Unknown data event Type = " + dataEvent.type) }
             }
             }
-
         }
 
     private val batteryLevel: Int
@@ -80,8 +70,4 @@ class WearListener : WearableListenerService() {
             return 100 * level / scale
         }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.cancel()
-    }
 }

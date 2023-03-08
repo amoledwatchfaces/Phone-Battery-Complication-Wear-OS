@@ -21,6 +21,7 @@ import android.content.ContentValues
 import android.content.Context
 import android.util.Log
 import androidx.preference.PreferenceManager
+import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService.Companion.updateBatteryComplication
 
@@ -30,31 +31,34 @@ private const val REQUEST_PATH = "/request"
 private const val REQUEST_KEY = "request-key"
 
 class MobileListener : WearableListenerService() {
-    @SuppressLint("ApplySharedPref")
-    override fun onDataChanged(dataEventBuffer: DataEventBuffer) {
-        Log.d(TAG, "OnDataChanged!")
-        for (event in dataEventBuffer) {
-            val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-            if (event.type == DataEvent.TYPE_CHANGED) {
-                val path = event.dataItem.uri.path
-                if (path == BATTERY_PATH) {
-                    val dataMapItem = DataMapItem.fromDataItem(event.dataItem)
-                    val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
-                    preferences.edit()
-                        .putInt(getString(R.string.key_pref_mobile_battery_level), level)
-                        .putBoolean(getString(R.string.key_pref_has_mobile_app), true)
-                        .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
-                        .putBoolean(getString(R.string.key_pref_connected), true)
-                        .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
-                        .commit() //TODO: We are testing commit as we want the good value immediately
-                    Log.d(TAG, "Received Phone Battery Level: $level")
-                    updateBatteryComplication(this)
 
+    private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(this)}
+
+    @SuppressLint("ApplySharedPref", "VisibleForTests")
+    override fun onDataChanged(dataEvents: DataEventBuffer) {
+        if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
+
+        dataEvents.forEach { dataEvent ->
+            when (dataEvent.type) {
+                DataEvent.TYPE_CHANGED -> {
+                    when (dataEvent.dataItem.uri.path) {
+                        BATTERY_PATH -> {
+                            val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
+                            val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
+                            preferences.edit()
+                                .putInt(getString(R.string.key_pref_mobile_battery_level), level)
+                                .putBoolean(getString(R.string.key_pref_has_mobile_app), true)
+                                .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
+                                .putBoolean(getString(R.string.key_pref_connected), true)
+                                .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
+                                .commit()
+                            Log.d(TAG, "Received Phone Battery Level: $level")
+                            updateBatteryComplication(this)
+                        }
+                    }
                 }
-                else { Log.e(ContentValues.TAG, "Unrecognized path: $path") }
-            }
-            else if (event.type == DataEvent.TYPE_DELETED) {
-                Log.v(ContentValues.TAG, "Data deleted : " + event.dataItem.toString())
+                DataEvent.TYPE_DELETED -> {
+                Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString())
                 preferences.edit()
                     .putInt(getString(R.string.key_pref_mobile_battery_level), 0)
                     .putBoolean(getString(R.string.key_pref_has_mobile_app), false)
@@ -64,7 +68,8 @@ class MobileListener : WearableListenerService() {
                     .commit()
                 updateBatteryComplication(this)
             }
-            else { Log.e(ContentValues.TAG, "Unknown data event Type = " + event.type) }
+                else -> { Log.e(ContentValues.TAG, "Unknown data event Type = " + dataEvent.type) }
+        }
         }
     }
 
@@ -88,26 +93,21 @@ class MobileListener : WearableListenerService() {
         updateBatteryComplication(this)
     }
 
-    /*
-    override fun onDestroy() {
-        super.onDestroy()
-        scope.cancel()
-    }
-*/
-
     companion object {
+        @SuppressLint("VisibleForTests")
         fun sendPhoneBatteryRequest (lastUpdateTime: Long, context: Context) {
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastUpdateTime >= 5000) {
-                val dataMap = PutDataMapRequest.create(REQUEST_PATH)
-                dataMap.dataMap.putLong(REQUEST_KEY, currentTime)
-                val request = dataMap.asPutDataRequest()
-                request.setUrgent()
+                val request = PutDataMapRequest.create(REQUEST_PATH).apply{
+                    dataMap.putLong(REQUEST_KEY, currentTime) }
+                    .asPutDataRequest()
+                    .setUrgent()
 
-                val result = Wearable.getDataClient(context).putDataItem(request)
-                result
-                    .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery level Request was successful: $dataItem") }
-                    .addOnFailureListener { e -> Log.e(TAG,"Sending Phone battery level Request FAILED with error: $e") }
+                val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
+                dataItemTask
+                    .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
+                    .addOnFailureListener { e -> Log.e(TAG,"Sending request task failed!: $e") }
+                    .addOnCompleteListener{task -> Log.d(TAG,"Sending request Task complete!: $task")}
             }
             else
                 Log.e(TAG, "Too many updates")

@@ -4,14 +4,15 @@ plugins {
 }
 
 android {
+
     compileSdk 33
 
     defaultConfig {
         applicationId "com.weartools.phonebattcomp"
         minSdk 23
         targetSdk 33
-        versionCode 205
-        versionName "2.0.5"
+        versionCode 217
+        versionName "2.1.7"
     }
 
     buildFeatures {
@@ -21,7 +22,11 @@ android {
     buildTypes {
         release {
             minifyEnabled true
+            shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+        debug {
+            signingConfig signingConfigs.debug
         }
     }
     compileOptions {
