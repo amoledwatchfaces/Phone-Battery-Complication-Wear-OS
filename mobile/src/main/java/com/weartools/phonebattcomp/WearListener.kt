@@ -29,6 +29,7 @@ import kotlinx.coroutines.*
 private const val BATTERY_PATH = "/battery-level"
 private const val BATTERY_KEY= "battery-key"
 private const val REQUEST_PATH = "/request"
+private const val FORCE_UPDATE_KEY = "force-update-key"
 
 class WearListener : WearableListenerService() {
 
@@ -42,8 +43,12 @@ class WearListener : WearableListenerService() {
                     when (dataEvent.dataItem.uri.path) {
                         REQUEST_PATH -> {
                                     val level = batteryLevel
+                                    val forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY)
                                     val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                                        dataMap.putInt(BATTERY_KEY, level) }
+                                        dataMap.putInt(BATTERY_KEY, level)
+                                        if (forceUpdate){
+                                            dataMap.putLong("immediate-update", System.currentTimeMillis())
+                                        }}
                                         .asPutDataRequest()
                                         .setUrgent()
 

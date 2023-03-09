@@ -29,12 +29,13 @@ private const val BATTERY_PATH = "/battery-level"
 private const val BATTERY_KEY= "battery-key"
 private const val REQUEST_PATH = "/request"
 private const val REQUEST_KEY = "request-key"
+private const val FORCE_UPDATE_KEY = "force-update-key"
 
 class MobileListener : WearableListenerService() {
 
     private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(this)}
 
-    @SuppressLint("ApplySharedPref", "VisibleForTests")
+    @SuppressLint("VisibleForTests")
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
 
@@ -51,7 +52,7 @@ class MobileListener : WearableListenerService() {
                                 .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
                                 .putBoolean(getString(R.string.key_pref_connected), true)
                                 .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
-                                .commit()
+                                .apply()
                             Log.d(TAG, "Received Phone Battery Level: $level")
                             updateBatteryComplication(this)
                         }
@@ -65,7 +66,8 @@ class MobileListener : WearableListenerService() {
                     .putBoolean(getString(R.string.key_pref_after_mobile_result), false)
                     .putBoolean(getString(R.string.key_pref_connected), false)
                     .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
-                    .commit()
+                    .apply()
+                Log.d(TAG, "Phone Companion Uninstalled!")
                 updateBatteryComplication(this)
             }
                 else -> { Log.e(ContentValues.TAG, "Unknown data event Type = " + dataEvent.type) }
@@ -75,31 +77,31 @@ class MobileListener : WearableListenerService() {
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
         val mobileApp = preferences.getBoolean(getString(R.string.key_pref_has_mobile_app), false)
-        val editor = preferences.edit()
         if (capabilityInfo.nodes.size > 0 && mobileApp) {
 
-                    editor.putBoolean(getString(R.string.key_pref_connected), true)
-                          .putBoolean(getString(R.string.key_pref_after_mobile_result), false)
-                          .apply()
+            sendPhoneBatteryRequest(0,this, forceUpdate = true)
         }
         else {
-            editor.putBoolean(getString(R.string.key_pref_connected), false)
+            preferences.edit()
+                .putBoolean(getString(R.string.key_pref_connected), false)
                 .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
                 .apply()
+            updateBatteryComplication(this)
+
         }
         Log.d(TAG, "Capability changed: " + capabilityInfo.nodes.size)
-        updateBatteryComplication(this)
+        //Executors.newSingleThreadScheduledExecutor().schedule({ updateBatteryComplication(this) }, 1, TimeUnit.SECONDS) //TODO: Delayed complication update
     }
 
     companion object {
         @SuppressLint("VisibleForTests")
-        fun sendPhoneBatteryRequest (lastUpdateTime: Long, context: Context) {
+        fun sendPhoneBatteryRequest (lastUpdateTime: Long, context: Context, forceUpdate: Boolean) {
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastUpdateTime >= 5000) {
                 val request = PutDataMapRequest.create(REQUEST_PATH).apply{
-                    dataMap.putLong(REQUEST_KEY, currentTime) }
+                    dataMap.putLong(REQUEST_KEY, currentTime)
+                    dataMap.putBoolean(FORCE_UPDATE_KEY, forceUpdate)}
                     .asPutDataRequest()
                     .setUrgent()
 
