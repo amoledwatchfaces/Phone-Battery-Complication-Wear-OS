@@ -11,8 +11,8 @@ android {
         applicationId "com.weartools.phonebattcomp"
         minSdk 23
         targetSdk 33
-        versionCode 219
-        versionName "2.1.9"
+        versionCode 221
+        versionName "2.2.1"
     }
 
     buildFeatures {
