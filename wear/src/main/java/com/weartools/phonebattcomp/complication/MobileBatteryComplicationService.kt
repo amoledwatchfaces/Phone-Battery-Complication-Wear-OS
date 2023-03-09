@@ -33,7 +33,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType)
     {
         super.onComplicationActivated(complicationInstanceId, type)
-        Log.d(TAG, "Activated: $complicationInstanceId")
+        MobileListener.sendPhoneBatteryRequest(0,this,true)
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
@@ -80,7 +80,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val level = preferences.getInt(getString(R.string.key_pref_mobile_battery_level), 0)
         val level2: String = if (level==0) "-" else "$level%"
 
-        if (!hasResult) { MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, forceUpdate = false) }
+        if (!hasResult) { MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, false) }
         else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
 
          return when (request.complicationType) {

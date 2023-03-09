@@ -46,7 +46,7 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
         scope.launch {
             try {
                 if (args.providerComponent.toString() == "ComponentInfo{com.weartools.phonebattcomp/com.weartools.phonebattcomp.complication.MobileBatteryComplicationService}" && (!hasMobileApp)){
-                    MobileListener.sendPhoneBatteryRequest(0, context, forceUpdate = false)
+                    MobileListener.sendPhoneBatteryRequest(0, context, false)
                     openAppStoreOnPhone(context = context)
                     Log.d(TAG, "Opening Play Store Listing!")
                     Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()
