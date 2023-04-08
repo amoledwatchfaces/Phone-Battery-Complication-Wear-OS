@@ -11,8 +11,8 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 220,
-      "versionName": "2.2.0",
+      "versionCode": 222,
+      "versionName": "2.2.2",
       "outputFile": "wear-release.apk"
     }
   ],

@@ -28,10 +28,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppThemeCustom">
 
-        <uses-library
-            android:name="com.google.android.wearable"
-            android:required="false"/>
-
         <service
             android:name=".WearListener"
             android:exported="true">

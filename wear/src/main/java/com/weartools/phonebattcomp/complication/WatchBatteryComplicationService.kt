@@ -67,6 +67,24 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                 )).build())
                 .setTapAction(null)
                 .build()
+            ComplicationType.MONOCHROMATIC_IMAGE -> MonochromaticImageComplicationData.Builder(
+                monochromaticImage = MonochromaticImage.Builder(
+                    Icon.createWithResource(this, R.drawable.ic_battery_7)
+                )
+                    .build(),
+                contentDescription = PlainComplicationText.Builder(text = "MONO_IMG.").build()
+            )
+                .setTapAction(null)
+                .build()
+            ComplicationType.SMALL_IMAGE -> SmallImageComplicationData.Builder(
+                smallImage = SmallImage.Builder(
+                    image = Icon.createWithResource(this, R.drawable.ic_battery_7),
+                    type = SmallImageType.ICON
+                ).build(),
+                contentDescription = PlainComplicationText.Builder(text = "SMALL_IMAGE.").build()
+            )
+                .setTapAction(null)
+                .build()
             else -> {null}
         }
     }
@@ -95,6 +113,49 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                 .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
                     R.drawable.ic_watch
                 )).build())
+                .setTapAction(openScreen())
+                .build()
+
+            ComplicationType.MONOCHROMATIC_IMAGE -> MonochromaticImageComplicationData.Builder(
+                monochromaticImage = MonochromaticImage.Builder(
+                    Icon.createWithResource(this, when (level) {
+                        in 0..5 -> R.drawable.ic_batt_low
+                        in 6..15 -> R.drawable.ic_battery_1
+                        in 16..25 -> R.drawable.ic_battery_2
+                        in 26..35 -> R.drawable.ic_battery_3
+                        in 36..45 -> R.drawable.ic_battery_4
+                        in 46..55 -> R.drawable.ic_battery_5
+                        in 56..65 -> R.drawable.ic_battery_6
+                        in 66..75 -> R.drawable.ic_battery_7
+                        in 76..85 -> R.drawable.ic_battery_8
+                        in 86..95 -> R.drawable.ic_battery_9
+                        else -> R.drawable.ic_battery_10
+                    })
+                ).build(),
+                contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
+                .setTapAction(openScreen())
+                .build()
+
+
+            ComplicationType.SMALL_IMAGE -> SmallImageComplicationData.Builder(
+                smallImage = SmallImage.Builder(
+                    image = Icon.createWithResource(this, when (level) {
+                        in 0..5 -> R.drawable.ic_batt_low
+                        in 6..15 -> R.drawable.ic_battery_1
+                        in 16..25 -> R.drawable.ic_battery_2
+                        in 26..35 -> R.drawable.ic_battery_3
+                        in 36..45 -> R.drawable.ic_battery_4
+                        in 46..55 -> R.drawable.ic_battery_5
+                        in 56..65 -> R.drawable.ic_battery_6
+                        in 66..75 -> R.drawable.ic_battery_7
+                        in 76..85 -> R.drawable.ic_battery_8
+                        in 86..95 -> R.drawable.ic_battery_9
+                        else -> R.drawable.ic_battery_10
+                    }),
+                    type = SmallImageType.ICON
+                ).build(),
+                contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build()
+            )
                 .setTapAction(openScreen())
                 .build()
 

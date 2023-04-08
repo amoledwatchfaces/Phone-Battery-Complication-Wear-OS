@@ -27,9 +27,6 @@
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
 
-        <uses-library
-            android:name="com.google.android.wearable"
-            android:required="true" />
         <meta-data
             android:name="com.google.android.wearable.standalone"
             android:value="false" />
@@ -72,7 +69,7 @@
             </intent-filter>
             <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="100"/>
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="RANGED_VALUE,SHORT_TEXT"/>
+                android:value="RANGED_VALUE,SHORT_TEXT,ICON,SMALL_IMAGE"/>
         </service>
         <service
             android:name=".complication.WatchTempComplicationService"
