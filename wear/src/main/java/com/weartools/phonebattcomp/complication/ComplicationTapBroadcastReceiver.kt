@@ -21,6 +21,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.preference.PreferenceManager
@@ -89,8 +90,16 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
-        private fun Intent.getArgs(): ComplicationToggleArgs = requireNotNull(
-            extras?.getParcelable(EXTRA_ARGS)
-        )
+        private fun Intent.getArgs(): ComplicationToggleArgs =
+            when {
+                Build.VERSION.SDK_INT >= 33 ->
+                    requireNotNull(
+                        extras?.getParcelable(EXTRA_ARGS, ComplicationToggleArgs::class.java)
+                    )
+                else -> requireNotNull(
+                    @Suppress("DEPRECATION")
+                    extras?.getParcelable(EXTRA_ARGS)
+                )
+            }
     }
 }

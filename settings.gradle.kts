@@ -5,6 +5,7 @@ pluginManagement {
         mavenCentral()
     }
 }
+@Suppress("UnstableApiUsage") //TODO: CHECK LATER
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -13,5 +14,4 @@ dependencyResolutionManagement {
     }
 }
 rootProject.name = "Phone Battery Complication"
-include ':mobile'
-include ':wear'
+include(":mobile", ":wear")
