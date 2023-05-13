@@ -13,8 +13,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 233
-        versionName = "2.3.3"
+        versionCode = 10000235
+        versionName = "2.3.5"
     }
 
     buildTypes {
@@ -57,7 +57,6 @@ dependencies {
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     implementation ("androidx.preference:preference-ktx:1.2.0")
-    //implementation 'androidx.work:work-runtime:2.8.0'
 
     // COMPOSE
     implementation ("androidx.core:core-ktx:1.10.0")
@@ -65,7 +64,8 @@ dependencies {
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.7.0")
+    implementation ("androidx.activity:activity-compose:1.7.1")
+    implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")

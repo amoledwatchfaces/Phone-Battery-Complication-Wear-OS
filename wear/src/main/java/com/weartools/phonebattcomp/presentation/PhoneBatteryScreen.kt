@@ -15,6 +15,7 @@
  */
 package com.weartools.phonebattcomp.presentation
 
+import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -25,8 +26,15 @@ import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.outlined.Info
+import androidx.compose.material.icons.outlined.InstallMobile
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -35,6 +43,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.material.AutoCenteringParams
+import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.rememberScalingLazyListState
@@ -43,10 +52,10 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainActivity
 import com.weartools.phonebattcomp.Pref
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.theme.wearColorPalette
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun PhoneBatteryAppScreen(
     listState: ScalingLazyListState = rememberScalingLazyListState(),
@@ -63,7 +72,7 @@ fun PhoneBatteryAppScreen(
         modifier = Modifier.fillMaxSize()
             .onPreRotaryScrollEvent {
                 coroutineScope.launch {
-                    listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with anymateScrollBy 0f + OnPreRotary?
+                    listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
                     listState.animateScrollBy(0f)
                 }
                 true
@@ -82,20 +91,24 @@ fun PhoneBatteryAppScreen(
         item {
             SimpleChip(
                 text = stringResource(id = R.string.faq),
-                iconId = R.drawable.ic_help,
+                icon = { Icon(modifier = Modifier.padding(4.dp),imageVector = Icons.Filled.Help, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
                 onClick = { openHowTo=openHowTo.not() }
             )
         }
+
         item {
             DialogChip(
                 text = stringResource(id = R.string.version),
+                icon = { Icon(imageVector = Icons.Outlined.Info, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
                 title = BuildConfig.VERSION_NAME,
+                onClick = {context.openPlayStore()}
             )
         }
+
         item {
             SimpleChip(
                 text = stringResource(id = R.string.install_chip),
-                iconId = R.drawable.ic_playstore,
+                icon = { Icon(modifier = Modifier.padding(5.dp), imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
                 onClick = { openAppStoreOnPhone(context) }
             )
         }
@@ -132,7 +145,13 @@ fun PhoneBatteryAppScreen(
     }
 
 }
-
+fun Context.openPlayStore() {
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
+    } catch (e: ActivityNotFoundException) {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
+    }
+}
 fun openAppStoreOnPhone(context: Context) {
     val remoteActivityHelper = RemoteActivityHelper(context)
     val intentAndroid = Intent(Intent.ACTION_VIEW)

@@ -3,25 +3,41 @@ package com.weartools.phonebattcomp.presentation
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
-import androidx.compose.foundation.layout.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
+import androidx.compose.foundation.layout.padding
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.material.*
+import androidx.wear.compose.material.Chip
+import androidx.wear.compose.material.ChipDefaults
+import androidx.wear.compose.material.CompactChip
+import androidx.wear.compose.material.Icon
+import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.TitleCard
+import androidx.wear.compose.material.ToggleChip
+import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
+import androidx.wear.compose.material.rememberScalingLazyListState
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.theme.PhoneBatteryAppTheme
 import com.weartools.phonebattcomp.theme.wearColorPalette
@@ -32,6 +48,7 @@ fun DialogChip(
     text: String,
     title: String,
     onClick: (() -> Unit)? = null,
+    icon: @Composable (BoxScope.() -> Unit)?
 ) {
     Chip(
         modifier = Modifier
@@ -40,6 +57,7 @@ fun DialogChip(
         onClick = {
             onClick?.invoke()
         },
+        icon = icon,
         colors = ChipDefaults.gradientBackgroundChipColors(
             startBackgroundColor = Color(0xff2c2c2d),
             endBackgroundColor = Color(0xff2c2c2d)
@@ -60,8 +78,8 @@ fun DialogChip(
 @Composable
 fun SimpleChip(
     text: String,
-    iconId: Int,
     onClick: (() -> Unit)? = null,
+    icon: @Composable (BoxScope.() -> Unit)?
 ) {
     CompactChip(
         modifier = Modifier
@@ -81,16 +99,7 @@ fun SimpleChip(
                 overflow = TextOverflow.Ellipsis
             )
         },
-        icon = {
-            Icon(
-                painter = painterResource(iconId),
-                contentDescription = "Mark Castle",
-                tint = wearColorPalette.secondaryVariant,
-                modifier = Modifier
-                    .size(ChipDefaults.SmallIconSize)
-                    .wrapContentSize(align = Alignment.Center)
-            )
-        }
+        icon = icon
     )
 }
 
@@ -172,7 +181,6 @@ fun SectionText(modifier: Modifier = Modifier, text: String) {
     )
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun ListItemsWidget(
     titles: String,
@@ -189,7 +197,7 @@ fun ListItemsWidget(
             modifier = Modifier
                 .onPreRotaryScrollEvent {
                     coroutineScope.launch {
-                        listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with anymateScrollBy 0f + OnPreRotary?
+                        listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
                         listState.animateScrollBy(0f)
                     }
                     true

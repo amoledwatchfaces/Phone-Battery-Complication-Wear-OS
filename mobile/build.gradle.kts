@@ -12,8 +12,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 23
         targetSdk = 33
-        versionCode = 232
-        versionName = "2.3.2"
+        versionCode = 10000234
+        versionName = "2.3.5"
     }
 
     compileOptions {
@@ -51,10 +51,10 @@ dependencies {
     implementation ("androidx.legacy:legacy-support-v4:1.0.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
     implementation ("androidx.preference:preference:1.2.0")
-    implementation ("com.google.android.material:material:1.8.0")
+    implementation ("com.google.android.material:material:1.9.0")
 
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
-    implementation ("androidx.activity:activity-ktx:1.7.0")
+    implementation ("androidx.activity:activity-ktx:1.7.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
