@@ -23,13 +23,15 @@ import android.widget.Toast
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.gestures.scrollBy
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.outlined.ContactSupport
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
+import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -42,16 +44,19 @@ import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material.AutoCenteringParams
 import androidx.wear.compose.material.Icon
+import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.compose.material.ScalingLazyColumn
 import androidx.wear.compose.material.ScalingLazyListState
 import androidx.wear.compose.material.rememberScalingLazyListState
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainActivity
-import com.weartools.phonebattcomp.Pref
+import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.data.PassiveDataViewModel
 import com.weartools.phonebattcomp.theme.wearColorPalette
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
@@ -60,19 +65,21 @@ import kotlinx.coroutines.launch
 fun PhoneBatteryAppScreen(
     listState: ScalingLazyListState = rememberScalingLazyListState(),
     focusRequester: FocusRequester,
-    coroutineScope: CoroutineScope
+    coroutineScope: CoroutineScope,
+    nodeName: String,
+    batteryLevel: Int,
+    tempUnit: Boolean
 ) {
-
+    val viewModel: PassiveDataViewModel = viewModel()
     val context = LocalContext.current
-    val pref = Pref(context)
-    var militaryTime by remember { mutableStateOf(pref.getTempUnit()) }
     var openHowTo by remember{ mutableStateOf(false) }
 
     ScalingLazyColumn(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .onPreRotaryScrollEvent {
                 coroutineScope.launch {
-                    listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
+                    listState.scrollBy(it.verticalScrollPixels * 2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
                     listState.animateScrollBy(0f)
                 }
                 true
@@ -89,13 +96,15 @@ fun PhoneBatteryAppScreen(
         // APP INFO SECTION
         //item { PreferenceCategory(title = stringResource(id = R.string.app_info)) }
         item {
-            SimpleChip(
-                text = stringResource(id = R.string.faq),
-                icon = { Icon(modifier = Modifier.padding(4.dp),imageVector = Icons.Filled.Help, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
-                onClick = { openHowTo=openHowTo.not() }
+            DialogChip(
+                text = if (batteryLevel==0) "--" else "$batteryLevel %",
+                icon = { Icon(imageVector = Icons.Outlined.Smartphone, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
+                title = nodeName,
+                onClick = {
+                    MobileListener.sendPhoneBatteryRequest(0,context,true)
+                }
             )
         }
-
         item {
             DialogChip(
                 text = stringResource(id = R.string.version),
@@ -104,13 +113,20 @@ fun PhoneBatteryAppScreen(
                 onClick = {context.openPlayStore()}
             )
         }
-
-        item {
-            SimpleChip(
-                text = stringResource(id = R.string.install_chip),
-                icon = { Icon(modifier = Modifier.padding(5.dp), imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
-                onClick = { openAppStoreOnPhone(context) }
-            )
+        item{
+            Row(modifier = Modifier.padding(top = 12.dp)) {
+                OutlinedButton(
+                    modifier = Modifier.padding(end = 12.dp),
+                    onClick = {openHowTo=openHowTo.not()}
+                ) {
+                    Icon(imageVector = Icons.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                }
+                OutlinedButton(
+                    onClick = {openHowTo=openHowTo.not()}
+                ) {
+                    Icon(imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                }
+            }
         }
 
         // TEMPERATURE UNIT COMPLICATION
@@ -120,11 +136,8 @@ fun PhoneBatteryAppScreen(
                 label = stringResource(id = R.string.temp_unit_pref_title),
                 secondaryLabelOn = stringResource(id = R.string.temp_unit_C),
                 secondaryLabelOff = stringResource(id = R.string.temp_unit_F),
-                checked = militaryTime,
-                onCheckedChange = {
-                    militaryTime=it
-                    pref.setTempUnit(it)
-                }
+                checked = tempUnit,
+                onCheckedChange = {viewModel.toggleEnabled(context)}
             )
         }
 

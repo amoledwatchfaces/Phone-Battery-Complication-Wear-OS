@@ -66,11 +66,22 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
     implementation ("androidx.activity:activity-compose:1.7.1")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
     // PREF
+
+    implementation ("androidx.wear:wear-remote-interactions:1.0.0")
+    implementation ("androidx.activity:activity-ktx:1.7.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+
+    // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
+
 }

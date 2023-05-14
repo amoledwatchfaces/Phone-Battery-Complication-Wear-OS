@@ -249,7 +249,7 @@ fun HowToCard(title: String, text: String) {
     TitleCard(
         modifier = Modifier.padding(horizontal = 10.dp),
         onClick = {  },
-        title = { Text(title, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = wearColorPalette.primary, lineHeight = 16.sp) },
+        title = { Text(title, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = wearColorPalette.secondaryVariant, lineHeight = 16.sp) },
         contentColor = MaterialTheme.colors.onSurface,
         titleColor = MaterialTheme.colors.onSurface
     ) {

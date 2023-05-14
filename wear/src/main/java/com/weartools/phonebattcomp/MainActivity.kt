@@ -16,80 +16,103 @@
  */
 package com.weartools.phonebattcomp
 
-import android.content.SharedPreferences
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.tooling.preview.Devices
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.preference.PreferenceManager
-import androidx.wear.compose.material.*
-import com.weartools.phonebattcomp.complication.WatchTempComplicationService
-import com.weartools.phonebattcomp.presentation.PhoneBatteryAppScreen
-import com.weartools.phonebattcomp.theme.PhoneBatteryAppTheme
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.CapabilityClient.OnCapabilityChangedListener
+import com.google.android.gms.wearable.CapabilityInfo
+import com.google.android.gms.wearable.Wearable
+import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.presentation.PhoneBatteryApp
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.withContext
 
-class MainActivity : ComponentActivity(), SharedPreferences.OnSharedPreferenceChangeListener  {
+class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
+
+    private lateinit var capabilityClient: CapabilityClient
+    private val repository by lazy { DataRepository(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        capabilityClient = Wearable.getCapabilityClient(this)
+        val passiveDataRepository = (application as MainApplication).dataRepository
+
+        MobileListener.sendPhoneBatteryRequest(0,this,true)
+
+        lifecycleScope.launch {
+            lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
+                launch {
+                    // Initial request for devices with our capability, aka, our Wear app installed.
+                    findWearDevicesWithApp()
+                }
+            }
+        }
+
         setContent {
-            PhoneBatteryApp()
+            PhoneBatteryApp(
+                dataRepository = passiveDataRepository,
+            )
         }
     }
 
     override fun onResume() {
         super.onResume()
-        PreferenceManager
-            .getDefaultSharedPreferences(this)
-            .registerOnSharedPreferenceChangeListener(this)
+        MobileListener.sendPhoneBatteryRequest(0,this,true)
+        capabilityClient.addListener(this, CAPABILITY_MOBILE_APP)
     }
 
     override fun onPause() {
         super.onPause()
-        PreferenceManager
-            .getDefaultSharedPreferences(this)
-            .unregisterOnSharedPreferenceChangeListener(this)
+        capabilityClient.removeListener(this, CAPABILITY_MOBILE_APP)
+
     }
 
+    override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
+        Log.d(TAG, "onCapabilityChanged(): $capabilityInfo")
+        capabilityInfo.nodes.firstOrNull()?.let {
+            runBlocking {
+                repository.storeNodeName(it.displayName)
+            }
+        }
+    }
 
-    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        // update complications for new settings
-        WatchTempComplicationService.updateComplication(this)
+    private suspend fun findWearDevicesWithApp() {
+        Log.d(TAG, "findWearDevicesWithApp()")
+
+        try {
+            val capabilityInfo = capabilityClient
+                .getCapability(CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_ALL)
+                .await()
+
+            withContext(Dispatchers.Main) {
+                capabilityInfo.nodes.firstOrNull()?.let {
+                    repository.storeNodeName(it.displayName)
+                }
+            }
+        } catch (cancellationException: CancellationException) {
+            // Request was cancelled normally
+            throw cancellationException
+        } catch (throwable: Throwable) {
+            Log.d(TAG, "Capability request failed to return any results.")
+        }
     }
 
     companion object {
         const val PLAY_STORE_APP_URI = "market://details?id=com.weartools.phonebattcomp"
-    }
-}
-
-@Composable
-fun PhoneBatteryApp() {
-    PhoneBatteryAppTheme {
-        val listState = rememberScalingLazyListState()
-        val focusRequester = remember { FocusRequester() }
-        val coroutineScope = rememberCoroutineScope()
-        LaunchedEffect(Unit) {focusRequester.requestFocus()}
-        Scaffold(
-            modifier = Modifier.fillMaxSize(),
-            timeText = { TimeText(modifier = Modifier.scrollAway(listState)) },
-            positionIndicator = { PositionIndicator(scalingLazyListState = listState) }
-        ) {
-            PhoneBatteryAppScreen(listState = listState, focusRequester = focusRequester, coroutineScope = coroutineScope)
-        }
+        private val TAG = MainActivity::class.java.simpleName
+        private const val CAPABILITY_MOBILE_APP = "mobile"
     }
 }
 
 
-@Preview(device = Devices.WEAR_OS_SMALL_ROUND, showSystemUi = true)
-@Composable
-fun DefaultPreview() {
-    PhoneBatteryApp()
-}
+

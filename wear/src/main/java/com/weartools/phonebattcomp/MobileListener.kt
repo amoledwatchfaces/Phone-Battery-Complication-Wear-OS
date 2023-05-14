@@ -24,6 +24,8 @@ import androidx.preference.PreferenceManager
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService.Companion.updateBatteryComplication
+import com.weartools.phonebattcomp.data.DataRepository
+import kotlinx.coroutines.runBlocking
 
 private const val BATTERY_PATH = "/battery-level"
 private const val BATTERY_KEY= "battery-key"
@@ -34,6 +36,7 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 class MobileListener : WearableListenerService() {
 
     private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(this)}
+    private val repository by lazy { DataRepository(this) }
 
     @SuppressLint("VisibleForTests")
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -46,6 +49,7 @@ class MobileListener : WearableListenerService() {
                         BATTERY_PATH -> {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
                             val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
+                            runBlocking { repository.storeBatteryLevel(level) } //TODO: IMPROVE
                             preferences.edit()
                                 .putInt(getString(R.string.key_pref_mobile_battery_level), level)
                                 .putBoolean(getString(R.string.key_pref_has_mobile_app), true)
@@ -91,7 +95,6 @@ class MobileListener : WearableListenerService() {
 
         }
         Log.d(TAG, "Capability changed: " + capabilityInfo.nodes.size)
-        //Executors.newSingleThreadScheduledExecutor().schedule({ updateBatteryComplication(this) }, 1, TimeUnit.SECONDS) //TODO: Delayed complication update
     }
 
     companion object {

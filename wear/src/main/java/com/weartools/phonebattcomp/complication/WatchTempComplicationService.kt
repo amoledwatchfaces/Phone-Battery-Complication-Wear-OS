@@ -23,14 +23,21 @@ import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.os.BatteryManager
 import android.util.Log
-import androidx.preference.PreferenceManager
-import androidx.wear.watchface.complications.data.*
+import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.MonochromaticImage
+import androidx.wear.watchface.complications.data.PlainComplicationText
+import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.data.DataRepository
+import kotlinx.coroutines.flow.first
 
 class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
+
+    private val repository by lazy { DataRepository(this) }
 
     override fun onComplicationActivated(
         complicationInstanceId: Int,
@@ -56,8 +63,10 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
         Log.d(TAG, "Updating Watch Temp Complication")
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val tempunit = preferences.getBoolean(getString(R.string.temp_unit), true)
+
+        val tempunit = repository.tempUnit.first()
+        Log.d(TAG, "Temp Unit: $tempunit")
+
         val temp = (this.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))!!.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0)) / 10
 
         val level = if (tempunit) temp else temp*9/5+32
