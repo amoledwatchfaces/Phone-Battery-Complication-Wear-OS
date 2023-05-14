@@ -60,7 +60,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
         setContent {
             PhoneBatteryApp(
-                dataRepository = passiveDataRepository,
+                dataRepository = passiveDataRepository
             )
         }
     }

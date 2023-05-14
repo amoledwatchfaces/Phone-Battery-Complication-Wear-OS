@@ -20,11 +20,11 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.util.Log
-import androidx.preference.PreferenceManager
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService.Companion.updateBatteryComplication
 import com.weartools.phonebattcomp.data.DataRepository
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
 private const val BATTERY_PATH = "/battery-level"
@@ -35,7 +35,6 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 
 class MobileListener : WearableListenerService() {
 
-    private val preferences by lazy { PreferenceManager.getDefaultSharedPreferences(this)}
     private val repository by lazy { DataRepository(this) }
 
     @SuppressLint("VisibleForTests")
@@ -49,14 +48,13 @@ class MobileListener : WearableListenerService() {
                         BATTERY_PATH -> {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
                             val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
-                            runBlocking { repository.storeBatteryLevel(level) } //TODO: IMPROVE
-                            preferences.edit()
-                                .putInt(getString(R.string.key_pref_mobile_battery_level), level)
-                                .putBoolean(getString(R.string.key_pref_has_mobile_app), true)
-                                .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
-                                .putBoolean(getString(R.string.key_pref_connected), true)
-                                .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
-                                .apply()
+                            runBlocking { repository.storeResponse(
+                                batteryLevel = level,
+                                hasMobileApp = true,
+                                afterMobileResult = true,
+                                isConnected = true,
+                                lastUpdate = System.currentTimeMillis()
+                            ) }
                             Log.d(TAG, "Received Phone Battery Level: $level")
                             updateBatteryComplication(this)
                         }
@@ -64,13 +62,13 @@ class MobileListener : WearableListenerService() {
                 }
                 DataEvent.TYPE_DELETED -> {
                 Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString())
-                preferences.edit()
-                    .putInt(getString(R.string.key_pref_mobile_battery_level), 0)
-                    .putBoolean(getString(R.string.key_pref_has_mobile_app), false)
-                    .putBoolean(getString(R.string.key_pref_after_mobile_result), false)
-                    .putBoolean(getString(R.string.key_pref_connected), false)
-                    .putLong(getString(R.string.key_pref_last_update),System.currentTimeMillis()) //TODO: TEST
-                    .apply()
+                    runBlocking { repository.storeResponse(
+                        batteryLevel = 0,
+                        hasMobileApp = false,
+                        afterMobileResult = false,
+                        isConnected = false,
+                        lastUpdate = System.currentTimeMillis()
+                    ) }
                 Log.d(TAG, "Phone Companion Uninstalled!")
                 updateBatteryComplication(this)
             }
@@ -81,18 +79,16 @@ class MobileListener : WearableListenerService() {
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
-        val mobileApp = preferences.getBoolean(getString(R.string.key_pref_has_mobile_app), false)
-        if (capabilityInfo.nodes.size > 0 && mobileApp) {
-
+        val hasMobileApp = runBlocking { repository.hasMobileApp.first() }
+        if (capabilityInfo.nodes.size > 0 && hasMobileApp) {
             sendPhoneBatteryRequest(0,this, forceUpdate = true)
         }
         else {
-            preferences.edit()
-                .putBoolean(getString(R.string.key_pref_connected), false)
-                .putBoolean(getString(R.string.key_pref_after_mobile_result), true)
-                .apply()
+            runBlocking {
+                repository.storeConnection(false)
+                repository.storeResult(true)
+            }
             updateBatteryComplication(this)
-
         }
         Log.d(TAG, "Capability changed: " + capabilityInfo.nodes.size)
     }

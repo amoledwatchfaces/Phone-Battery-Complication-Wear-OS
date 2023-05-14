@@ -20,15 +20,25 @@ import android.content.ComponentName
 import android.content.Context
 import android.graphics.drawable.Icon
 import android.util.Log
-import androidx.preference.PreferenceManager
-import androidx.wear.watchface.complications.data.*
+import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.LongTextComplicationData
+import androidx.wear.watchface.complications.data.MonochromaticImage
+import androidx.wear.watchface.complications.data.PlainComplicationText
+import androidx.wear.watchface.complications.data.RangedValueComplicationData
+import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.data.DataRepository
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.runBlocking
 
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
+
+    private val repository by lazy { DataRepository(this) }
 
     override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType)
     {
@@ -73,15 +83,14 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
 
-        val preferences = PreferenceManager.getDefaultSharedPreferences(this)
-        val hasResult = preferences.getBoolean(getString(R.string.key_pref_after_mobile_result), false)
-        val isWatchConnected = preferences.getBoolean(getString(R.string.key_pref_connected), false)
-        val lastUpdateTime = preferences.getLong(getString(R.string.key_pref_last_update), 0)
-        val level = preferences.getInt(getString(R.string.key_pref_mobile_battery_level), 0)
+        val hasResult = repository.afterMobileResult.first()
+        val isWatchConnected = repository.isConnected.first()
+        val lastUpdateTime = repository.lastUpdate.first()
+        val level = repository.batteryLevel.first()
         val level2: String = if (level==0) "-" else "$level%"
 
         if (!hasResult) { MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, false) }
-        else { preferences.edit().putBoolean(getString(R.string.key_pref_after_mobile_result), false).apply() }
+        else { runBlocking { repository.storeResult(false) } }
 
          return when (request.complicationType) {
 

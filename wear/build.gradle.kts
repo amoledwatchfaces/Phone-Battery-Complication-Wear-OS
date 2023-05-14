@@ -13,8 +13,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000235
-        versionName = "2.3.5"
+        versionCode = 10000237
+        versionName = "2.3.7"
     }
 
     buildTypes {
@@ -56,8 +56,6 @@ dependencies {
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
-    implementation ("androidx.preference:preference-ktx:1.2.0")
-
     // COMPOSE
     implementation ("androidx.core:core-ktx:1.10.0")
     implementation ("androidx.compose.ui:ui:$composeUiVersion")
@@ -67,17 +65,13 @@ dependencies {
     implementation ("androidx.activity:activity-compose:1.7.1")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
-    // PREF
-
-    implementation ("androidx.wear:wear-remote-interactions:1.0.0")
-    implementation ("androidx.activity:activity-ktx:1.7.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
-
+    // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 

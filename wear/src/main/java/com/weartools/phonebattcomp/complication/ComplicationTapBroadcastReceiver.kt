@@ -24,25 +24,28 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import android.widget.Toast
-import androidx.preference.PreferenceManager
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import com.weartools.phonebattcomp.MainActivity
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.data.DataRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
+
     override fun onReceive(context: Context, intent: Intent) {
         val args = intent.getArgs()
         val result = goAsync()
-        val preferences = PreferenceManager.getDefaultSharedPreferences(context)
-        val hasMobileApp = preferences.getBoolean(context.getString(R.string.key_pref_has_mobile_app), false)
+
+        val hasMobileApp = runBlocking { DataRepository(context).hasMobileApp.first() }
 
         scope.launch {
             try {

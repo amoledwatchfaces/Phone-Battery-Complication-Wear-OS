@@ -122,7 +122,7 @@ fun PhoneBatteryAppScreen(
                     Icon(imageVector = Icons.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
                 }
                 OutlinedButton(
-                    onClick = {openHowTo=openHowTo.not()}
+                    onClick = { openAppStoreOnPhone(context) }
                 ) {
                     Icon(imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
                 }
