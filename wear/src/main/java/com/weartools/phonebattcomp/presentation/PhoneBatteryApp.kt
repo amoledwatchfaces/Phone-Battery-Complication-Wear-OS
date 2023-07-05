@@ -42,6 +42,7 @@ fun PhoneBatteryApp(
             val batteryLevel by viewModel.batteryLevel.collectAsState()
             val nodeName by viewModel.nodeName.collectAsState()
             val tempUnit by viewModel.tempUnit.collectAsState()
+            val percentage by viewModel.percentage.collectAsState()
 
             PhoneBatteryAppScreen(
                 listState = listState,
@@ -49,7 +50,8 @@ fun PhoneBatteryApp(
                 coroutineScope = coroutineScope,
                 nodeName = nodeName,
                 batteryLevel = batteryLevel,
-                tempUnit = tempUnit
+                tempUnit = tempUnit,
+                percentage = percentage
             )
         }
     }

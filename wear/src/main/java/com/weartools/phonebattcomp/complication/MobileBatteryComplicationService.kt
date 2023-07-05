@@ -87,7 +87,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val isWatchConnected = repository.isConnected.first()
         val lastUpdateTime = repository.lastUpdate.first()
         val level = repository.batteryLevel.first()
-        val level2: String = if (level==0) "-" else "$level%"
+        val percentage = if (repository.percentage.first()) "%" else ""
+        val level2: String = if (level==0) "-" else "$level$percentage"
 
         if (!hasResult) { MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, false) }
         else { runBlocking { repository.storeResult(false) } }

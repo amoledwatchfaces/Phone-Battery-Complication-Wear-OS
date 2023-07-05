@@ -23,12 +23,25 @@ import android.graphics.drawable.Icon
 import android.os.BatteryManager
 import android.provider.Settings
 import android.util.Log
-import androidx.wear.watchface.complications.data.*
+import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.MonochromaticImage
+import androidx.wear.watchface.complications.data.MonochromaticImageComplicationData
+import androidx.wear.watchface.complications.data.PlainComplicationText
+import androidx.wear.watchface.complications.data.RangedValueComplicationData
+import androidx.wear.watchface.complications.data.ShortTextComplicationData
+import androidx.wear.watchface.complications.data.SmallImage
+import androidx.wear.watchface.complications.data.SmallImageComplicationData
+import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.data.DataRepository
+import kotlinx.coroutines.flow.first
 
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
+
+    private val repository by lazy { DataRepository(this) }
 
     override fun onComplicationActivated(
         complicationInstanceId: Int,
@@ -91,6 +104,8 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         Log.d(TAG, "Updating Watch Battery Complication")
+
+        val percentage = if (repository.percentage.first()) "%" else ""
         val level = this.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))!!.getIntExtra(BatteryManager.EXTRA_LEVEL, 0)
 
         return when (request.complicationType) {
@@ -100,7 +115,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                 min = 0f,
                 max = 100f,
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
-                .setText(PlainComplicationText.Builder(text = "$level%").build())
+                .setText(PlainComplicationText.Builder(text = "$level$percentage").build())
                 .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
                     R.drawable.ic_watch
                 )).build())
@@ -108,7 +123,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                 .build()
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder (
-                text = PlainComplicationText.Builder(text = "$level%").build(),
+                text = PlainComplicationText.Builder(text = "$level$percentage").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
                 .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
                     R.drawable.ic_watch

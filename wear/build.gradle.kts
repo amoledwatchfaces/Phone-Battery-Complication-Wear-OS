@@ -13,8 +13,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000237
-        versionName = "2.3.7"
+        versionCode = 10000245
+        versionName = "2.4.5"
     }
 
     buildTypes {
@@ -57,12 +57,12 @@ dependencies {
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     // COMPOSE
-    implementation ("androidx.core:core-ktx:1.10.0")
+    implementation ("androidx.core:core-ktx:1.10.1")
     implementation ("androidx.compose.ui:ui:$composeUiVersion")
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.7.1")
+    implementation ("androidx.activity:activity-compose:1.7.2")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
@@ -78,4 +78,6 @@ dependencies {
     // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
 
+    // SPLASH SCREEN
+    implementation ("androidx.core:core-splashscreen:1.0.1")
 }

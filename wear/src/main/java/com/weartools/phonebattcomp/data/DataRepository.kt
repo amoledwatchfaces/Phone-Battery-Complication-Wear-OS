@@ -38,6 +38,9 @@ class DataRepository(private val context: Context) {
     val tempUnit: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[TEMP_UNIT] ?: true
     }
+    val percentage: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[PERCENTAGE] ?: true
+    }
 
     val batteryLevel: Flow<Int> = context.dataStore.data.map { prefs ->
         prefs[BATTERY_LEVEL] ?: 0
@@ -65,6 +68,11 @@ class DataRepository(private val context: Context) {
     suspend fun storeTempUnit(tempUnit: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[TEMP_UNIT] = tempUnit
+        }
+    }
+    suspend fun storePercentage(percentage: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[PERCENTAGE] = percentage
         }
     }
 
@@ -107,6 +115,7 @@ class DataRepository(private val context: Context) {
     companion object {
         private val NODE_NAME = stringPreferencesKey("node_name")
         private val TEMP_UNIT = booleanPreferencesKey("temp_unit")
+        private val PERCENTAGE = booleanPreferencesKey("percentage")
         private val BATTERY_LEVEL = intPreferencesKey("battery_level")
 
         private val HAS_MOBILE_APP = booleanPreferencesKey("has_mobile_app")

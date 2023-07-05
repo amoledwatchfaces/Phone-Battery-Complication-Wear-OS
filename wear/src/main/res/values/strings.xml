@@ -11,11 +11,16 @@
     <string name="install_chip">Companion app</string>
     <string name="node_name" translatable="false">node_name</string>
 
-
     <string name="app_info">About</string>
     <string name="faq">FAQ</string>
     <string name="version">Version</string>
-    <string name="version_number" translatable="false">v2.0.4</string>
+
+    <!-- Percentage -->
+    <string name="percentage_section" translatable="false">Phone / Watch Battery Complication</string>
+    <string name="percentage_toggle" translatable="false">Percentage (%)</string>
+    <string name="percentage_on" translatable="false">Show; e.g. 86 %</string>
+    <string name="percentage_off" translatable="false">Hide; e.g. 86</string>
+
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Phone Battery level</string>
@@ -40,6 +45,7 @@
     <string name="temp_unit_pref_title">Temp unit</string>
 
     <!-- DO NOT TRANSLATE -->
+    <string name="percentage" translatable="false">percentage</string>
     <string name="temp_unit" translatable="false">temp_unit</string>
     <string name="temp_unit_C" translatable="false">°C</string>
     <string name="temp_unit_F" translatable="false">°F</string>

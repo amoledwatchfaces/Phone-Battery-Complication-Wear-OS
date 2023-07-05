@@ -68,7 +68,8 @@ fun PhoneBatteryAppScreen(
     coroutineScope: CoroutineScope,
     nodeName: String,
     batteryLevel: Int,
-    tempUnit: Boolean
+    tempUnit: Boolean,
+    percentage: Boolean
 ) {
     val viewModel: PassiveDataViewModel = viewModel()
     val context = LocalContext.current
@@ -127,6 +128,18 @@ fun PhoneBatteryAppScreen(
                     Icon(imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
                 }
             }
+        }
+
+        // PERCENTAGE COMPLICATION
+        item { PreferenceCategory(title = stringResource(id = R.string.percentage_section)) }
+        item {
+            ToggleChip(
+                label = stringResource(id = R.string.percentage_toggle),
+                secondaryLabelOn = stringResource(id = R.string.percentage_on),
+                secondaryLabelOff = stringResource(id = R.string.percentage_off),
+                checked = percentage,
+                onCheckedChange = {viewModel.togglePercentage(context)}
+            )
         }
 
         // TEMPERATURE UNIT COMPLICATION

@@ -21,6 +21,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
+import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
+import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchTempComplicationService
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -32,12 +34,14 @@ class PassiveDataViewModel(
     val batteryLevel = dataRepository.batteryLevel.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
     val nodeName = dataRepository.nodeName.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "Not connected")
     val tempUnit = dataRepository.tempUnit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+    val percentage = dataRepository.percentage.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
     init {
         viewModelScope.launch {
             dataRepository.batteryLevel.distinctUntilChanged().collect {}
             dataRepository.nodeName.distinctUntilChanged().collect {}
             dataRepository.tempUnit.distinctUntilChanged().collect {}
+            dataRepository.percentage.distinctUntilChanged().collect {}
         }
     }
 
@@ -45,16 +49,24 @@ class PassiveDataViewModel(
         viewModelScope.launch {
             val newEnabledStatus = !tempUnit.value
             dataRepository.storeTempUnit(newEnabledStatus)
-            updateComplication(context = context)
+            updateComplication(context = context, WatchTempComplicationService::class.java)
+        }
+    }
+    fun togglePercentage(context: Context) {
+        viewModelScope.launch {
+            val newEnabledStatus = !percentage.value
+            dataRepository.storePercentage(newEnabledStatus)
+            updateComplication(context = context, MobileBatteryComplicationService::class.java)
+            updateComplication(context = context, WatchBatteryComplicationService::class.java)
         }
     }
 
-fun updateComplication(context: Context){
-     ComplicationDataSourceUpdateRequester.create(
+    fun updateComplication(context: Context, clazz: Class<*>){
+        ComplicationDataSourceUpdateRequester.create(
             context.applicationContext,
-            ComponentName(context.applicationContext, WatchTempComplicationService::class.java)
+            ComponentName(context.applicationContext, clazz)
         ).run { requestUpdateAll() }
-}
+    }
 
 }
 
