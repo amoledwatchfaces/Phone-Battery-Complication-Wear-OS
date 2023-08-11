@@ -50,15 +50,15 @@ dependencies {
 
     implementation ("androidx.legacy:legacy-support-v4:1.0.0")
     implementation ("androidx.constraintlayout:constraintlayout:2.1.4")
-    implementation ("androidx.preference:preference:1.2.0")
+    implementation ("androidx.preference:preference-ktx:1.2.1")
     implementation ("com.google.android.material:material:1.9.0")
 
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     implementation ("androidx.activity:activity-ktx:1.7.2")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
 
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // SPLASH SCREEN
     implementation ("androidx.core:core-splashscreen:1.0.1")

@@ -20,10 +20,12 @@ import android.annotation.SuppressLint
 import android.content.ContentValues
 import android.content.Context
 import android.util.Log
+import androidx.wear.tiles.TileService
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.*
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService.Companion.updateBatteryComplication
 import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 
@@ -57,6 +59,7 @@ class MobileListener : WearableListenerService() {
                             ) }
                             Log.d(TAG, "Received Phone Battery Level: $level")
                             updateBatteryComplication(this)
+                            TileService.getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java)
                         }
                     }
                 }

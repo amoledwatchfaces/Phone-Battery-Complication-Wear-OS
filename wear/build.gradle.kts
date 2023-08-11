@@ -4,17 +4,16 @@ plugins {
     id ("kotlin-parcelize")
 }
 
-@Suppress("UnstableApiUsage") //TODO: CHECK LATER
 android {
 
-    compileSdk = 33
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000249
-        versionName = "2.4.9"
+        versionCode = 10000250
+        versionName = "2.5.0"
     }
 
     buildTypes {
@@ -72,12 +71,21 @@ dependencies {
     debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.6.4")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.0.0")
 
     // SPLASH SCREEN
     implementation ("androidx.core:core-splashscreen:1.0.1")
+
+    // TILE
+    implementation("androidx.wear.protolayout:protolayout-expression:1.0.0")
+    implementation("androidx.wear.protolayout:protolayout:1.0.0")
+    implementation("androidx.wear.protolayout:protolayout-material:1.0.0")
+    implementation("androidx.wear.tiles:tiles:1.2.0")
+    implementation("com.google.android.horologist:horologist-compose-tools:0.5.3")
+    implementation("com.google.android.horologist:horologist-tiles:0.5.3")
+    implementation("io.coil-kt:coil-compose:2.4.0") // ONLY FOR PREVIEWS - DISABLE LATER
 }

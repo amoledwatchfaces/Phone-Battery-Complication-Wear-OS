@@ -20,6 +20,7 @@
     <style name="Theme.App" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <item name="colorPrimary">#202020</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorAccent">@color/colorAccent</item>
     </style>
 
     <style name="Theme.App.Starting" parent="Theme.SplashScreen">

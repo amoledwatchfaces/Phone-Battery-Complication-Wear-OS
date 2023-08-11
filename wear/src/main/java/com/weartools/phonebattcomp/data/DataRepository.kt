@@ -58,6 +58,9 @@ class DataRepository(private val context: Context) {
     val lastUpdate: Flow<Long> = context.dataStore.data.map { prefs ->
         prefs[LAST_UPDATE] ?: 0
     }
+    val isTileSet: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[IS_TILE_SET] ?: false
+    }
 
     suspend fun storeNodeName(node: String) {
         context.dataStore.edit { prefs ->
@@ -97,6 +100,11 @@ class DataRepository(private val context: Context) {
             prefs[HAS_MOBILE_APP] = hasMobileApp
         }
     }
+    suspend fun storeTileSetState(set: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[IS_TILE_SET] = set
+        }
+    }
 
     suspend fun storeResponse(
         batteryLevel: Int,
@@ -122,6 +130,8 @@ class DataRepository(private val context: Context) {
         private val AFTER_MOBILE_RESULT = booleanPreferencesKey("after_mobile_result")
         private val IS_CONNECTED = booleanPreferencesKey("is_connected")
         private val LAST_UPDATE = longPreferencesKey("last_update_time")
+
+        private val IS_TILE_SET = booleanPreferencesKey("is_tile_set")
     }
 }
 
