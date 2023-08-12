@@ -4,6 +4,7 @@
 <resources lang="de" country="DE">
     <!-- Do not translate translatable="false" lines -->
     <string name="app_name">Smartphone-Akku Komplikation</string> <!-- Does not need to be translated, but it's recommended -->
+    <string name="tile_name">Smartphone-Akku</string>
 
     <string name="settings">Einstellungen</string>
     <string name="install_companion">Bitte Smartphone-Begleitapp installieren!</string>

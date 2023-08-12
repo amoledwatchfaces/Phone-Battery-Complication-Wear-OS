@@ -12,8 +12,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000250
-        versionName = "2.5.0"
+        versionCode = 10000255
+        versionName = "2.5.5"
     }
 
     buildTypes {
@@ -85,7 +85,4 @@ dependencies {
     implementation("androidx.wear.protolayout:protolayout:1.0.0")
     implementation("androidx.wear.protolayout:protolayout-material:1.0.0")
     implementation("androidx.wear.tiles:tiles:1.2.0")
-    implementation("com.google.android.horologist:horologist-compose-tools:0.5.3")
-    implementation("com.google.android.horologist:horologist-tiles:0.5.3")
-    implementation("io.coil-kt:coil-compose:2.4.0") // ONLY FOR PREVIEWS - DISABLE LATER
 }

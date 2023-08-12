@@ -2,7 +2,7 @@
 buildscript {
     extra.apply {
         set("compose_version", "1.4.3")
-        set("compose_wear_version", "1.1.2")
+        set("compose_wear_version", "1.2.0")
     }
 }
 

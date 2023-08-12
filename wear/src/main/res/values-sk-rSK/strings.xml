@@ -4,6 +4,7 @@
 <resources lang="sk" country="SK">
     <!-- Do not translate translatable="false" lines -->
     <string name="app_name">Batéria Telefónu - Voliteľný prvok</string> <!-- Does not need to be translated, but it's recommended -->
+    <string name="tile_name">Batéria Telefónu</string>
 
     <string name="settings">Nastavenia</string>
     <string name="install_companion">Nainštaluj mobilnú apku</string>
