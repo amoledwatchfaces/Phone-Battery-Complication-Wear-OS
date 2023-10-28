@@ -50,25 +50,25 @@ dependencies {
     val composeWearVersion = rootProject.extra["compose_wear_version"]
 
     // WEAR OS
-    implementation ("com.google.android.gms:play-services-wearable:18.0.0")
+    implementation ("com.google.android.gms:play-services-wearable:18.1.0")
     implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.1.1")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     // COMPOSE
-    implementation ("androidx.core:core-ktx:1.10.1")
+    implementation ("androidx.core:core-ktx:1.12.0")
     implementation ("androidx.compose.ui:ui:$composeUiVersion")
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.7.2")
+    implementation ("androidx.activity:activity-compose:1.8.0")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.5.4")
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
@@ -85,4 +85,5 @@ dependencies {
     implementation("androidx.wear.protolayout:protolayout:1.0.0")
     implementation("androidx.wear.protolayout:protolayout-material:1.0.0")
     implementation("androidx.wear.tiles:tiles:1.2.0")
+    implementation ("com.google.code.gson:gson:2.10.1")
 }

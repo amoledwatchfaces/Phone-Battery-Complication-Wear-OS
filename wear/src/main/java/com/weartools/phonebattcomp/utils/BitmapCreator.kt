@@ -1,50 +1,95 @@
 package com.weartools.phonebattcomp.utils
 
+import android.content.ContentValues.TAG
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.Paint
+import android.util.Log
 
 object BitmapCreator {
 
     fun createCompositeBitmap(byteArrays: List<ByteArray>): Bitmap {
         val canvasSize = 96
-        val padding = 4
 
-        val numByteArrays = byteArrays.size
-        val numRows = if (numByteArrays == 2) 1 else 2
-        val numColumns = 2
+        val arraySize = byteArrays.size
+        val numByteArrays = arraySize.coerceAtMost(4)
 
-        val resultBitmap = Bitmap.createBitmap(
-            canvasSize * numColumns + (numColumns - 1) * padding,
-            canvasSize * numRows + (numRows - 1) * padding,
-            Bitmap.Config.ARGB_8888
-        )
+        val resultBitmap = Bitmap.createBitmap(canvasSize,canvasSize, Bitmap.Config.ARGB_8888)
 
         val canvas = Canvas(resultBitmap)
-
         val paint = Paint()
 
         for (i in 0 until numByteArrays) {
-            val row = i / numColumns
-            val col = i % numColumns
-            val x = col * (canvasSize + padding)
-            val y = row * (canvasSize + padding)
+
+            val x: Float
+            var y: Float
+
+            when (i) {
+                0 -> {
+                    x = 0F
+                    y = 0F
+                }
+                1 -> {
+                    x = 48F
+                    y = 0F
+                }
+                2 -> {
+                    x = 0F
+                    y = 48F
+                }
+                else -> {
+                    x = 48F
+                    y = 48F
+                }
+            }
 
             if (numByteArrays == 2) {
-                // Center the single row vertically
-                val yOffset = (resultBitmap.height - canvasSize) / 2
-                canvas.translate(0f, yOffset.toFloat())
+                y += (canvasSize / 4)
             }
 
             val byteArray = byteArrays[i]
             val subBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 
-            val scaledBitmap = Bitmap.createScaledBitmap(subBitmap, canvasSize, canvasSize, false)
+            Log.w(TAG, "i: $i , arraySize: $arraySize")
+            val scaledBitmap =
+                if (i == 3 && arraySize >= 5) {
+                    generatePlusBitmap()
+                }
+            else {
+                Bitmap.createScaledBitmap(
+                subBitmap,
+                48,
+                48,
+                false)}
 
-            canvas.drawBitmap(scaledBitmap, x.toFloat(), y.toFloat(), paint)
+            canvas.drawBitmap(scaledBitmap, x, y, paint)
         }
 
         return resultBitmap
+    }
+
+
+    fun generatePlusBitmap(): Bitmap {
+        val plusSize = 48
+        val plusBitmap = Bitmap.createBitmap(plusSize, plusSize, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(plusBitmap)
+        val paint = Paint()
+
+        // Set the plus sign color to white
+        paint.color = Color.WHITE
+        paint.strokeWidth = plusSize.toFloat() / 8  // Adjust this value for desired line thickness
+
+        // Calculate the position to center the 32x32 plus sign inside the 48x48 bitmap
+        val plusCenterX = plusSize.toFloat() / 2
+        val plusCenterY = plusSize.toFloat() / 2
+        val plusHalfSize = 22 / 2
+
+        // Draw the plus sign in the center of the bitmap
+        canvas.drawLine(plusCenterX - plusHalfSize, plusCenterY, plusCenterX + plusHalfSize, plusCenterY, paint)
+        canvas.drawLine(plusCenterX, plusCenterY - plusHalfSize, plusCenterX, plusCenterY + plusHalfSize, paint)
+
+        return plusBitmap
     }
 }

@@ -17,9 +17,7 @@
 package com.weartools.phonebattcomp.complication
 
 import android.content.ComponentName
-import android.content.Context
 import android.graphics.drawable.Icon
-import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.LongTextComplicationData
@@ -27,7 +25,6 @@ import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.RangedValueComplicationData
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
-import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.MobileListener
@@ -132,23 +129,5 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
-    }
-
-    override fun onComplicationDeactivated(complicationInstanceId: Int) {
-        super.onComplicationDeactivated(complicationInstanceId)
-        Log.d(TAG, "Deactivated: $complicationInstanceId")
-    }
-
-    companion object {
-        private val TAG = MobileBatteryComplicationService::class.java.simpleName
-
-        @JvmStatic
-        fun updateBatteryComplication(context: Context?) {
-            Log.d(TAG, "Updating Phone Battery Complication")
-            val componentName = ComponentName(context!!, MobileBatteryComplicationService::class.java)
-            val req = ComplicationDataSourceUpdateRequester.create(context,componentName)
-            req.requestUpdateAll()
-        }
-
     }
 }

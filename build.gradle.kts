@@ -2,13 +2,13 @@
 buildscript {
     extra.apply {
         set("compose_version", "1.4.3")
-        set("compose_wear_version", "1.2.0")
+        set("compose_wear_version", "1.2.1")
     }
 }
 
 plugins {
     val kotlinVersion = "1.8.20"
-    id("com.android.application") version("8.1.0") apply false
+    id("com.android.application") version("8.1.2") apply false
     id("org.jetbrains.kotlin.android") version(kotlinVersion) apply false
 }
 

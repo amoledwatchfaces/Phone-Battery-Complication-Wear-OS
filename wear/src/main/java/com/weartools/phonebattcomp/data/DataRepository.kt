@@ -24,6 +24,8 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
+import com.weartools.phonebattcomp.utils.updateComplication
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -61,6 +63,17 @@ class DataRepository(private val context: Context) {
     val isTileSet: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[IS_TILE_SET] ?: false
     }
+
+    val byteArrayMutableListJsonString: Flow<String> = context.dataStore.data.map {
+        it[BITMAP_LIST_KEY]?: ""
+    }
+    suspend fun storeByteArrayMutableList(byteArrayMutableList: String) {
+        context.dataStore.edit {
+            it[BITMAP_LIST_KEY] = byteArrayMutableList
+        }
+        context.updateComplication(NotificationsIconsComplicationService::class.java)
+    }
+
 
     suspend fun storeNodeName(node: String) {
         context.dataStore.edit { prefs ->
@@ -113,11 +126,13 @@ class DataRepository(private val context: Context) {
         isConnected: Boolean,
         lastUpdate: Long
     ) {
-        context.dataStore.edit { prefs -> prefs[BATTERY_LEVEL] = batteryLevel }
-        context.dataStore.edit { prefs -> prefs[HAS_MOBILE_APP] = hasMobileApp }
-        context.dataStore.edit { prefs -> prefs[AFTER_MOBILE_RESULT] = afterMobileResult }
-        context.dataStore.edit { prefs -> prefs[IS_CONNECTED] = isConnected }
-        context.dataStore.edit { prefs -> prefs[LAST_UPDATE] = lastUpdate }
+        context.dataStore.edit { prefs ->
+            prefs[BATTERY_LEVEL] = batteryLevel
+            prefs[HAS_MOBILE_APP] = hasMobileApp
+            prefs[AFTER_MOBILE_RESULT] = afterMobileResult
+            prefs[IS_CONNECTED] = isConnected
+            prefs[LAST_UPDATE] = lastUpdate
+        }
     }
 
     companion object {
@@ -132,6 +147,8 @@ class DataRepository(private val context: Context) {
         private val LAST_UPDATE = longPreferencesKey("last_update_time")
 
         private val IS_TILE_SET = booleanPreferencesKey("is_tile_set")
+
+        private val BITMAP_LIST_KEY = stringPreferencesKey("notify_bitmap_list")
     }
 }
 
