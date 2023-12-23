@@ -28,7 +28,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.outlined.ContactSupport
+import androidx.compose.material.icons.automirrored.outlined.ContactSupport
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.material.icons.outlined.Smartphone
@@ -46,11 +46,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
-import androidx.wear.compose.material.Icon
-import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material.Icon
+import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainActivity
@@ -120,7 +120,7 @@ fun PhoneBatteryAppScreen(
                     modifier = Modifier.padding(end = 12.dp),
                     onClick = {openHowTo=openHowTo.not()}
                 ) {
-                    Icon(imageVector = Icons.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                    Icon(imageVector = Icons.AutoMirrored.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
                 }
                 OutlinedButton(
                     onClick = { openAppStoreOnPhone(context) }
@@ -166,8 +166,14 @@ fun PhoneBatteryAppScreen(
     }
 
     if (openHowTo){
-        ListItemsWidget(titles = stringResource(id = R.string.faq), callback ={
-            if (it!=-1) {/**/}else openHowTo=false } )
+        ListItemsWidget(titles = stringResource(id = R.string.faq), callback = {
+            if (it == -1) {
+                openHowTo = false
+                return@ListItemsWidget
+            } else {
+                openHowTo = openHowTo.not()
+            }
+        })
     }
 
 }

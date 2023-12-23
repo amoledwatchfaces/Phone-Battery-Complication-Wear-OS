@@ -25,6 +25,8 @@
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Phone Battery level</string>
+    <string name="combined_battery_preview_desc" translatable="false">Combined Battery
+        levels (alpha)</string>
     <string name="phone_battery_at">Phone Battery level at&#160;</string>
     <string name="phone_battery_long_text">Phone Battery:&#160;</string>
 

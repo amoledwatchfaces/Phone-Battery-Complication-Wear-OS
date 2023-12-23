@@ -1,12 +1,10 @@
 package com.weartools.phonebattcomp.utils
 
-import android.content.ContentValues.TAG
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
-import android.util.Log
 
 object BitmapCreator {
 
@@ -52,7 +50,7 @@ object BitmapCreator {
             val byteArray = byteArrays[i]
             val subBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
 
-            Log.w(TAG, "i: $i , arraySize: $arraySize")
+            //Log.w(TAG, "i: $i , arraySize: $arraySize")
             val scaledBitmap =
                 if (i == 3 && arraySize >= 5) {
                     generatePlusBitmap()

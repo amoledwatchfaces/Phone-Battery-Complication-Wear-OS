@@ -16,9 +16,8 @@
  */
 package com.weartools.phonebattcomp.complication
 
-import android.content.ContentValues
+import android.graphics.Color
 import android.graphics.drawable.Icon
-import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.PlainComplicationText
@@ -71,8 +70,6 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
         val noNotification = data == ""
 
 
-
-
         /*
             private fun loadBitmapFromByteArray(byteArray: ByteArray): Bitmap {
                 return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
@@ -87,14 +84,18 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     if (noNotification.not()) {
                         val parts = data.split("|")
                         val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
-                        Log.w(ContentValues.TAG, "Icon List size: ${byteArrayList.size}")
-                        if (byteArrayList.size == 1) {Icon.createWithData(byteArrayList[0],0, byteArrayList[0].size)}
+                        //Log.w(ContentValues.TAG, "Icon List size: ${byteArrayList.size}")
+                        if (byteArrayList.size == 1) {
+                            Icon.createWithData(byteArrayList[0],0, byteArrayList[0].size).setTint(
+                                Color.WHITE)
+                        }
                         else {
                             Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(byteArrayList))
                         }
                     }
                     else Icon.createWithResource(this, R.drawable.ic_notif_none),
-                    type = SmallImageType.ICON).build(),
+                    type = SmallImageType.ICON)
+                    .build(),
                 contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build()
             )
                 .setTapAction(null)

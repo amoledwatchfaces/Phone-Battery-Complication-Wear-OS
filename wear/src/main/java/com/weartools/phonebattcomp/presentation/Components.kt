@@ -19,7 +19,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent
+import androidx.compose.ui.input.rotary.onRotaryScrollEvent
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,7 +40,6 @@ import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.theme.PhoneBatteryAppTheme
 import com.weartools.phonebattcomp.theme.wearColorPalette
 import kotlinx.coroutines.launch
 
@@ -188,28 +188,33 @@ fun ListItemsWidget(
 ) {
     val state = remember { mutableStateOf(true) }
 
-    PhoneBatteryAppTheme {
         val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
         val focusRequester = remember { FocusRequester() }
         val coroutineScope = rememberCoroutineScope()
+
         LaunchedEffect(Unit) {focusRequester.requestFocus()}
         Dialog(
-            modifier = Modifier
-                .onPreRotaryScrollEvent {
-                    coroutineScope.launch {
-                        listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
-                        listState.animateScrollBy(0f)
-                    }
-                    true
-                }
-                .focusRequester(focusRequester)
-                .focusable(),
             showDialog = state.value,
             scrollState = listState,
             onDismissRequest = { callback.invoke(-1) }
         )
         {
+            LocalView.current.viewTreeObserver.addOnWindowFocusChangeListener {
+                if (it) {
+                    focusRequester.requestFocus()
+                }
+            }
             Alert(
+                modifier = Modifier
+                    .onRotaryScrollEvent {
+                        coroutineScope.launch {
+                            listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
+                            listState.animateScrollBy(0f)
+                        }
+                        true
+                    }
+                    .focusRequester(focusRequester)
+                    .focusable(),
                 backgroundColor = Color.Black,
                 scrollState = listState,
                 title = { PreferenceCategory(title = titles) },
@@ -240,7 +245,6 @@ fun ListItemsWidget(
                 }
             )
 
-        }
     }
 }
 

@@ -22,34 +22,28 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
-        sendToWatch(currentRanking)
+        sendToWatch()
     }
 
-    override fun onNotificationPosted(sbn: StatusBarNotification, rankingMap: RankingMap) {
+    override fun onNotificationPosted(sbn: StatusBarNotification) {
         Log.w(ContentValues.TAG, "Notification Posted!")
-        sendToWatch(rankingMap)
+        sendToWatch()
     }
 
-    override fun onNotificationRemoved(sbn: StatusBarNotification, rankingMap: RankingMap) {
+    override fun onNotificationRemoved(sbn: StatusBarNotification) {
         Log.w(ContentValues.TAG, "Notification Removed!")
-        sendToWatch(rankingMap)
+        sendToWatch()
     }
 
     @SuppressLint("VisibleForTests")
-    private fun sendToWatch(rankingMap: RankingMap) {
+    private fun sendToWatch() {
         val putDataMapReq = PutDataMapRequest.create(URI)
         val bitmaps = ArrayList<Bitmap>()
         for (notification in activeNotifications) {
-            val ranking = Ranking()
-            rankingMap.getRanking(notification.key, ranking)
 
-            /*
-            if (ranking.importance <= NotificationManager.IMPORTANCE_MIN ||
-                    notification.packageName == "android" &&
-                    notification.notification.channelId == "FOREGROUND_SERVICE") {
+            if (notification.isOngoing) {
                 continue
             }
-             */
 
             val bitmap = notification.notification.smallIcon.loadDrawable(this)?.let {
                 drawableToBitmap(

@@ -1,9 +1,83 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <!-- Translated by: amoledwatchfaces -->
-<resources lang="en" country="US">
+<resources>
     <!-- Do not translate translatable="false" lines -->
     <string name="app_name">Phone Battery Complication</string> <!-- Does not need to be translated, but it's recommended -->
+
+    <string name="wear_os_watch_face">for Wear OS</string>
+    <string name="info">About</string>
+    <string name="note">Note</string>
+    <string name="welcome">Welcome!</string>
+
+
+    <string name="installation_guides">Set Up Guide</string>
+
+    <string name="install_to_wearable">Install to wearable</string>
+
+
+    <string name="website">amoledwatchfaces.com</string>
+    <string name="support">support@amoledwatchfaces.com</string>
+    <string name="dev_page">amoledwatchfaces™ - dev page</string>
+    <string name="privacy">Privacy policy</string>
+    <string name="feedback">Feedback</string>
+    <string name="liked_watch_face">Liked our complication app?</string>
+    <string name="leave_review">Leave a review</string>
+    <string name="follow_us">Follow us</string>
+
+
+
+    <string name="social_telegram">https://t.me/amoledwatchfaces</string>
+    <string name="social_github">https://github.com/amoledwatchfaces</string>
+    <string name="social_coffee">https://www.buymeacoffee.com/amoledwfs</string>
+    <string name="link_privacy">https://amoledwatchfaces.com/privacy</string>
+    <string name="link_guide">https://youtu.be/c8QJwh4NFbw</string>
+    <string name="link_website">https://amoledwatchfaces.com/</string>
+
+
+    <string name="toast_searching">Searching for wearable devices…</string>
+    <string name="toast_check_wearable">Please check your wearable device"</string>
+    <string name="toast_fail">Node request failed to return any results.</string>
+    <string name="toast_no_devices">No wearable devices found…</string>
+    <string name="toast_wearable_connected">Wearable connected:</string>
+
+
+
+    <string name="intro">
+        This phone companion app helps us to send the phone battery level to the watch.
+    </string>
+
+    <string name="connected">
+        Your Wear OS device is connected!
+        Just tap floating action button to install app to your watch device(s). Then set-up
+        Complication.
+    </string>
+
+    <string name="no_devices">
+        You have no Wear OS devices connected to your phone at this time…
+    </string>
+
+    <string name="try_reconnect">
+        Try turning on Bluetooth connection, connect your Wear OS device and refresh this app.
+    </string>
+
+
+    <string name="note_text">
+        If you downloaded the application mistakenly or for some other reason it
+        is not possible to set up complication, contact us at:
+    </string>
+
+    <string name="uninstall">
+        IMPORTANT!\nBoth phone and wear apps need to be installed for the complication to work
+        properly!
+    </string>
+
+    <string name="check_portfolio">You can check our full watch face portfolio here:
+    </string>
+
+
+
+
 
     <!-- Make sure \n\n is in the same position -->
     <string name="message_checking">This phone companion app helps us to send the phone battery level to the watch.\n\nChecking for Wear OS devices…\n\nPlease turn on Bluetooth connection, connect your Wear OS device and refresh this app.</string>
@@ -16,7 +90,7 @@
     <string name="store_request_successful">Please check your watch device</string>
     <string name="store_request_unsuccessful">Play Store Request Failed. Your Wear OS device may have API Lower than 27 (older devices).</string>
 
-    <string name="important">IMPORTANT!\n\nBoth phone and wear apps need to be installed for the complication to work properly!</string>
+    <string name="important"></string>
     <string name="support_amoledwatchfaces_com" translatable="false">support@amoledwatchfaces.com</string>
 
     <string name="you_can_check_our_full_watch_face_portfolio_here">You can check our full watch face portfolio here:</string>

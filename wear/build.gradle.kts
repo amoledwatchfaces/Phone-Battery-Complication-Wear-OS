@@ -11,9 +11,10 @@ android {
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
+        //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000255
-        versionName = "2.5.5"
+        versionCode = 10000306
+        versionName = "3.0.6"
     }
 
     buildTypes {
@@ -29,29 +30,27 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_11
-        targetCompatibility = JavaVersion.VERSION_11
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
-    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
-        kotlinOptions {
-            jvmTarget = "11"
-        }
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.6"
+        kotlinCompilerExtensionVersion = "1.5.3"
     }
     namespace = "com.weartools.phonebattcomp"
 }
 
 dependencies {
-    val composeUiVersion = rootProject.extra["compose_version"]
-    val composeWearVersion = rootProject.extra["compose_wear_version"]
+    val composeUiVersion = "1.5.4"
+    val composeWearVersion = "1.3.0-beta01"
 
     // WEAR OS
     implementation ("com.google.android.gms:play-services-wearable:18.1.0")
-    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.1.1")
+    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.2.0")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
@@ -61,7 +60,7 @@ dependencies {
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.8.0")
+    implementation ("androidx.activity:activity-compose:1.8.1")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
