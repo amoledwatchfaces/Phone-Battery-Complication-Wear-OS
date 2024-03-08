@@ -1,8 +1,5 @@
 package com.weartools.phonebattcomp.presentation
 
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,13 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.rotary.onRotaryScrollEvent
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -39,9 +33,10 @@ import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
-import kotlinx.coroutines.launch
 
 @Composable
 fun DialogChip(
@@ -52,8 +47,7 @@ fun DialogChip(
 ) {
     Chip(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+            .fillMaxWidth(),
         onClick = {
             onClick?.invoke()
         },
@@ -83,8 +77,7 @@ fun SimpleChip(
 ) {
     CompactChip(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+            .fillMaxWidth(),
         onClick = {
             onClick?.invoke()
         },
@@ -114,8 +107,7 @@ fun ToggleChip(
 ) {
     ToggleChip(
         modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 10.dp),
+            .fillMaxWidth(),
         checked = checked,
         colors = ToggleChipDefaults.toggleChipColors(
             checkedEndBackgroundColor = wearColorPalette.primaryVariant,
@@ -181,6 +173,7 @@ fun SectionText(modifier: Modifier = Modifier, text: String) {
     )
 }
 
+@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun ListItemsWidget(
     titles: String,
@@ -190,7 +183,6 @@ fun ListItemsWidget(
 
         val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
         val focusRequester = remember { FocusRequester() }
-        val coroutineScope = rememberCoroutineScope()
 
         LaunchedEffect(Unit) {focusRequester.requestFocus()}
         Dialog(
@@ -206,15 +198,10 @@ fun ListItemsWidget(
             }
             Alert(
                 modifier = Modifier
-                    .onRotaryScrollEvent {
-                        coroutineScope.launch {
-                            listState.scrollBy(it.verticalScrollPixels*2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
-                            listState.animateScrollBy(0f)
-                        }
-                        true
-                    }
-                    .focusRequester(focusRequester)
-                    .focusable(),
+                    .rotaryWithScroll(
+                        scrollableState = listState,
+                        focusRequester = focusRequester
+                    ),
                 backgroundColor = Color.Black,
                 scrollState = listState,
                 title = { PreferenceCategory(title = titles) },
@@ -251,7 +238,6 @@ fun ListItemsWidget(
 @Composable
 fun HowToCard(title: String, text: String) {
     TitleCard(
-        modifier = Modifier.padding(horizontal = 10.dp),
         onClick = {  },
         title = { Text(title, fontSize = 12.sp, fontWeight = FontWeight.Bold, color = wearColorPalette.secondaryVariant, lineHeight = 16.sp) },
         contentColor = MaterialTheme.colors.onSurface,

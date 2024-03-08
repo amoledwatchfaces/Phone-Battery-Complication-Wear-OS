@@ -6,14 +6,13 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.PositionIndicator
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.TimeText
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.scrollAway
 import com.weartools.phonebattcomp.data.DataRepository
 import com.weartools.phonebattcomp.data.PassiveDataViewModel
@@ -27,7 +26,6 @@ fun PhoneBatteryApp(
     PhoneBatteryAppTheme {
         val listState = rememberScalingLazyListState()
         val focusRequester = remember { FocusRequester() }
-        val coroutineScope = rememberCoroutineScope()
         LaunchedEffect(Unit) {focusRequester.requestFocus()}
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -47,7 +45,6 @@ fun PhoneBatteryApp(
             PhoneBatteryAppScreen(
                 listState = listState,
                 focusRequester = focusRequester,
-                coroutineScope = coroutineScope,
                 nodeName = nodeName,
                 batteryLevel = batteryLevel,
                 tempUnit = tempUnit,

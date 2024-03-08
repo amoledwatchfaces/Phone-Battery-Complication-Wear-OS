@@ -13,8 +13,8 @@ android {
         minSdk = 27
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000310
-        versionName = "3.1.0"
+        versionCode = 10000315
+        versionName = "3.1.5"
     }
 
     buildTypes {
@@ -85,4 +85,7 @@ dependencies {
     implementation("androidx.wear.protolayout:protolayout-material:1.1.0")
     implementation("androidx.wear.tiles:tiles:1.3.0")
     implementation ("com.google.code.gson:gson:2.10.1")
+
+    // HOROLOGIST
+    implementation ("com.google.android.horologist:horologist-annotations:0.6.3")
 }

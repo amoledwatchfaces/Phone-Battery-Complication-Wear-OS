@@ -20,9 +20,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
-import androidx.compose.foundation.focusable
-import androidx.compose.foundation.gestures.animateScrollBy
-import androidx.compose.foundation.gestures.scrollBy
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -39,8 +36,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
-import androidx.compose.ui.input.rotary.onPreRotaryScrollEvent
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -52,20 +47,20 @@ import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.remote.interactions.RemoteActivityHelper
+import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainActivity
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.PassiveDataViewModel
+import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun PhoneBatteryAppScreen(
     listState: ScalingLazyListState = rememberScalingLazyListState(),
     focusRequester: FocusRequester,
-    coroutineScope: CoroutineScope,
     nodeName: String,
     batteryLevel: Int,
     tempUnit: Boolean,
@@ -78,15 +73,10 @@ fun PhoneBatteryAppScreen(
     ScalingLazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .onPreRotaryScrollEvent {
-                coroutineScope.launch {
-                    listState.scrollBy(it.verticalScrollPixels * 2) //*2 for faster scrolling with animateScrollBy 0f + OnPreRotary?
-                    listState.animateScrollBy(0f)
-                }
-                true
-            }
-            .focusRequester(focusRequester)
-            .focusable(),
+            .rotaryWithScroll(
+                scrollableState = listState,
+                focusRequester = focusRequester
+            ),
         autoCentering = AutoCenteringParams(itemIndex = 1),
         state = listState,
     )
