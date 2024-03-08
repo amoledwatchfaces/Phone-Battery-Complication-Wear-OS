@@ -99,12 +99,10 @@ class CombinedBatteryComplicationService : SuspendingComplicationDataSourceServi
                  text = PlainComplicationText.Builder(text = level2).build(),
                  contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                  .setMonochromaticImage(
-                     if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                         R.drawable.ic_phone_icon
-                     )).build()}
-                     else { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                         R.drawable.ic_phone_disconnected
-                     )).build()})
+                     MonochromaticImage.Builder(image = if (isWatchConnected) {
+                         Icon.createWithResource(this, R.drawable.ic_phone_icon) }
+                         else { Icon.createWithResource(this, R.drawable.ic_phone_disconnected) }
+                     ).build())
 
                  // WATCH BATTERY
                  .setTitle(PlainComplicationText.Builder(text = "$watchBatteryLevel").build())

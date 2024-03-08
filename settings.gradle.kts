@@ -15,3 +15,4 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Phone Battery Complication"
 include(":mobile", ":wear")
+

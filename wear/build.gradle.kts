@@ -13,8 +13,8 @@ android {
         minSdk = 27
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000306
-        versionName = "3.0.6"
+        versionCode = 10000310
+        versionName = "3.1.0"
     }
 
     buildTypes {
@@ -39,18 +39,18 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.3"
+        kotlinCompilerExtensionVersion = "1.5.8"
     }
     namespace = "com.weartools.phonebattcomp"
 }
 
 dependencies {
-    val composeUiVersion = "1.5.4"
-    val composeWearVersion = "1.3.0-beta01"
+    val composeUiVersion = "1.6.3"
+    val composeWearVersion = "1.3.0"
 
     // WEAR OS
     implementation ("com.google.android.gms:play-services-wearable:18.1.0")
-    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.2.0")
+    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha01")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
@@ -60,14 +60,14 @@ dependencies {
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.8.1")
+    implementation ("androidx.activity:activity-compose:1.8.2")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.6.2")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.5.4")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
@@ -80,9 +80,9 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // TILE
-    implementation("androidx.wear.protolayout:protolayout-expression:1.0.0")
-    implementation("androidx.wear.protolayout:protolayout:1.0.0")
-    implementation("androidx.wear.protolayout:protolayout-material:1.0.0")
-    implementation("androidx.wear.tiles:tiles:1.2.0")
+    implementation("androidx.wear.protolayout:protolayout-expression:1.1.0")
+    implementation("androidx.wear.protolayout:protolayout:1.1.0")
+    implementation("androidx.wear.protolayout:protolayout-material:1.1.0")
+    implementation("androidx.wear.tiles:tiles:1.3.0")
     implementation ("com.google.code.gson:gson:2.10.1")
 }

@@ -82,6 +82,7 @@
                 android:value="RANGED_VALUE,SHORT_TEXT,LONG_TEXT"/>
         </service>
         <service
+            android:enabled="false"
             android:name=".complication.CombinedBatteryComplicationService"
             android:icon="@drawable/ic_combined_icon"
             android:label="@string/combined_battery_preview_desc"
@@ -91,8 +92,7 @@
                 <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST"/>
             </intent-filter>
             <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="300"/>
-            <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="LONG_TEXT"/>
+            <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES" android:value="LONG_TEXT"/>
         </service>
         <service
             android:name=".complication.WatchBatteryComplicationService"
