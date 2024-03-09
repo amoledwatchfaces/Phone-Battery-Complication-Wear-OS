@@ -20,15 +20,15 @@
       <path
           android:fillColor="#FF000000"
           android:pathData="M6,6m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0"
-          android:strokeAlpha="0.8"
-          android:fillAlpha="0.8"/>
+          android:strokeAlpha="0.85"
+          android:fillAlpha="0.85"/>
+      <path
+          android:pathData="m6,9.22c1.78,0 3.22,-1.44 3.22,-3.22s-1.44,-3.22 -3.22,-3.22 -3.22,1.44 -3.22,3.22 1.44,3.22 3.22,3.22"
+          android:strokeWidth=".6"
+          android:fillColor="#00000000"
+          android:strokeColor="#000"/>
       <path
           android:pathData="m6.79,7.11h-1.58v-2.21h1.58m0,-0.63h-1.58c-0.18,0 -0.32,0.14 -0.32,0.32v2.85c0,0.17 0.14,0.32 0.32,0.32h1.58c0.17,0 0.32,-0.14 0.32,-0.32v-2.85c0,-0.18 -0.14,-0.32 -0.32,-0.32Z"
           android:fillColor="#cdf9ff"/>
-      <path
-          android:pathData="m6,9.22c1.78,0 3.22,-1.44 3.22,-3.22s-1.44,-3.22 -3.22,-3.22 -3.22,1.44 -3.22,3.22 1.44,3.22 3.22,3.22"
-          android:strokeWidth=".58"
-          android:fillColor="#00000000"
-          android:strokeColor="#000"/>
   </group>
 </vector>
