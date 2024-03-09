@@ -11,7 +11,6 @@ android {
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
-        //noinspection OldTargetApi
         targetSdk = 33
         versionCode = 10000315
         versionName = "3.1.5"
