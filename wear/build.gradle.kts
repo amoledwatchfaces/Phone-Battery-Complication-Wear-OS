@@ -12,8 +12,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000315
-        versionName = "3.1.5"
+        versionCode = 10000320
+        versionName = "3.2.0"
     }
 
     buildTypes {

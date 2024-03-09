@@ -38,7 +38,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.utils.*
+import com.weartools.phonebattcomp.utils.openAmoledWebPage
+import com.weartools.phonebattcomp.utils.openBuyMeACoffeeSocialLink
+import com.weartools.phonebattcomp.utils.openGithubSocialLink
+import com.weartools.phonebattcomp.utils.openPlayStorePortfolio
+import com.weartools.phonebattcomp.utils.openPrivacyPolicyLink
+import com.weartools.phonebattcomp.utils.openTelegramSocialLink
+import com.weartools.phonebattcomp.utils.sendFeedbackEmail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -85,8 +91,10 @@ fun InfoScreen(
             item { Text(
                 modifier = Modifier.padding(bottom = 10.dp),
                 style = MaterialTheme.typography.titleLarge,
+                maxLines = 2,
                 fontWeight = FontWeight.Medium,
-                text = "${stringResource(id = R.string.app_name)} ${stringResource(id = R.string.wear_os_watch_face)}") }
+                text = stringResource(id = R.string.app_name)
+            ) }
 
             item {
                 ElevatedCard(
