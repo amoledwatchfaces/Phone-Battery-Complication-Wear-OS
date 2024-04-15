@@ -72,6 +72,10 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = getString(R.string.phone_battery_long_text)+"86%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    R.drawable.ic_phone_icon
+                )).build())
+                .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
                 .setTapAction(null)
                 .build()
             else -> {null}
