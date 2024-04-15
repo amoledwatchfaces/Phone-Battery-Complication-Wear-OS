@@ -22,7 +22,14 @@ import android.content.Context
 import android.util.Log
 import androidx.wear.tiles.TileService
 import com.google.android.gms.tasks.Task
-import com.google.android.gms.wearable.*
+import com.google.android.gms.wearable.CapabilityInfo
+import com.google.android.gms.wearable.DataEvent
+import com.google.android.gms.wearable.DataEventBuffer
+import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.DataMapItem
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
+import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.data.DataRepository
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
@@ -36,6 +43,10 @@ private const val BATTERY_KEY= "battery-key"
 private const val REQUEST_PATH = "/request"
 private const val REQUEST_KEY = "request-key"
 private const val FORCE_UPDATE_KEY = "force-update-key"
+
+private const val ACTIVE_SYNC_PATH = "/active-sync"
+private const val ACTIVE_SYNC_KEY = "active-sync-key"
+private const val IS_CHARGING_KEY = "is-charging-key"
 private const val URI = "/foobar"
 private const val TAG = "MobileListener::"
 
@@ -54,12 +65,15 @@ class MobileListener : WearableListenerService() {
                         BATTERY_PATH -> {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
                             val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
+                            val isCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
+                            Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
                             runBlocking { repository.storeResponse(
                                 batteryLevel = level,
                                 hasMobileApp = true,
                                 afterMobileResult = true,
                                 isConnected = true,
-                                lastUpdate = System.currentTimeMillis()
+                                lastUpdate = System.currentTimeMillis(),
+                                isCharging = isCharging
                             ) }
                             //Log.d(TAG, "Received Phone Battery Level: $level")
                             this.updateComplication(MobileBatteryComplicationService::class.java)
@@ -79,7 +93,8 @@ class MobileListener : WearableListenerService() {
                         hasMobileApp = false,
                         afterMobileResult = false,
                         isConnected = false,
-                        lastUpdate = System.currentTimeMillis()
+                        lastUpdate = System.currentTimeMillis(),
+                        isCharging = false
                     ) }
                 //Log.d(TAG, "Phone Companion Uninstalled!")
                     this.updateComplication(MobileBatteryComplicationService::class.java)
@@ -141,6 +156,23 @@ class MobileListener : WearableListenerService() {
             }
             else
                 Log.e(TAG, "Too many updates")
+        }
+
+        fun sendActiveSyncState (state: Boolean, context: Context) {
+
+                Log.d(TAG,"Sending Active Sync State: $state")
+
+                val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
+                    dataMap.putBoolean(ACTIVE_SYNC_KEY, state)}
+                    .asPutDataRequest()
+                    .setUrgent()
+
+                val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
+                dataItemTask
+                    .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Active Sync Status was successful: $dataItem") }
+                    .addOnFailureListener { e -> Log.e(TAG,"Sending Active Sync Status task failed!: $e") }
+                    .addOnCompleteListener{task -> Log.d(TAG,"Sending Active Sync Task complete!: $task")}
+
         }
     }
 }

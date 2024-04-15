@@ -3,15 +3,20 @@ package com.weartools.phonebattcomp
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
+import com.google.android.gms.tasks.Task
+import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
+import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
@@ -20,15 +25,28 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
-class MainViewModel : ViewModel() {
+class MainViewModel(
+    private val dataRepository: DataRepository
+) : ViewModel() {
+
+    val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+
+    init {
+        viewModelScope.launch {
+            dataRepository.activeSync.distinctUntilChanged().collect {}
+        }
+    }
 
     private lateinit var nodeClient: NodeClient
     private lateinit var remoteActivityHelper: RemoteActivityHelper
@@ -52,7 +70,6 @@ class MainViewModel : ViewModel() {
 
     private val watchAvailableStateMutableStateFlow = MutableStateFlow(value = false)
     val watchAvailableStateStateFlow: StateFlow<Boolean> = watchAvailableStateMutableStateFlow.asStateFlow()
-
 
     fun openPlayStoreOnWear(context: Context) {
         //Log.d(TAG, "Opening Play Store listing on Watch")
@@ -158,7 +175,47 @@ class MainViewModel : ViewModel() {
         }
     }
 
+    fun activateBatterySync(context: Context) {
+        BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
+
+        viewModelScope.launch {
+            try {
+                val request = PutDataMapRequest.create(BATTERY_PATH).apply{
+                    dataMap.putInt(BATTERY_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryLevel(context))
+                    dataMap.putBoolean(IS_CHARGING_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryChargingStatus(context))
+                }
+                    .asPutDataRequest()
+                    .setUrgent()
+
+                val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
+                dataItemTask
+                    .addOnSuccessListener { dataItem -> Log.d(ContentValues.TAG,"WM: Sending Phone Battery request was successful: $dataItem") }
+                    .addOnFailureListener { e -> Log.e(ContentValues.TAG,"WM: Sending request task failed!: $e") }
+                    .addOnCompleteListener{task -> Log.d(ContentValues.TAG,"WM: Sending request Task complete!: $task")}
+
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+
+                Log.e(TAG, "Error while activating battery sync", e)
+            }
+        }
+    }
+
     companion object {
         private const val TAG = "MainViewModel"
+    }
+}
+
+class MainViewModelFactory(
+    private val dataRepository: DataRepository
+) : ViewModelProvider.Factory {
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
+            @Suppress("UNCHECKED_CAST")
+            return MainViewModel(
+                dataRepository = dataRepository
+            ) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
     }
 }

@@ -12,8 +12,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000325
-        versionName = "3.2.5"
+        versionCode = 10000331
+        versionName = "3.3.0"
     }
 
     buildTypes {
@@ -44,12 +44,12 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.6.3"
-    val composeWearVersion = "1.3.0"
+    val composeUiVersion = "1.6.5"
+    val composeWearVersion = "1.3.1"
 
     // WEAR OS
     implementation ("com.google.android.gms:play-services-wearable:18.1.0")
-    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha01")
+    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha02")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 

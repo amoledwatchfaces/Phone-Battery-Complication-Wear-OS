@@ -17,7 +17,9 @@
 package com.weartools.phonebattcomp.complication
 
 import android.content.ComponentName
+import android.content.ContentValues.TAG
 import android.graphics.drawable.Icon
+import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.LongTextComplicationData
@@ -80,15 +82,23 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
 
-        val hasResult = repository.afterMobileResult.first()
+        val isCharging = repository.isCharging.first()
+        Log.i(TAG, "Complication: is phone charging? $isCharging")
         val isWatchConnected = repository.isConnected.first()
-        val lastUpdateTime = repository.lastUpdate.first()
-        val level = repository.batteryLevel.first()
+        val activeSync = repository.activeSync.first()
         val percentage = if (repository.percentage.first()) "%" else ""
-        val level2: String = if (level==0) "-" else "$level$percentage"
 
-        if (!hasResult) { MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, false) }
-        else { runBlocking { repository.storeResult(false) } }
+        if (activeSync.not()) {
+            val hasResult = repository.afterMobileResult.first()
+            val lastUpdateTime = repository.lastUpdate.first()
+            if (!hasResult) {
+                MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, false)
+            }
+            else { runBlocking { repository.storeResult(false) } }
+        }
+
+        val level = repository.batteryLevel.first()
+        val level2: String = if (level==0) "-" else "$level$percentage"
 
          return when (request.complicationType) {
 
@@ -112,7 +122,10 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 text = PlainComplicationText.Builder(text = level2).build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                 .setMonochromaticImage(
-                    if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                    if (isWatchConnected && isCharging) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
+                        R.drawable.ic_phone_charging_3
+                    )).build()}
+                    else if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
                         R.drawable.ic_phone_icon
                     )).build()}
                     else { MonochromaticImage.Builder(image = Icon.createWithResource(this,

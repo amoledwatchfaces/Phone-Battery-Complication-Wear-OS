@@ -16,6 +16,12 @@
     <string name="faq">FAQ</string>
     <string name="version">Version</string>
 
+    <string name="active_sync">Active Sync</string>
+    <string name="active_sync_on">Enabled</string>
+    <string name="active_sync_off">Disabled</string>
+    <string name="active_sync_experimental">Experimental, may increase power consumption on
+    your phone, decrease power consumption on your watch</string>
+
     <!-- Percentage -->
     <string name="percentage_section" translatable="false">Phone / Watch Battery Complication</string>
     <string name="percentage_toggle" translatable="false">Percentage (%)</string>
@@ -25,8 +31,6 @@
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Phone Battery level</string>
-    <string name="combined_battery_preview_desc" translatable="false">Combined Battery
-        levels (alpha)</string>
     <string name="phone_battery_at">Phone Battery level at&#160;</string>
     <string name="phone_battery_long_text">Phone Battery:&#160;</string>
 

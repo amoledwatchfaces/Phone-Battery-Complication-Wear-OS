@@ -23,15 +23,28 @@ import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
 import com.google.android.gms.tasks.Task
-import com.google.android.gms.wearable.*
-import kotlinx.coroutines.*
+import com.google.android.gms.wearable.DataEvent
+import com.google.android.gms.wearable.DataEventBuffer
+import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.DataMapItem
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
+import com.google.android.gms.wearable.WearableListenerService
+import kotlinx.coroutines.runBlocking
 
-private const val BATTERY_PATH = "/battery-level"
-private const val BATTERY_KEY= "battery-key"
+const val BATTERY_PATH = "/battery-level"
+const val BATTERY_KEY= "battery-key"
+const val IS_CHARGING_KEY = "is-charging-key"
+
 private const val REQUEST_PATH = "/request"
 private const val FORCE_UPDATE_KEY = "force-update-key"
 
+private const val ACTIVE_SYNC_PATH = "/active-sync"
+private const val ACTIVE_SYNC_KEY = "active-sync-key"
+
 class WearListener : WearableListenerService() {
+
+    private val repository by lazy { DataRepository(this) }
 
     @SuppressLint("VisibleForTests")
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -46,6 +59,7 @@ class WearListener : WearableListenerService() {
                                     val forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY)
                                     val request = PutDataMapRequest.create(BATTERY_PATH).apply{
                                         dataMap.putInt(BATTERY_KEY, level)
+                                        dataMap.putBoolean(IS_CHARGING_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryChargingStatus(applicationContext))
                                         if (forceUpdate){
                                             dataMap.putLong("immediate-update", System.currentTimeMillis())
                                         }}
@@ -54,12 +68,30 @@ class WearListener : WearableListenerService() {
 
                                     val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
                                     dataItemTask
-                                        .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
-                                        .addOnFailureListener { e -> Log.e(TAG,"Sending request task failed!: $e") }
-                                        .addOnCompleteListener{task -> Log.d(TAG,"Sending request Task complete!: $task")}
+                                        .addOnSuccessListener { dataItem -> Log.d(TAG,"WL: Sending Phone Battery request was successful: $dataItem") }
+                                        .addOnFailureListener { e -> Log.e(TAG,"WL: Sending request task failed!: $e") }
+                                        .addOnCompleteListener{task -> Log.d(TAG,"WL: Sending request Task complete!: $task")}
                                     }
+                        ACTIVE_SYNC_PATH -> {
+                            Log.d(TAG,"Active Sync: Received status change info!")
+                            val activeSyncState = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
+                            if (activeSyncState) {
+                                Log.d(TAG,"Turning Active Sync ON")
+                                BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
+                                runBlocking {
+                                    repository.setActiveSyncState(true)
                                 }
+                            }
+                            else {
+                                Log.d(TAG,"Turning Active Sync OFF")
+                                BatteryStatusBroadcastReceiver.unsubscribeFromUpdates(this)
+                                runBlocking {
+                                    repository.setActiveSyncState(false)
+                                }
+                            }
                         }
+                    }
+                }
 
                 DataEvent.TYPE_DELETED -> { Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString()) }
                 else -> { Log.e(TAG, "Unknown data event Type = " + dataEvent.type) }

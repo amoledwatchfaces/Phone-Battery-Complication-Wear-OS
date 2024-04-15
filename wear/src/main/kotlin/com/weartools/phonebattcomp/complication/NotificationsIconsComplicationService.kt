@@ -86,7 +86,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                         val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
                         //Log.w(ContentValues.TAG, "Icon List size: ${byteArrayList.size}")
                         if (byteArrayList.size == 1) {
-                            Icon.createWithData(byteArrayList[0],0, byteArrayList[0].size)
+                            Icon.createWithBitmap(BitmapCreator.createSingleBitmap(byteArrayList[0]))
                                 .setTint(Color.WHITE)
                         }
                         else {

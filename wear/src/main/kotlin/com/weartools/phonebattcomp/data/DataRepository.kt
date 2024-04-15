@@ -33,6 +33,15 @@ private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(na
 
 class DataRepository(private val context: Context) {
 
+    val activeSync: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[ACTIVE_SYNC] ?: false
+    }
+
+    val isCharging: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[IS_CHARGING] ?: false
+    }
+
+
     val nodeName: Flow<String> = context.dataStore.data.map { prefs ->
         prefs[NODE_NAME] ?: "Not connected"
     }
@@ -86,6 +95,19 @@ class DataRepository(private val context: Context) {
             prefs[TEMP_UNIT] = tempUnit
         }
     }
+
+    suspend fun setActiveSyncState(state: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[ACTIVE_SYNC] = state
+        }
+    }
+
+    suspend fun setChargingState(state: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[IS_CHARGING] = state
+        }
+    }
+
     suspend fun storePercentage(percentage: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[PERCENTAGE] = percentage
@@ -124,7 +146,8 @@ class DataRepository(private val context: Context) {
         hasMobileApp: Boolean,
         afterMobileResult: Boolean,
         isConnected: Boolean,
-        lastUpdate: Long
+        lastUpdate: Long,
+        isCharging: Boolean
     ) {
         context.dataStore.edit { prefs ->
             prefs[BATTERY_LEVEL] = batteryLevel
@@ -132,6 +155,7 @@ class DataRepository(private val context: Context) {
             prefs[AFTER_MOBILE_RESULT] = afterMobileResult
             prefs[IS_CONNECTED] = isConnected
             prefs[LAST_UPDATE] = lastUpdate
+            prefs[IS_CHARGING] = isCharging
         }
     }
 
@@ -149,6 +173,8 @@ class DataRepository(private val context: Context) {
         private val IS_TILE_SET = booleanPreferencesKey("is_tile_set")
 
         private val BITMAP_LIST_KEY = stringPreferencesKey("notify_bitmap_list")
+        private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
+        private val IS_CHARGING = booleanPreferencesKey("is_charging")
     }
 }
 

@@ -64,7 +64,8 @@ fun PhoneBatteryAppScreen(
     nodeName: String,
     batteryLevel: Int,
     tempUnit: Boolean,
-    percentage: Boolean
+    percentage: Boolean,
+    activeSync: Boolean
 ) {
     val viewModel: PassiveDataViewModel = viewModel()
     val context = LocalContext.current
@@ -141,6 +142,17 @@ fun PhoneBatteryAppScreen(
                 secondaryLabelOff = stringResource(id = R.string.temp_unit_F),
                 checked = tempUnit,
                 onCheckedChange = {viewModel.toggleEnabled(context)}
+            )
+        }
+        item {
+            ToggleChip(
+                label = stringResource(id = R.string.active_sync),
+                secondaryLabelOn = stringResource(id = R.string.active_sync_experimental),
+                secondaryLabelOff = stringResource(id = R.string.active_sync_experimental),
+                checked = activeSync,
+                onCheckedChange = {
+                    viewModel.toggleActiveSync(it, context)
+                }
             )
         }
 

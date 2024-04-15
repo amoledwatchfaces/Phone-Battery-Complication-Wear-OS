@@ -8,6 +8,22 @@ import android.graphics.Paint
 
 object BitmapCreator {
 
+    fun createSingleBitmap(byteArray: ByteArray): Bitmap {
+        val canvasSize = 96
+
+        val resultBitmap = Bitmap.createBitmap(canvasSize,canvasSize, Bitmap.Config.ARGB_8888)
+
+        val canvas = Canvas(resultBitmap)
+        val paint = Paint()
+
+        val subBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+        val scaledBitmap = Bitmap.createScaledBitmap(subBitmap, 72, 72, false)
+
+        canvas.drawBitmap(scaledBitmap, 12F, 12F, paint)
+
+        return resultBitmap
+    }
+
     fun createCompositeBitmap(byteArrays: List<ByteArray>): Bitmap {
         val canvasSize = 96
 
@@ -34,7 +50,7 @@ object BitmapCreator {
                     y = 0F
                 }
                 2 -> {
-                    x = 0F
+                    x = if (numByteArrays == 3) 24F else 0F
                     y = 48F
                 }
                 else -> {
