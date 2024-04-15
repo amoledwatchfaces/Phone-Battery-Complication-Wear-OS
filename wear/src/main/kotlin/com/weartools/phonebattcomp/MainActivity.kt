@@ -93,7 +93,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
         try {
             val capabilityInfo = capabilityClient
-                .getCapability(CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_ALL)
+                .getCapability(CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_REACHABLE)
                 .await()
 
             withContext(Dispatchers.Main) {

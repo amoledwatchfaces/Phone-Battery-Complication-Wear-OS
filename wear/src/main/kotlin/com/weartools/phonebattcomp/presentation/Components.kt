@@ -152,12 +152,11 @@ fun PreferenceCategory(
     Text(
         text = title,
         modifier = modifier.padding(
-            start = 16.dp,
             top = 14.dp,
-            end = 16.dp,
             bottom = 4.dp
         ),
         color = wearColorPalette.secondary,
+        textAlign = TextAlign.Center,
         style = MaterialTheme.typography.caption2
     )
 }

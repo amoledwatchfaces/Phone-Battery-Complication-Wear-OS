@@ -144,6 +144,15 @@ fun PhoneBatteryAppScreen(
                 onCheckedChange = {viewModel.toggleEnabled(context)}
             )
         }
+        item { PreferenceCategory(title = "Active Sync: Alpha") }
+        item {
+            SectionText(
+                text = "Notification Access necessary! (companion app)",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 5.dp),
+            )
+        }
         item {
             ToggleChip(
                 label = stringResource(id = R.string.active_sync),

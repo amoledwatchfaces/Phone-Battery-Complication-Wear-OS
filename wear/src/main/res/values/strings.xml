@@ -19,7 +19,8 @@
     <string name="active_sync">Active Sync</string>
     <string name="active_sync_on">Enabled</string>
     <string name="active_sync_off">Disabled</string>
-    <string name="active_sync_experimental">Experimental!!</string>
+    <string name="active_sync_experimental">More frequent complication updates ++ charging
+        status</string>
 
     <!-- Percentage -->
     <string name="percentage_section" translatable="false">Phone / Watch Battery Complication</string>

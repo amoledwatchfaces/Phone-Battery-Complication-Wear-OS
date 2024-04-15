@@ -12,8 +12,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000330
-        versionName = "3.3.0"
+        versionCode = 10000336
+        versionName = "3.3.5"
     }
 
     testBuildType = "debug"

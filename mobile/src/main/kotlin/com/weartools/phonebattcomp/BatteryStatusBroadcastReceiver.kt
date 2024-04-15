@@ -22,38 +22,43 @@ import kotlin.coroutines.cancellation.CancellationException
 class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
 
     private var lastBatteryLevelPercentSent: Int? = null
+    private var lastChargingStatus: Boolean? = null
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
+        Log.i("PHONE BATTERY COMPLICATION", "Received $intent")
         try {
-            val maybeBatteryPercentage = when(intent.action) {
-                ACTION_BATTERY_CHANGED -> intent.getBatteryLevelPercent()
-                ACTION_POWER_CONNECTED, ACTION_POWER_DISCONNECTED -> 0
-                else -> null
+            var batteryLevel: Int? = null
+            var isCharging: Boolean? = null
+            when (intent.action){
+                ACTION_BATTERY_CHANGED -> {
+                    batteryLevel = intent.getBatteryLevelPercent()
+                    isCharging = intent.getBatteryChargingStatus()
+                }
+                ACTION_POWER_CONNECTED -> {
+                    batteryLevel = context.registerReceiver(null, IntentFilter(ACTION_BATTERY_CHANGED))?.getBatteryLevelPercent()
+                    isCharging = true
+                }
+                ACTION_POWER_DISCONNECTED -> {
+                    batteryLevel = context.registerReceiver(null, IntentFilter(ACTION_BATTERY_CHANGED))?.getBatteryLevelPercent()
+                    isCharging = false }
             }
 
-            if (maybeBatteryPercentage == null) {
-                Log.w("BatteryStatusBroadcastReceiver", "Unable to extract battery level")
+            if (batteryLevel == null && isCharging == null) {
+                Log.w("BatteryStatusBroadcastReceiver", "Unable to extract battery status")
                 return
             }
 
             GlobalScope.launch {
                 try {
-                    if (maybeBatteryPercentage != lastBatteryLevelPercentSent) {
+                    if (batteryLevel != lastBatteryLevelPercentSent || isCharging != lastChargingStatus) {
 
-                        val levelToSend =  if (maybeBatteryPercentage == 0) lastBatteryLevelPercentSent?:0 else maybeBatteryPercentage
-
-                        val chargingStatus = when(intent.action){
-                            ACTION_BATTERY_CHANGED -> intent.getBatteryChargingStatus()
-                                else -> getCurrentBatteryChargingStatus(context)
-                        }
-
-                        Log.i(TAG,"Active Sync: Sending Battery Level: $maybeBatteryPercentage")
-                        Log.i(TAG,"Active Sync: Is Charging?: $chargingStatus")
+                        Log.i(TAG,"Active Sync: Sending Battery Level: $batteryLevel")
+                        Log.i(TAG,"Active Sync: Is Charging?: $isCharging")
 
                         val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                            dataMap.putInt(BATTERY_KEY, levelToSend)
-                            dataMap.putBoolean(IS_CHARGING_KEY, chargingStatus)
+                            dataMap.putInt(BATTERY_KEY, batteryLevel?: lastBatteryLevelPercentSent?:0)
+                            dataMap.putBoolean(IS_CHARGING_KEY, isCharging?: lastChargingStatus?: false)
                             }
                             .asPutDataRequest()
                             .setUrgent()
@@ -64,7 +69,8 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                             .addOnFailureListener { e -> Log.e(TAG,"BSBR: request task failed!: $e") }
                             .addOnCompleteListener{task -> Log.d(TAG,"BSBR: request Task complete!: $task")}
 
-                        lastBatteryLevelPercentSent = maybeBatteryPercentage
+                        lastBatteryLevelPercentSent = batteryLevel
+                        lastChargingStatus = isCharging
                     }
 
                 } catch (t: Throwable) {
