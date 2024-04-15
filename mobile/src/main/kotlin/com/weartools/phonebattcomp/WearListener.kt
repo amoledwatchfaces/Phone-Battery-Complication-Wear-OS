@@ -22,10 +22,8 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
-import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
@@ -55,35 +53,39 @@ class WearListener : WearableListenerService() {
                 DataEvent.TYPE_CHANGED -> {
                     when (dataEvent.dataItem.uri.path) {
                         REQUEST_PATH -> {
-                                    val level = batteryLevel
-                                    val forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY)
-                                    val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                                        dataMap.putInt(BATTERY_KEY, level)
-                                        dataMap.putBoolean(IS_CHARGING_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryChargingStatus(applicationContext))
-                                        if (forceUpdate){
-                                            dataMap.putLong("immediate-update", System.currentTimeMillis())
-                                        }}
-                                        .asPutDataRequest()
-                                        .setUrgent()
+                            val level = batteryLevel
+                            val forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY)
+                            val request = PutDataMapRequest.create(BATTERY_PATH).apply{
+                                dataMap.putInt(BATTERY_KEY, level)
+                                dataMap.putBoolean(IS_CHARGING_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryChargingStatus(applicationContext))
+                                if (forceUpdate){
+                                    dataMap.putLong("immediate-update", System.currentTimeMillis())
+                                }
+                            }
+                                .asPutDataRequest()
+                                .setUrgent()
 
+                            Wearable.getDataClient(this).putDataItem(request)
+                            /*
                                     val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
                                     dataItemTask
                                         .addOnSuccessListener { dataItem -> Log.d(TAG,"WL: Sending Phone Battery request was successful: $dataItem") }
                                         .addOnFailureListener { e -> Log.e(TAG,"WL: Sending request task failed!: $e") }
                                         .addOnCompleteListener{task -> Log.d(TAG,"WL: Sending request Task complete!: $task")}
-                                    }
+                             */
+                        }
                         ACTIVE_SYNC_PATH -> {
-                            Log.d(TAG,"Active Sync: Received status change info!")
+                            //Log.d(TAG,"Active Sync: Received status change info!")
                             val activeSyncState = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
                             if (activeSyncState) {
-                                Log.d(TAG,"Turning Active Sync ON")
+                                //Log.d(TAG,"Turning Active Sync ON")
                                 BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
                                 runBlocking {
                                     repository.setActiveSyncState(true)
                                 }
                             }
                             else {
-                                Log.d(TAG,"Turning Active Sync OFF")
+                                //Log.d(TAG,"Turning Active Sync OFF")
                                 BatteryStatusBroadcastReceiver.unsubscribeFromUpdates(this)
                                 runBlocking {
                                     repository.setActiveSyncState(false)

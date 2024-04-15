@@ -17,9 +17,7 @@
 package com.weartools.phonebattcomp.complication
 
 import android.content.ComponentName
-import android.content.ContentValues.TAG
 import android.graphics.drawable.Icon
-import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.LongTextComplicationData
@@ -87,10 +85,10 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
 
         val isCharging = repository.isCharging.first()
-        Log.i(TAG, "Complication: is phone charging? $isCharging")
         val isWatchConnected = repository.isConnected.first()
         val activeSync = repository.activeSync.first()
         val percentage = if (repository.percentage.first()) "%" else ""
+        //Log.i(TAG, "Complication: is phone charging? $isCharging")
 
         if (activeSync.not()) {
             val hasResult = repository.afterMobileResult.first()

@@ -21,7 +21,6 @@ import android.content.ContentValues
 import android.content.Context
 import android.util.Log
 import androidx.wear.tiles.TileService
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -56,7 +55,7 @@ class MobileListener : WearableListenerService() {
     private val repository by lazy { DataRepository(this) }
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
+        //if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
 
         dataEvents.forEach { dataEvent ->
             when (dataEvent.type) {
@@ -66,7 +65,7 @@ class MobileListener : WearableListenerService() {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
                             val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
                             val isCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
-                            Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
+                            //Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
                             runBlocking { repository.storeResponse(
                                 batteryLevel = level,
                                 hasMobileApp = true,
@@ -148,11 +147,15 @@ class MobileListener : WearableListenerService() {
                     .asPutDataRequest()
                     .setUrgent()
 
+                Wearable.getDataClient(context).putDataItem(request)
+
+                /*
                 val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
                 dataItemTask
                     .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
                     .addOnFailureListener { e -> Log.e(TAG,"Sending request task failed!: $e") }
                     .addOnCompleteListener{task -> Log.d(TAG,"Sending request Task complete!: $task")}
+                */
             }
             else
                 Log.e(TAG, "Too many updates")
@@ -167,11 +170,15 @@ class MobileListener : WearableListenerService() {
                     .asPutDataRequest()
                     .setUrgent()
 
+                Wearable.getDataClient(context).putDataItem(request)
+
+                /*
                 val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
                 dataItemTask
                     .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Active Sync Status was successful: $dataItem") }
                     .addOnFailureListener { e -> Log.e(TAG,"Sending Active Sync Status task failed!: $e") }
                     .addOnCompleteListener{task -> Log.d(TAG,"Sending Active Sync Task complete!: $task")}
+                */
 
         }
     }
