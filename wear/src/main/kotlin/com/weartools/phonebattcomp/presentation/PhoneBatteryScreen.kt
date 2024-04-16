@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ContactSupport
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.material.icons.outlined.Smartphone
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -44,8 +46,11 @@ import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.OutlinedButton
+import androidx.wear.compose.material.OutlinedCompactChip
+import androidx.wear.compose.material.Text
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.weartools.phonebattcomp.BuildConfig
@@ -64,12 +69,12 @@ fun PhoneBatteryAppScreen(
     nodeName: String,
     batteryLevel: Int,
     tempUnit: Boolean,
-    percentage: Boolean,
-    activeSync: Boolean
+    percentage: Boolean
 ) {
     val viewModel: PassiveDataViewModel = viewModel()
     val context = LocalContext.current
     var openHowTo by remember{ mutableStateOf(false) }
+    var openExperimental by remember{ mutableStateOf(false) }
 
     ScalingLazyColumn(
         modifier = Modifier
@@ -144,24 +149,19 @@ fun PhoneBatteryAppScreen(
                 onCheckedChange = {viewModel.toggleEnabled(context)}
             )
         }
-        item { PreferenceCategory(title = "Active Sync: Alpha") }
-        item {
-            SectionText(
-                text = "Notification Access necessary! (companion app)",
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 5.dp),
-            )
-        }
-        item {
-            ToggleChip(
-                label = stringResource(id = R.string.active_sync),
-                secondaryLabelOn = stringResource(id = R.string.active_sync_experimental),
-                secondaryLabelOff = stringResource(id = R.string.active_sync_experimental),
-                checked = activeSync,
-                onCheckedChange = {
-                    viewModel.toggleActiveSync(it, context)
-                }
+
+        item{
+            OutlinedCompactChip(
+                colors = ChipDefaults.chipColors(
+                    backgroundColor = Color(0xFF0E1011)
+                ),
+                border = ChipDefaults.outlinedChipBorder(),
+                label = { Text(color = wearColorPalette.secondary, text = "Experimental")},
+                modifier = Modifier.padding(top = 12.dp),
+                icon = {
+                    Icon(imageVector = Icons.Filled.Science, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                       },
+                onClick = { openExperimental=openExperimental.not() }
             )
         }
 
@@ -183,6 +183,16 @@ fun PhoneBatteryAppScreen(
                 return@ListItemsWidget
             } else {
                 openHowTo = openHowTo.not()
+            }
+        })
+    }
+    if (openExperimental){
+        ExperimentalWidget(viewModel= viewModel,context = context, callback = {
+            if (it == -1) {
+                openExperimental = false
+                return@ExperimentalWidget
+            } else {
+                openExperimental = openExperimental.not()
             }
         })
     }

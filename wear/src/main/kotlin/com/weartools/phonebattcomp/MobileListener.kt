@@ -46,6 +46,8 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 private const val ACTIVE_SYNC_PATH = "/active-sync"
 private const val ACTIVE_SYNC_KEY = "active-sync-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
+private const val NOTIFICATIONS_SYNC_PATH = "/notifications-sync"
+private const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
 private const val URI = "/foobar"
 private const val TAG = "MobileListener::"
 
@@ -171,15 +173,17 @@ class MobileListener : WearableListenerService() {
                     .setUrgent()
 
                 Wearable.getDataClient(context).putDataItem(request)
+        }
+        fun sendNotificationsSyncState (state: Boolean, context: Context) {
 
-                /*
-                val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
-                dataItemTask
-                    .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Active Sync Status was successful: $dataItem") }
-                    .addOnFailureListener { e -> Log.e(TAG,"Sending Active Sync Status task failed!: $e") }
-                    .addOnCompleteListener{task -> Log.d(TAG,"Sending Active Sync Task complete!: $task")}
-                */
+            Log.d(TAG,"Sending Notifications Sync State: $state")
 
+            val request = PutDataMapRequest.create(NOTIFICATIONS_SYNC_PATH).apply{
+                dataMap.putBoolean(NOTIFICATIONS_SYNC_KEY, state)}
+                .asPutDataRequest()
+                .setUrgent()
+
+            Wearable.getDataClient(context).putDataItem(request)
         }
     }
 }

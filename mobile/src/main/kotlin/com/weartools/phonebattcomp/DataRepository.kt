@@ -16,12 +16,21 @@ class DataRepository(private val context: Context) {
     val activeSync: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[ACTIVE_SYNC] ?: false
     }
+    val notificationsSync: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[NOTIFICATIONS_SYNC] ?: true
+    }
     suspend fun setActiveSyncState(state: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[ACTIVE_SYNC] = state
         }
     }
+    suspend fun setNotificationsSyncState(state: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[NOTIFICATIONS_SYNC] = state
+        }
+    }
     companion object {
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
+        private val NOTIFICATIONS_SYNC = booleanPreferencesKey("notifications_sync")
     }
 }

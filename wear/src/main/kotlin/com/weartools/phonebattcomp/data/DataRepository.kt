@@ -36,6 +36,9 @@ class DataRepository(private val context: Context) {
     val activeSync: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[ACTIVE_SYNC] ?: false
     }
+    val notificationsSync: Flow<Boolean> = context.dataStore.data.map { prefs ->
+        prefs[NOTIFICATIONS_SYNC] ?: true
+    }
 
     val isCharging: Flow<Boolean> = context.dataStore.data.map { prefs ->
         prefs[IS_CHARGING] ?: false
@@ -99,6 +102,11 @@ class DataRepository(private val context: Context) {
     suspend fun setActiveSyncState(state: Boolean) {
         context.dataStore.edit { prefs ->
             prefs[ACTIVE_SYNC] = state
+        }
+    }
+    suspend fun setNotificationsSyncState(state: Boolean) {
+        context.dataStore.edit { prefs ->
+            prefs[NOTIFICATIONS_SYNC] = state
         }
     }
 
@@ -174,6 +182,7 @@ class DataRepository(private val context: Context) {
 
         private val BITMAP_LIST_KEY = stringPreferencesKey("notify_bitmap_list")
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
+        private val NOTIFICATIONS_SYNC = booleanPreferencesKey("notifications_sync")
         private val IS_CHARGING = booleanPreferencesKey("is_charging")
     }
 }

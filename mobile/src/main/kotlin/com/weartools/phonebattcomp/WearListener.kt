@@ -16,7 +16,6 @@
  */
 package com.weartools.phonebattcomp
 
-import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.IntentFilter
@@ -40,13 +39,15 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 private const val ACTIVE_SYNC_PATH = "/active-sync"
 private const val ACTIVE_SYNC_KEY = "active-sync-key"
 
+private const val NOTIFICATIONS_SYNC_PATH = "/notifications-sync"
+private const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
+
 class WearListener : WearableListenerService() {
 
     private val repository by lazy { DataRepository(this) }
 
-    @SuppressLint("VisibleForTests")
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-        if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
+        //if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
 
         dataEvents.forEach { dataEvent ->
             when (dataEvent.type) {
@@ -89,6 +90,22 @@ class WearListener : WearableListenerService() {
                                 BatteryStatusBroadcastReceiver.unsubscribeFromUpdates(this)
                                 runBlocking {
                                     repository.setActiveSyncState(false)
+                                }
+                            }
+                        }
+                        NOTIFICATIONS_SYNC_PATH -> {
+                            //Log.d(TAG,"Active Sync: Received status change info!")
+                            val notificationsSyncState = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(NOTIFICATIONS_SYNC_KEY)
+                            if (notificationsSyncState) {
+                                //Log.d(TAG,"Turning Active Sync ON")
+                                runBlocking {
+                                    repository.setNotificationsSyncState(true)
+                                }
+                            }
+                            else {
+                                //Log.d(TAG,"Turning Active Sync OFF")
+                                runBlocking {
+                                    repository.setNotificationsSyncState(false)
                                 }
                             }
                         }

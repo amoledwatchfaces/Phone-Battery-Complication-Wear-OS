@@ -39,6 +39,7 @@ class PassiveDataViewModel(
     val tempUnit = dataRepository.tempUnit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
     val percentage = dataRepository.percentage.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
     init {
         viewModelScope.launch {
@@ -47,6 +48,7 @@ class PassiveDataViewModel(
             dataRepository.tempUnit.distinctUntilChanged().collect {}
             dataRepository.percentage.distinctUntilChanged().collect {}
             dataRepository.activeSync.distinctUntilChanged().collect {}
+            dataRepository.notificationsSync.distinctUntilChanged().collect {}
         }
     }
 
@@ -70,6 +72,12 @@ class PassiveDataViewModel(
         viewModelScope.launch {
             dataRepository.setActiveSyncState(state)
             MobileListener.sendActiveSyncState(state,context)
+        }
+    }
+    fun toggleNotificationsSync(state: Boolean,context: Context) {
+        viewModelScope.launch {
+            dataRepository.setNotificationsSyncState(state)
+            MobileListener.sendNotificationsSyncState(state,context)
         }
     }
 

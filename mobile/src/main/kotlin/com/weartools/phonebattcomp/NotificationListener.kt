@@ -1,19 +1,24 @@
 package com.weartools.phonebattcomp
 
-import android.annotation.SuppressLint
-import android.content.ContentValues
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
-import java.util.*
 
 class NotificationListener : NotificationListenerService() {
+
+    private val repository by lazy { DataRepository(this) }
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     companion object {
         private const val ICON_SIZE = 48
@@ -22,21 +27,32 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
-        sendToWatch()
+        serviceScope.launch {
+            if (repository.notificationsSync.first()) sendToWatch()
+        }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        Log.w(ContentValues.TAG, "Notification Posted!")
-        sendToWatch()
+        //Log.w(ContentValues.TAG, "Notification Posted!")
+        serviceScope.launch {
+            if (repository.notificationsSync.first()) sendToWatch()
+        }
     }
+
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        Log.w(ContentValues.TAG, "Notification Removed!")
-        sendToWatch()
+        //Log.w(ContentValues.TAG, "Notification Removed!")
+        serviceScope.launch {
+            if (repository.notificationsSync.first()) sendToWatch()
+        }
+    }
+    override fun onDestroy() {
+        super.onDestroy()
+        serviceScope.cancel()
     }
 
-    @SuppressLint("VisibleForTests")
     private fun sendToWatch() {
+        //Log.i("NotificationListener", "Sending notifications icon to watch")
         val putDataMapReq = PutDataMapRequest.create(URI)
         val bitmaps = ArrayList<Bitmap>()
         for (notification in activeNotifications) {

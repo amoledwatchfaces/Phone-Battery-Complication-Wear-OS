@@ -41,10 +41,12 @@ class MainViewModel(
 ) : ViewModel() {
 
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
     init {
         viewModelScope.launch {
             dataRepository.activeSync.distinctUntilChanged().collect {}
+            dataRepository.notificationsSync.distinctUntilChanged().collect {}
         }
     }
 

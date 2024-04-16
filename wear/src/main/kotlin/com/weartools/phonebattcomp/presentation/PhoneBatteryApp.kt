@@ -41,7 +41,6 @@ fun PhoneBatteryApp(
             val nodeName by viewModel.nodeName.collectAsState()
             val tempUnit by viewModel.tempUnit.collectAsState()
             val percentage by viewModel.percentage.collectAsState()
-            val activeSync by viewModel.activeSync.collectAsState()
 
             PhoneBatteryAppScreen(
                 listState = listState,
@@ -49,8 +48,7 @@ fun PhoneBatteryApp(
                 nodeName = nodeName,
                 batteryLevel = batteryLevel,
                 tempUnit = tempUnit,
-                percentage = percentage,
-                activeSync = activeSync
+                percentage = percentage
             )
         }
     }
