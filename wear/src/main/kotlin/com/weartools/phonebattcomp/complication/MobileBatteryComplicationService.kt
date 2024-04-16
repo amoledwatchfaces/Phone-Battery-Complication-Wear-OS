@@ -31,7 +31,6 @@ import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataRepository
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
 
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
@@ -96,7 +95,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             if (!hasResult) {
                 MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, false)
             }
-            else { runBlocking { repository.storeResult(false) } }
+            else { repository.storeResult(false) }
         }
 
         val level = repository.batteryLevel.first()

@@ -35,19 +35,16 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
-
 
     override fun onReceive(context: Context, intent: Intent) {
         val args = intent.getArgs()
         val result = goAsync()
 
-        val hasMobileApp = runBlocking { DataRepository(context).hasMobileApp.first() }
-
         scope.launch {
+            val hasMobileApp = DataRepository(context).hasMobileApp.first()
             try {
                 if (args.providerComponent.toString() == "ComponentInfo{com.weartools.phonebattcomp/com.weartools.phonebattcomp.complication.MobileBatteryComplicationService}" && (!hasMobileApp)){
                     MobileListener.sendPhoneBatteryRequest(0, context, true)

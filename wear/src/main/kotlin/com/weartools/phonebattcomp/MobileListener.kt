@@ -33,8 +33,10 @@ import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.data.DataRepository
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import com.weartools.phonebattcomp.utils.updateComplication
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
 import java.util.Base64
 
 private const val BATTERY_PATH = "/battery-level"
@@ -55,6 +57,7 @@ private const val TAG = "MobileListener::"
 class MobileListener : WearableListenerService() {
 
     private val repository by lazy { DataRepository(this) }
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         //if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
@@ -68,7 +71,7 @@ class MobileListener : WearableListenerService() {
                             val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
                             val isCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
                             //Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
-                            runBlocking { repository.storeResponse(
+                            ioScope.launch { repository.storeResponse(
                                 batteryLevel = level,
                                 hasMobileApp = true,
                                 afterMobileResult = true,
@@ -89,7 +92,7 @@ class MobileListener : WearableListenerService() {
                 }
                 DataEvent.TYPE_DELETED -> {
                 //Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString())
-                    runBlocking { repository.storeResponse(
+                    ioScope.launch { repository.storeResponse(
                         batteryLevel = 0,
                         hasMobileApp = false,
                         afterMobileResult = false,
@@ -107,16 +110,18 @@ class MobileListener : WearableListenerService() {
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
-        val hasMobileApp = runBlocking { repository.hasMobileApp.first() }
-        if (capabilityInfo.nodes.size > 0 && hasMobileApp) {
-            sendPhoneBatteryRequest(0,this, forceUpdate = true)
-        }
-        else {
-            runBlocking {
-                repository.storeConnection(false)
-                repository.storeResult(true)
+        ioScope.launch{
+            val hasMobileApp = repository.hasMobileApp.first()
+            if (capabilityInfo.nodes.size > 0 && hasMobileApp) {
+                sendPhoneBatteryRequest(0,this@MobileListener, forceUpdate = true)
             }
-            this.updateComplication(MobileBatteryComplicationService::class.java)
+            else {
+                ioScope.launch {
+                    repository.storeConnection(false)
+                    repository.storeResult(true)
+                }
+                updateComplication(MobileBatteryComplicationService::class.java)
+            }
         }
         //Log.d(TAG, "Capability changed: " + capabilityInfo.nodes.size)
     }
@@ -135,7 +140,7 @@ class MobileListener : WearableListenerService() {
 
         val concatenatedString = newBitmaps.joinToString("|") { Base64.getEncoder().encodeToString(it) }
 
-        runBlocking {repository.storeByteArrayMutableList(concatenatedString)}
+        ioScope.launch {repository.storeByteArrayMutableList(concatenatedString)}
     }
 
     companion object {

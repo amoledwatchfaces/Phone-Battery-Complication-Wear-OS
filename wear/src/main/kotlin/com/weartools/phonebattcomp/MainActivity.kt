@@ -33,7 +33,6 @@ import com.weartools.phonebattcomp.presentation.PhoneBatteryApp
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
@@ -82,7 +81,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         Log.d(TAG, "onCapabilityChanged(): $capabilityInfo")
         capabilityInfo.nodes.firstOrNull()?.let {
-            runBlocking {
+            lifecycleScope.launch {
                 repository.storeNodeName(it.displayName)
             }
         }

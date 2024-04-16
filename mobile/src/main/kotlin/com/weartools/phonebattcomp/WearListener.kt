@@ -27,7 +27,9 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 const val BATTERY_PATH = "/battery-level"
 const val BATTERY_KEY= "battery-key"
@@ -45,6 +47,7 @@ private const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
 class WearListener : WearableListenerService() {
 
     private val repository by lazy { DataRepository(this) }
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         //if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
@@ -81,14 +84,14 @@ class WearListener : WearableListenerService() {
                             if (activeSyncState) {
                                 //Log.d(TAG,"Turning Active Sync ON")
                                 BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
-                                runBlocking {
+                                ioScope.launch {
                                     repository.setActiveSyncState(true)
                                 }
                             }
                             else {
                                 //Log.d(TAG,"Turning Active Sync OFF")
                                 BatteryStatusBroadcastReceiver.unsubscribeFromUpdates(this)
-                                runBlocking {
+                                ioScope.launch {
                                     repository.setActiveSyncState(false)
                                 }
                             }
@@ -98,13 +101,13 @@ class WearListener : WearableListenerService() {
                             val notificationsSyncState = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(NOTIFICATIONS_SYNC_KEY)
                             if (notificationsSyncState) {
                                 //Log.d(TAG,"Turning Active Sync ON")
-                                runBlocking {
+                                ioScope.launch {
                                     repository.setNotificationsSyncState(true)
                                 }
                             }
                             else {
                                 //Log.d(TAG,"Turning Active Sync OFF")
-                                runBlocking {
+                                ioScope.launch {
                                     repository.setNotificationsSyncState(false)
                                 }
                             }
