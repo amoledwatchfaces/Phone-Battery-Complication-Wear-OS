@@ -108,6 +108,8 @@ class MobileListener : WearableListenerService() {
     }
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
+        Log.d("MobileListener", "Nodes: ${capabilityInfo.nodes}")
+        Log.d("MobileListener", "Name: ${capabilityInfo.name}")
         super.onCapabilityChanged(capabilityInfo)
         ioScope.launch{
             val hasMobileApp = repository.hasMobileApp.first()
