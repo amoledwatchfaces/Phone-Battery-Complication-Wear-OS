@@ -68,7 +68,7 @@
 
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
-                <data android:scheme="wear" android:host="*"  />
+                <data android:scheme="wear" android:host="*"/>
             </intent-filter>
 
             <intent-filter>
