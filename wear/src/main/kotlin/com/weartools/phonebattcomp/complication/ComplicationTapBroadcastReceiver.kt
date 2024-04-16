@@ -26,7 +26,7 @@ import android.util.Log
 import android.widget.Toast
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import com.weartools.phonebattcomp.MainActivity
+import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataRepository
@@ -68,7 +68,7 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
         val remoteActivityHelper = RemoteActivityHelper(context)
         val intentAndroid = Intent(Intent.ACTION_VIEW)
             .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setData(Uri.parse(MainActivity.PLAY_STORE_APP_URI))
+            .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
         remoteActivityHelper.startRemoteActivity(intentAndroid, targetNodeId = null)
     }
 

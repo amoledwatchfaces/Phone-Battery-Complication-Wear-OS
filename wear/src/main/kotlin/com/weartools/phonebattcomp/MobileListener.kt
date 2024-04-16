@@ -112,7 +112,7 @@ class MobileListener : WearableListenerService() {
         ioScope.launch{
             val hasMobileApp = repository.hasMobileApp.first()
             if (capabilityInfo.nodes.size > 0 && hasMobileApp) {
-                if (capabilityInfo.name == "mobile") {
+                if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP) {
                     capabilityInfo.nodes.firstOrNull()?.displayName?.let { repository.storeNodeName(it) }
                 }
                 sendPhoneBatteryRequest(0,this@MobileListener, forceUpdate = true)

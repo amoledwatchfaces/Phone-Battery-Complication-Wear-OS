@@ -54,7 +54,6 @@ import androidx.wear.compose.material.Text
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.weartools.phonebattcomp.BuildConfig
-import com.weartools.phonebattcomp.MainActivity
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.PassiveDataViewModel
@@ -209,7 +208,7 @@ fun openAppStoreOnPhone(context: Context) {
     val remoteActivityHelper = RemoteActivityHelper(context)
     val intentAndroid = Intent(Intent.ACTION_VIEW)
         .addCategory(Intent.CATEGORY_BROWSABLE)
-        .setData(Uri.parse(MainActivity.PLAY_STORE_APP_URI))
+        .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
     remoteActivityHelper.startRemoteActivity(intentAndroid,targetNodeId = null)
     Toast.makeText(context, context.getString(R.string.check_phone), Toast.LENGTH_LONG).show()
 }

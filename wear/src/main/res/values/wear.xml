@@ -19,5 +19,6 @@
     <string-array name="android_wear_capabilities" tools:ignore="UnusedResources" translatable="false">
         <!-- declaring the provided capabilities -->
         <item>wear</item>
+        <item>phonebattcomp_wear_app</item>
     </string-array>
 </resources>

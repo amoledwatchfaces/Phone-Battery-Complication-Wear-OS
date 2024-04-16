@@ -16,6 +16,7 @@
  */
 package com.weartools.phonebattcomp
 
+import android.content.ContentValues.TAG
 import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
@@ -69,12 +70,12 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
     override fun onResume() {
         super.onResume()
         MobileListener.sendPhoneBatteryRequest(0,this,true)
-        capabilityClient.addListener(this, CAPABILITY_MOBILE_APP)
+        capabilityClient.addListener(this, BuildConfig.CAPABILITY_MOBILE_APP)
     }
 
     override fun onPause() {
         super.onPause()
-        capabilityClient.removeListener(this, CAPABILITY_MOBILE_APP)
+        capabilityClient.removeListener(this, BuildConfig.CAPABILITY_MOBILE_APP)
 
     }
 
@@ -92,7 +93,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
         try {
             val capabilityInfo = capabilityClient
-                .getCapability(CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_REACHABLE)
+                .getCapability(BuildConfig.CAPABILITY_MOBILE_APP, CapabilityClient.FILTER_REACHABLE)
                 .await()
 
             withContext(Dispatchers.Main) {
@@ -106,12 +107,6 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
         } catch (throwable: Throwable) {
             Log.d(TAG, "Capability request failed to return any results.")
         }
-    }
-
-    companion object {
-        const val PLAY_STORE_APP_URI = "market://details?id=com.weartools.phonebattcomp"
-        private val TAG = MainActivity::class.java.simpleName
-        private const val CAPABILITY_MOBILE_APP = "mobile"
     }
 }
 
