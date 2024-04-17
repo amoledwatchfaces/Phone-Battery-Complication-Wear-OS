@@ -27,8 +27,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000365
-        versionName = "3.6.6"
+        versionCode = 10000369
+        versionName = "3.7.0"
     }
 
     testBuildType = "debug"
@@ -50,7 +50,7 @@ android {
     buildTypes {
         release {
             isMinifyEnabled = true
-            isShrinkResources = false
+            isShrinkResources = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
             signingConfig = signingConfigs.getByName("release")
         }
