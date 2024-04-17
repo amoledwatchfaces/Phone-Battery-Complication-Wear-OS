@@ -1,9 +1,24 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
 }
 
 android {
+
+    signingConfigs {
+        create("release") {
+            val keystoreProperties = Properties().apply{
+                load(FileInputStream(file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.properties")))
+            }
+            storeFile = file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.jks")
+            keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
+            storePassword = keystoreProperties.getProperty("STORE_PASSWORD")
+            keyPassword= keystoreProperties.getProperty("KEY_PASSWORD")
+        }
+    }
 
     compileSdk = 34
 
@@ -12,8 +27,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000363
-        versionName = "3.6.4"
+        versionCode = 10000365
+        versionName = "3.6.6"
     }
 
     testBuildType = "debug"
@@ -37,6 +52,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 

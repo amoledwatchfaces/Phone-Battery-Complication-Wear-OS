@@ -83,6 +83,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
 
+        //Log.d("COMPLICATION UPDATE", "Updating Phone Battery Complication")
+
         if (!repository.activeSync.first()) {
             if (!repository.afterMobileResult.first()) {
                 MobileListener.sendPhoneBatteryRequest(repository.lastUpdate.first(), applicationContext, false)

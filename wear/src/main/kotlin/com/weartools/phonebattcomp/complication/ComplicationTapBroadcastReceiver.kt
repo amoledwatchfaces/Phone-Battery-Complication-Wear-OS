@@ -22,7 +22,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.util.Log
 import android.widget.Toast
 import androidx.wear.remote.interactions.RemoteActivityHelper
@@ -52,7 +51,6 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
                     openAppStoreOnPhone(context = context)
                     Log.d(TAG, "Opening Play Store Listing!")
                     Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()
-
                 } else {
                     ComplicationDataSourceUpdateRequester
                         .create(context = context, complicationDataSourceComponent = args.providerComponent)
@@ -89,17 +87,9 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
-        private fun Intent.getArgs(): ComplicationToggleArgs {
-            return when {
-                Build.VERSION.SDK_INT >= 33 ->
-                    extras?.getParcelable(EXTRA_ARGS, ComplicationToggleArgs::class.java)
-                        ?: throw IllegalStateException("ComplicationToggleArgs not found in Intent extras")
-                else -> {
-                    @Suppress("DEPRECATION")
-                    extras?.getParcelable(EXTRA_ARGS) as? ComplicationToggleArgs
-                        ?: throw IllegalStateException("ComplicationToggleArgs not found in Intent extras")
-                }
-            }
-        }
+        private fun Intent.getArgs(): ComplicationToggleArgs = requireNotNull(
+            @Suppress("DEPRECATION")
+            extras?.getParcelable(EXTRA_ARGS)
+        )
     }
 }

@@ -1,3 +1,6 @@
+import java.io.FileInputStream
+import java.util.Properties
+
 plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
@@ -6,14 +9,26 @@ plugins {
 
 android {
 
+    signingConfigs {
+        create("release") {
+            val keystoreProperties = Properties().apply{
+                load(FileInputStream(file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.properties")))
+            }
+            storeFile = file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.jks")
+            keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
+            storePassword = keystoreProperties.getProperty("STORE_PASSWORD")
+            keyPassword= keystoreProperties.getProperty("KEY_PASSWORD")
+        }
+    }
+
     compileSdk = 34
 
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000364
-        versionName = "3.6.4"
+        versionCode = 10000366
+        versionName = "3.6.6"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -24,6 +39,7 @@ android {
             isMinifyEnabled = true
             isShrinkResources = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("release")
         }
     }
 
@@ -53,6 +69,7 @@ dependencies {
 
     // WEAR OS
     implementation ("com.google.android.gms:play-services-wearable:18.1.0")
+    implementation ("androidx.wear.watchface:watchface:1.2.1")
     implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha02")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
