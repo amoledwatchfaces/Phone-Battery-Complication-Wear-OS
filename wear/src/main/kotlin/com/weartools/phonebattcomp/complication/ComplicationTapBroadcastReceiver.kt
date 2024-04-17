@@ -18,6 +18,7 @@ package com.weartools.phonebattcomp.complication
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -46,18 +47,16 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
         scope.launch {
             val hasMobileApp = DataRepository(context).hasMobileApp.first()
             try {
-                if (args.providerComponent.toString() == "ComponentInfo{com.weartools.phonebattcomp/com.weartools.phonebattcomp.complication.MobileBatteryComplicationService}" && (!hasMobileApp)){
+                if (args.providerComponent == ComponentName(context, MobileBatteryComplicationService::class.java) && hasMobileApp.not()) {
                     MobileListener.sendPhoneBatteryRequest(0, context, true)
                     openAppStoreOnPhone(context = context)
                     Log.d(TAG, "Opening Play Store Listing!")
                     Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()
 
-                }
-                else {
-                    //MobileListener.sendPhoneBatteryRequest(0, context, true)
-                ComplicationDataSourceUpdateRequester
-                    .create(context = context, complicationDataSourceComponent = args.providerComponent)
-                    .requestUpdate(args.complicationInstanceId)
+                } else {
+                    ComplicationDataSourceUpdateRequester
+                        .create(context = context, complicationDataSourceComponent = args.providerComponent)
+                        .requestUpdate(args.complicationInstanceId)
                 }
             } finally {
                 result.finish()
@@ -90,16 +89,17 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
         }
-        private fun Intent.getArgs(): ComplicationToggleArgs =
-            when {
+        private fun Intent.getArgs(): ComplicationToggleArgs {
+            return when {
                 Build.VERSION.SDK_INT >= 33 ->
-                    requireNotNull(
-                        extras?.getParcelable(EXTRA_ARGS, ComplicationToggleArgs::class.java)
-                    )
-                else -> requireNotNull(
+                    extras?.getParcelable(EXTRA_ARGS, ComplicationToggleArgs::class.java)
+                        ?: throw IllegalStateException("ComplicationToggleArgs not found in Intent extras")
+                else -> {
                     @Suppress("DEPRECATION")
-                    extras?.getParcelable(EXTRA_ARGS)
-                )
+                    extras?.getParcelable(EXTRA_ARGS) as? ComplicationToggleArgs
+                        ?: throw IllegalStateException("ComplicationToggleArgs not found in Intent extras")
+                }
             }
+        }
     }
 }

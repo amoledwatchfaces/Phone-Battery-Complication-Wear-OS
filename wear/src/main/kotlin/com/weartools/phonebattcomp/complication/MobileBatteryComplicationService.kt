@@ -83,23 +83,25 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
 
-        val isCharging = repository.isCharging.first()
-        val isWatchConnected = repository.isConnected.first()
-        val activeSync = repository.activeSync.first()
-        val percentage = if (repository.percentage.first()) "%" else ""
-        //Log.i(TAG, "Complication: is phone charging? $isCharging")
-
-        if (activeSync.not()) {
-            val hasResult = repository.afterMobileResult.first()
-            val lastUpdateTime = repository.lastUpdate.first()
-            if (!hasResult) {
-                MobileListener.sendPhoneBatteryRequest(lastUpdateTime, applicationContext, false)
+        if (!repository.activeSync.first()) {
+            if (!repository.afterMobileResult.first()) {
+                MobileListener.sendPhoneBatteryRequest(repository.lastUpdate.first(), applicationContext, false)
             }
-            else { repository.storeResult(false) }
+            else {
+                repository.storeResult(false)
+            }
         }
 
+        val isCharging = repository.isCharging.first()
+        val isWatchConnected = repository.isConnected.first()
+        val percentage = if (repository.percentage.first()) "%" else ""
         val level = repository.batteryLevel.first()
         val level2: String = if (level==0) "-" else "$level$percentage"
+        val icon = when {
+            isWatchConnected && isCharging -> MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_charging_3)).build()
+            isWatchConnected -> MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build()
+            else -> MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_disconnected)).build()
+        }
 
          return when (request.complicationType) {
 
@@ -109,48 +111,21 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     max = 100f,
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                     .setText(PlainComplicationText.Builder(text = level2).build())
-                .setMonochromaticImage(
-                    if (isWatchConnected && isCharging) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                        R.drawable.ic_phone_charging_3
-                    )).build()}
-                    else if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                        R.drawable.ic_phone_icon
-                    )).build()}
-                    else { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                        R.drawable.ic_phone_disconnected
-                    )).build()})
+                    .setMonochromaticImage(icon)
                     .setTapAction(complicationPendingIntent)
                     .build()
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = level2).build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
-                .setMonochromaticImage(
-                    if (isWatchConnected && isCharging) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                        R.drawable.ic_phone_charging_3
-                    )).build()}
-                    else if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                        R.drawable.ic_phone_icon
-                    )).build()}
-                    else { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                        R.drawable.ic_phone_disconnected
-                    )).build()})
+                .setMonochromaticImage(icon)
                 .setTapAction(complicationPendingIntent)
                 .build()
 
              ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
                  text = PlainComplicationText.Builder(text = level2).build(),
                  contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
-                 .setMonochromaticImage(
-                     if (isWatchConnected && isCharging) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                         R.drawable.ic_phone_charging_3
-                     )).build()}
-                     else if (isWatchConnected) { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                         R.drawable.ic_phone_icon
-                     )).build()}
-                     else { MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                         R.drawable.ic_phone_disconnected
-                     )).build()})
+                 .setMonochromaticImage(icon)
                  .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
                  .setTapAction(complicationPendingIntent)
                  .build()
