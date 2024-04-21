@@ -27,8 +27,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000373
-        versionName = "3.7.4"
+        versionCode = 10000375
+        versionName = "3.7.6"
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -96,12 +96,9 @@ dependencies {
 
     // NAVIGATION
     implementation("androidx.navigation:navigation-compose:2.7.7")
-
     implementation ("androidx.activity:activity-ktx:1.9.0")
     implementation ("androidx.core:core-ktx:1.13.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
-    implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation("androidx.datastore:datastore-core:1.1.0")
 
     // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.1.0")

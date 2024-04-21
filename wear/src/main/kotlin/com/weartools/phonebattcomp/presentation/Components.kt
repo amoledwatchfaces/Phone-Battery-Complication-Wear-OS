@@ -36,7 +36,6 @@ import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.PassiveDataViewModel
 import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
@@ -176,7 +175,6 @@ fun SectionText(modifier: Modifier = Modifier, text: String) {
     )
 }
 
-@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun ListItemsWidget(
     titles: String,
@@ -237,7 +235,7 @@ fun ListItemsWidget(
 
     }
 }
-@OptIn(ExperimentalHorologistApi::class)
+
 @Composable
 fun ExperimentalWidget(
     viewModel: PassiveDataViewModel,

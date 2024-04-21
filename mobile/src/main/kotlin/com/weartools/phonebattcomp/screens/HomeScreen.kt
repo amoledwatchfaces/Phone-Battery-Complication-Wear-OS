@@ -196,12 +196,6 @@ fun HomeScreen(
                             modifier = Modifier.padding(16.dp),
                             textAlign = TextAlign.Left,
                         )
-                        Text(
-                            text = stringResource(id = R.string.uninstall),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.padding(16.dp),
-                            textAlign = TextAlign.Left,
-                        )
                     }
                     else if (isWatchConnected.value && commonNodesList.value.isNullOrEmpty().not()){
                         Text(

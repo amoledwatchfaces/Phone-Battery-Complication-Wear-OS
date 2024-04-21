@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalHorologistApi::class)
 
 package com.weartools.phonebattcomp.presentation.rotary
 
@@ -41,7 +40,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.debugInspectorInfo
 import androidx.wear.compose.foundation.ExperimentalWearFoundationApi
 import androidx.wear.compose.foundation.rememberActiveFocusRequester
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -67,7 +65,7 @@ import kotlin.math.abs
  * Scrollable `reverseDirection` parameter
  */
 @OptIn(ExperimentalWearFoundationApi::class)
-@ExperimentalHorologistApi
+
 @Suppress("ComposableModifierFactory")
 @Composable
 fun Modifier.rotaryWithScroll(
@@ -95,13 +93,13 @@ fun Modifier.rotaryWithScroll(
 /**
  * Defaults for rotary modifiers
  */
-@ExperimentalHorologistApi
+
 object RotaryDefaults {
 
     /**
      * Returns whether the input is Low-res (a bezel) or high-res(a crown/rsb).
      */
-    @ExperimentalHorologistApi
+    
     @Composable
     fun isLowResInput(): Boolean = LocalContext.current.packageManager
         .hasSystemFeature("android.hardware.rotaryencoder.lowres")

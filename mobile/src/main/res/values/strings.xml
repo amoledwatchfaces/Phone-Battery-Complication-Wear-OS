@@ -48,7 +48,7 @@
     </string>
 
     <string name="connected">
-        Your Wear OS device is connected!
+        Your Wear OS device is connected but the wearable app is missing!
         Just tap floating action button to install app to your watch device(s). Then set-up
         Complication.
     </string>

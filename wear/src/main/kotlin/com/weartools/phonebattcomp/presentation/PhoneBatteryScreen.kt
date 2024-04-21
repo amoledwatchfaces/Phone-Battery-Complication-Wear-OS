@@ -52,7 +52,6 @@ import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.compose.material.OutlinedCompactChip
 import androidx.wear.compose.material.Text
 import androidx.wear.remote.interactions.RemoteActivityHelper
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
@@ -60,7 +59,6 @@ import com.weartools.phonebattcomp.data.PassiveDataViewModel
 import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
 
-@OptIn(ExperimentalHorologistApi::class)
 @Composable
 fun PhoneBatteryAppScreen(
     listState: ScalingLazyListState = rememberScalingLazyListState(),

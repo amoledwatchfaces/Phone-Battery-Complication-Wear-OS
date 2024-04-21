@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 
-@file:OptIn(ExperimentalHorologistApi::class)
-
 package com.weartools.phonebattcomp.presentation.rotary
 
 import android.content.Context
@@ -29,7 +27,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalView
-import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -76,19 +73,19 @@ internal fun <T> Flow<T>.throttleLatest(timeframe: Long): Flow<T> =
 /**
  * Handles haptics for rotary usage
  */
-@ExperimentalHorologistApi
+
 interface RotaryHapticHandler {
 
     /**
      * Handles haptics when scroll is used
      */
-    @ExperimentalHorologistApi
+
     fun handleScrollHaptic(scrollDelta: Float)
 
     /**
      * Handles haptics when scroll with snap is used
      */
-    @ExperimentalHorologistApi
+    
     fun handleSnapHaptic(scrollDelta: Float)
 }
 
@@ -156,16 +153,16 @@ class DefaultRotaryHapticHandler(
 /**
  * Interface for Rotary haptic feedback
  */
-@ExperimentalHorologistApi
+
 interface RotaryHapticFeedback {
-    @ExperimentalHorologistApi
+    
     fun performHapticFeedback(type: RotaryHapticsType)
 }
 
 /**
  * Rotary haptic types
  */
-@ExperimentalHorologistApi
+
 @JvmInline
 value class RotaryHapticsType(private val type: Int) {
     companion object {
@@ -173,21 +170,21 @@ value class RotaryHapticsType(private val type: Int) {
          * A scroll ticking haptic. Similar to texture haptic - performed each time when
          * a scrollable content is scrolled by a certain distance
          */
-        @ExperimentalHorologistApi
+        
         val ScrollTick: RotaryHapticsType = RotaryHapticsType(1)
 
         /**
          * An item focus (snap) haptic. Performed when a scrollable content is snapped
          * to a specific item.
          */
-        @ExperimentalHorologistApi
+        
         val ScrollItemFocus: RotaryHapticsType = RotaryHapticsType(2)
 
         /**
          * A limit(overscroll) haptic. Performed when a list reaches the limit
          * (start or end) and can't scroll further
          */
-        @ExperimentalHorologistApi
+        
         val ScrollLimit: RotaryHapticsType = RotaryHapticsType(3)
     }
 }
@@ -202,7 +199,7 @@ value class RotaryHapticsType(private val type: Int) {
  * @param hapticsChannel Channel to which haptic events will be sent
  * @param rotaryHaptics Interface for Rotary haptic feedback which performs haptics
  */
-@ExperimentalHorologistApi
+
 @Composable
 fun rememberRotaryHapticHandler(
     scrollableState: ScrollableState,
@@ -243,12 +240,11 @@ private fun rememberHapticChannel() =
         )
     }
 
-@ExperimentalHorologistApi
+
 @Composable
 fun rememberDefaultRotaryHapticFeedback(): RotaryHapticFeedback =
     LocalView.current.let { view -> remember { findDeviceSpecificHapticFeedback(view) } }
 
-@OptIn(ExperimentalHorologistApi::class)
 internal fun findDeviceSpecificHapticFeedback(view: View): RotaryHapticFeedback =
     if (isGalaxyWatchClassic() || isGalaxyWatch()) {
         GalaxyWatchHapticFeedback(view)
@@ -263,10 +259,10 @@ internal fun findDeviceSpecificHapticFeedback(view: View): RotaryHapticFeedback 
 /**
  * Default Rotary implementation for [RotaryHapticFeedback]
  */
-@ExperimentalHorologistApi
+
 private class DefaultRotaryHapticFeedback(private val view: View) : RotaryHapticFeedback {
 
-    @ExperimentalHorologistApi
+    
     override fun performHapticFeedback(
         type: RotaryHapticsType,
     ) {
@@ -323,10 +319,10 @@ private class Wear3point5RotaryHapticFeedback(private val view: View) : RotaryHa
 /**
  * Implementation of [RotaryHapticFeedback] for Pixel Watch
  */
-@ExperimentalHorologistApi
+
 private class Wear4AtLeastRotaryHapticFeedback(private val view: View) : RotaryHapticFeedback {
 
-    @ExperimentalHorologistApi
+    
     override fun performHapticFeedback(
         type: RotaryHapticsType,
     ) {
@@ -357,10 +353,10 @@ private class Wear4AtLeastRotaryHapticFeedback(private val view: View) : RotaryH
 /**
  * Implementation of [RotaryHapticFeedback] for Galaxy Watches
  */
-@ExperimentalHorologistApi
+
 private class GalaxyWatchHapticFeedback(private val view: View) : RotaryHapticFeedback {
 
-    @ExperimentalHorologistApi
+    
     override fun performHapticFeedback(
         type: RotaryHapticsType,
     ) {

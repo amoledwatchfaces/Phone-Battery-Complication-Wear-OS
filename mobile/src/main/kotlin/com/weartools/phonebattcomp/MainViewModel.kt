@@ -14,6 +14,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
@@ -40,7 +41,7 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val dataRepository: DataRepository
-) : ViewModel() {
+) : ViewModel(),CapabilityClient.OnCapabilityChangedListener {
 
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
     val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
@@ -87,7 +88,7 @@ class MainViewModel(
         viewModelScope.launch {
             val intent = Intent(Intent.ACTION_VIEW)
                 .addCategory(Intent.CATEGORY_BROWSABLE)
-                .setData(Uri.parse("market://details?id=${context.packageName}"))
+                .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
             try {
                 remoteActivityHelper.startRemoteActivity(targetIntent = intent,targetNodeId = null).await()
                 message = context.getString(R.string.toast_check_wearable)
@@ -107,6 +108,7 @@ class MainViewModel(
 
         nodeClient = Wearable.getNodeClient(context)
         capabilityClient = Wearable.getCapabilityClient(context)
+        remoteActivityHelper = RemoteActivityHelper(context)
 
         //Toast.makeText(context, context.getString(R.string.toast_searching), Toast.LENGTH_SHORT).show()
 
@@ -131,9 +133,9 @@ class MainViewModel(
         }
     }
 
-    private fun findWearDevicesWithApp(context: Context) {
+    private fun findWearDevicesWithApp() {
         Log.d(TAG, "findWearDevicesWithApp()")
-        val capabilityInfoTask = Wearable.getCapabilityClient(context).getCapability(BuildConfig.CAPABILITY_WEAR_APP, CapabilityClient.FILTER_ALL)
+        val capabilityInfoTask = capabilityClient.getCapability(BuildConfig.CAPABILITY_WEAR_APP, CapabilityClient.FILTER_ALL)
 
         capabilityInfoTask.addOnCompleteListener { task ->
             if (task.isSuccessful) {
@@ -183,7 +185,7 @@ class MainViewModel(
                 watchAvailableStateMutableStateFlow.value = true
                 message = "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.joinToString(", ") {it.displayName}}"
                 setMessageShown()
-                findWearDevicesWithApp(context)
+                findWearDevicesWithApp()
                 //Toast.makeText(context, "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.first().displayName}", Toast.LENGTH_LONG).show()
             }
         }
@@ -237,6 +239,10 @@ class MainViewModel(
 
     companion object {
         private const val TAG = "MainViewModel"
+    }
+
+    override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
+        findWearDevicesWithApp()
     }
 }
 

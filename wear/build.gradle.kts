@@ -27,8 +27,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000374
-        versionName = "3.7.4"
+        versionCode = 10000376
+        versionName = "3.7.6"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -105,7 +105,4 @@ dependencies {
     implementation("androidx.wear.protolayout:protolayout-material:1.1.0")
     implementation("androidx.wear.tiles:tiles:1.3.0")
     implementation ("com.google.code.gson:gson:2.10.1")
-
-    // HOROLOGIST
-    implementation ("com.google.android.horologist:horologist-annotations:0.6.3")
 }
