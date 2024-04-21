@@ -3,7 +3,6 @@ package com.weartools.phonebattcomp
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -12,10 +11,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
-import com.google.android.gms.tasks.Task
 import com.google.android.gms.wearable.CapabilityClient
-import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -41,7 +37,38 @@ import kotlinx.coroutines.withContext
 
 class MainViewModel(
     private val dataRepository: DataRepository
-) : ViewModel(),CapabilityClient.OnCapabilityChangedListener {
+) : ViewModel(){
+
+    // TODO: Inject all three clients as modules from MainActivity (check Complications Suite wear app location module)
+
+    private lateinit var nodeClient: NodeClient
+    private lateinit var capabilityClient: CapabilityClient
+    private lateinit var remoteActivityHelper: RemoteActivityHelper
+    private lateinit var reviewManager: ReviewManager
+
+    private var allConnectedNodes: List<Node>? = null
+    private var wearNodesWithApp: Set<Node>? = null
+
+    private val listener = CapabilityClient.OnCapabilityChangedListener { capabilityInfo ->
+            // Handle capability changes here
+            Log.d("CAPABILITY","Capability changed: ${capabilityInfo.name}")
+            // You can use viewmodel events or other methods to notify the UI
+            viewModelScope.launch{
+                findWearDevices()
+            }
+        }
+
+    private val _isMessageShown = MutableSharedFlow<Boolean>()
+    private val loaderStateMutableStateFlow = MutableStateFlow(value = false)
+    private val watchAvailableStateMutableStateFlow = MutableStateFlow(value = false)
+    private val commonNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
+
+    val isMessageShownFlow = _isMessageShown.asSharedFlow()
+    val loaderStateStateFlow: StateFlow<Boolean> = loaderStateMutableStateFlow.asStateFlow()
+    val watchAvailableStateStateFlow: StateFlow<Boolean> = watchAvailableStateMutableStateFlow.asStateFlow()
+    val commonNodesStateFlow: StateFlow<List<Node>?> = commonNodesMutableStateFlow.asStateFlow()
+
+    var message: String = ""
 
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
     val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
@@ -53,21 +80,11 @@ class MainViewModel(
         }
     }
 
-    private lateinit var nodeClient: NodeClient
-    private lateinit var capabilityClient: CapabilityClient
-    private lateinit var remoteActivityHelper: RemoteActivityHelper
-    private lateinit var reviewManager: ReviewManager
-
-    private var allConnectedNodes: List<Node>? = null
-    private var wearNodesWithApp: Set<Node>? = null
-
-    private val loaderStateMutableStateFlow = MutableStateFlow(value = false)
-    val loaderStateStateFlow: StateFlow<Boolean> = loaderStateMutableStateFlow.asStateFlow()
-
-    private val _isMessageShown = MutableSharedFlow<Boolean>()
-    val isMessageShownFlow = _isMessageShown.asSharedFlow()
-
-    var message: String = ""
+    override fun onCleared() {
+        super.onCleared()
+        // Unregister listener to avoid leaks
+        capabilityClient.removeListener(listener)
+    }
 
     private fun setMessageShown(){
         viewModelScope.launch {
@@ -75,16 +92,7 @@ class MainViewModel(
         }
     }
 
-    private val watchAvailableStateMutableStateFlow = MutableStateFlow(value = false)
-    val watchAvailableStateStateFlow: StateFlow<Boolean> = watchAvailableStateMutableStateFlow.asStateFlow()
-
-
-    private val commonNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
-    val commonNodesStateFlow: StateFlow<List<Node>?> = commonNodesMutableStateFlow.asStateFlow()
-
     fun openPlayStoreOnWear(context: Context) {
-        //Log.d(TAG, "Opening Play Store listing on Watch")
-
         viewModelScope.launch {
             val intent = Intent(Intent.ACTION_VIEW)
                 .addCategory(Intent.CATEGORY_BROWSABLE)
@@ -102,23 +110,25 @@ class MainViewModel(
         }
     }
 
-    suspend fun findAllWearDevices(context: Context) {
-
-        loaderStateMutableStateFlow.value = true
-
+    fun findAllWearDevices(context: Context){
         nodeClient = Wearable.getNodeClient(context)
         capabilityClient = Wearable.getCapabilityClient(context)
         remoteActivityHelper = RemoteActivityHelper(context)
 
-        //Toast.makeText(context, context.getString(R.string.toast_searching), Toast.LENGTH_SHORT).show()
+        capabilityClient.addListener(listener,BuildConfig.CAPABILITY_WEAR_APP)
 
+        viewModelScope.launch { findWearDevices() }
+    }
+
+    suspend fun findWearDevices() {
+        loaderStateMutableStateFlow.value = true
         try {
             val connectedNodes = nodeClient.connectedNodes.await()
 
             withContext(Dispatchers.Main) {
                 allConnectedNodes = connectedNodes
                 delay(1_000L)
-                updateUI(context)
+                updateUI()
             }
         } catch (cancellationException: CancellationException) {
             // Request was cancelled normally
@@ -126,10 +136,8 @@ class MainViewModel(
         } catch (throwable: Throwable) {
             loaderStateMutableStateFlow.value = false
 
-            message = context.getString(R.string.toast_fail)
+            message = "Node request failed to return any results."
             _isMessageShown.emit(true)
-            //Toast.makeText(context, context.getString(R.string.toast_fail), Toast.LENGTH_SHORT).show()
-            Log.d(TAG, context.getString(R.string.toast_fail))
         }
     }
 
@@ -158,35 +166,20 @@ class MainViewModel(
     }
 
     @SuppressLint("StringFormatInvalid")
-    private fun updateUI(context: Context) {
-        //Log.d(TAG, "updateUI()")
-
+    private fun updateUI() {
         val allConnectedNodes = allConnectedNodes
-
-        //Log.d(TAG, "allConnectedNotes =  $allConnectedNodes")
-
         when {
-            allConnectedNodes == null -> {
-                //Toast.makeText(context, context.getString(R.string.toast_no_devices), Toast.LENGTH_LONG).show()
+            allConnectedNodes.isNullOrEmpty() -> {
                 loaderStateMutableStateFlow.value = false
                 watchAvailableStateMutableStateFlow.value = false
-                message = context.getString(R.string.toast_no_devices)
-                setMessageShown()
-            }
-            allConnectedNodes.isEmpty() -> {
-
-                //Toast.makeText(context, context.getString(R.string.toast_no_devices), Toast.LENGTH_LONG).show()
-                loaderStateMutableStateFlow.value = false
-                watchAvailableStateMutableStateFlow.value = false
-                message = context.getString(R.string.toast_no_devices)
+                message = "No wearable devices found…"
                 setMessageShown()
             }
             else -> {
                 watchAvailableStateMutableStateFlow.value = true
-                message = "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.joinToString(", ") {it.displayName}}"
+                message = "Wearable connected: ${allConnectedNodes.joinToString(", ") {it.displayName}}"
                 setMessageShown()
                 findWearDevicesWithApp()
-                //Toast.makeText(context, "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.first().displayName}", Toast.LENGTH_LONG).show()
             }
         }
     }
@@ -222,16 +215,9 @@ class MainViewModel(
                 }
                     .asPutDataRequest()
                     .setUrgent()
-
-                val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
-                dataItemTask
-                    .addOnSuccessListener { dataItem -> Log.d(ContentValues.TAG,"WM: Sending Phone Battery request was successful: $dataItem") }
-                    .addOnFailureListener { e -> Log.e(ContentValues.TAG,"WM: Sending request task failed!: $e") }
-                    .addOnCompleteListener{task -> Log.d(ContentValues.TAG,"WM: Sending request Task complete!: $task")}
-
+                Wearable.getDataClient(context).putDataItem(request)
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
-
                 Log.e(TAG, "Error while activating battery sync", e)
             }
         }
@@ -241,9 +227,6 @@ class MainViewModel(
         private const val TAG = "MainViewModel"
     }
 
-    override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
-        findWearDevicesWithApp()
-    }
 }
 
 class MainViewModelFactory(
