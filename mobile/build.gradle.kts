@@ -27,8 +27,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000369
-        versionName = "3.7.0"
+        versionCode = 10000373
+        versionName = "3.7.4"
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
