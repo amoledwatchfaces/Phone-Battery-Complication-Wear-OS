@@ -76,6 +76,7 @@ fun MainApp(
     val currentDestination = navBackStackEntry?.destination
 
     val isWearableConnected = viewModel.watchAvailableStateStateFlow.collectAsState()
+    val commonNodesList = viewModel.commonNodesStateFlow.collectAsState()
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.CREATED) {
@@ -113,7 +114,7 @@ fun MainApp(
                         Text(color = colorScheme.primaryContainer,text = stringResource(id = R.string.install_to_wearable)) },
                     containerColor = colorScheme.onPrimaryContainer,
                     onClick = { viewModel.openPlayStoreOnWear(context) },
-                    expanded = fabVisibility
+                    expanded = (fabVisibility && commonNodesList.value.isNullOrEmpty())
                 )
             }
             else if (currentDestination?.route == Screen.Home.route)
@@ -162,7 +163,7 @@ fun MainApp(
             navController,
             startDestination = Screen.Home.route,
             Modifier.padding(padding)) {
-            composable(Screen.Home.route) { HomeScreen(context, viewModel, scope, isWearableConnected, listState) }
+            composable(Screen.Home.route) { HomeScreen(context, viewModel, scope, isWearableConnected, commonNodesList, listState) }
             composable(Screen.About.route) { InfoScreen(context, viewModel) }
         }
     }

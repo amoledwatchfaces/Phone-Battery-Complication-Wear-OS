@@ -13,6 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.gms.tasks.Task
+import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
@@ -36,6 +37,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 
+
 class MainViewModel(
     private val dataRepository: DataRepository
 ) : ViewModel() {
@@ -51,10 +53,12 @@ class MainViewModel(
     }
 
     private lateinit var nodeClient: NodeClient
+    private lateinit var capabilityClient: CapabilityClient
     private lateinit var remoteActivityHelper: RemoteActivityHelper
     private lateinit var reviewManager: ReviewManager
 
     private var allConnectedNodes: List<Node>? = null
+    private var wearNodesWithApp: Set<Node>? = null
 
     private val loaderStateMutableStateFlow = MutableStateFlow(value = false)
     val loaderStateStateFlow: StateFlow<Boolean> = loaderStateMutableStateFlow.asStateFlow()
@@ -72,6 +76,10 @@ class MainViewModel(
 
     private val watchAvailableStateMutableStateFlow = MutableStateFlow(value = false)
     val watchAvailableStateStateFlow: StateFlow<Boolean> = watchAvailableStateMutableStateFlow.asStateFlow()
+
+
+    private val commonNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
+    val commonNodesStateFlow: StateFlow<List<Node>?> = commonNodesMutableStateFlow.asStateFlow()
 
     fun openPlayStoreOnWear(context: Context) {
         //Log.d(TAG, "Opening Play Store listing on Watch")
@@ -98,7 +106,7 @@ class MainViewModel(
         loaderStateMutableStateFlow.value = true
 
         nodeClient = Wearable.getNodeClient(context)
-        remoteActivityHelper = RemoteActivityHelper(context)
+        capabilityClient = Wearable.getCapabilityClient(context)
 
         //Toast.makeText(context, context.getString(R.string.toast_searching), Toast.LENGTH_SHORT).show()
 
@@ -120,6 +128,30 @@ class MainViewModel(
             _isMessageShown.emit(true)
             //Toast.makeText(context, context.getString(R.string.toast_fail), Toast.LENGTH_SHORT).show()
             Log.d(TAG, context.getString(R.string.toast_fail))
+        }
+    }
+
+    private fun findWearDevicesWithApp(context: Context) {
+        Log.d(TAG, "findWearDevicesWithApp()")
+        val capabilityInfoTask = Wearable.getCapabilityClient(context).getCapability(BuildConfig.CAPABILITY_WEAR_APP, CapabilityClient.FILTER_ALL)
+
+        capabilityInfoTask.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                Log.d(TAG, "Capability request succeeded.")
+                wearNodesWithApp = task.result.nodes
+
+                // Find common nodes
+                val commonNodes = wearNodesWithApp?.filter {
+                        it in (allConnectedNodes?.toSet() ?: emptySet())
+                    }
+                if (!commonNodes.isNullOrEmpty()) {
+                    commonNodesMutableStateFlow.value = commonNodes
+                }
+                loaderStateMutableStateFlow.value = false
+            } else {
+                Log.d(TAG, "Capability request failed to return any results.")
+                loaderStateMutableStateFlow.value = false
+            }
         }
     }
 
@@ -148,11 +180,11 @@ class MainViewModel(
                 setMessageShown()
             }
             else -> {
-                //Toast.makeText(context, "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.first().displayName}", Toast.LENGTH_LONG).show()
-                loaderStateMutableStateFlow.value = false
                 watchAvailableStateMutableStateFlow.value = true
-                message = "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.first().displayName}"
+                message = "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.joinToString(", ") {it.displayName}}"
                 setMessageShown()
+                findWearDevicesWithApp(context)
+                //Toast.makeText(context, "${context.getString(R.string.toast_wearable_connected)} ${allConnectedNodes.first().displayName}", Toast.LENGTH_LONG).show()
             }
         }
     }

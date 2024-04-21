@@ -29,6 +29,9 @@ android {
         targetSdk = 33
         versionCode = 10000369
         versionName = "3.7.0"
+
+        buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
+        buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
     }
 
     testBuildType = "debug"
@@ -42,6 +45,7 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.8"
@@ -74,10 +78,10 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // ICONS
-    implementation ("androidx.compose.material:material-icons-extended:1.6.5")
+    implementation ("androidx.compose.material:material-icons-extended:1.6.6")
 
     // COMPOSE
-    implementation ("androidx.activity:activity-compose:1.8.2")
+    implementation ("androidx.activity:activity-compose:1.9.0")
 
     implementation ("androidx.compose.material3:material3:1.2.1")
     implementation ("androidx.compose.material3:material3-window-size-class:1.2.1")
@@ -88,19 +92,19 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
 
     implementation ("androidx.compose.material3:material3")
-    implementation ("androidx.compose.material:material:1.6.5")
+    implementation ("androidx.compose.material:material:1.6.6")
 
     // NAVIGATION
     implementation("androidx.navigation:navigation-compose:2.7.7")
 
-    implementation ("androidx.activity:activity-ktx:1.8.2")
-    implementation ("androidx.core:core-ktx:1.12.0")
+    implementation ("androidx.activity:activity-ktx:1.9.0")
+    implementation ("androidx.core:core-ktx:1.13.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:2.7.0")
-    implementation("androidx.datastore:datastore-core:1.0.0")
+    implementation("androidx.datastore:datastore-core:1.1.0")
 
     // Used for Datastore
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("androidx.datastore:datastore-preferences:1.1.0")
 
     // DEBUG
     testImplementation("junit:junit:4.13.2")

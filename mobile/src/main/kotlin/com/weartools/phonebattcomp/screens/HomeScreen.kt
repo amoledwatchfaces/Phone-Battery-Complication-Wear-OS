@@ -47,6 +47,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.dp
+import com.google.android.gms.wearable.Node
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.ui.components.ImageSwitchBox
@@ -66,6 +67,7 @@ fun HomeScreen(
     viewModel: MainViewModel,
     scope: CoroutineScope,
     isWatchConnected: State<Boolean>,
+    commonNodesList: State<List<Node>?>,
     listState: LazyListState
 ) {
     val state by viewModel.loaderStateStateFlow.collectAsState()
@@ -186,7 +188,7 @@ fun HomeScreen(
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Left,
                     )
-                    if(isWatchConnected.value){
+                    if(isWatchConnected.value && commonNodesList.value.isNullOrEmpty()){
                         Text(
                             text = stringResource(id = R.string.connected),
                             style = MaterialTheme.typography.bodyLarge,
@@ -197,6 +199,31 @@ fun HomeScreen(
                         Text(
                             text = stringResource(id = R.string.uninstall),
                             style = MaterialTheme.typography.bodyLarge,
+                            modifier = Modifier.padding(16.dp),
+                            textAlign = TextAlign.Left,
+                        )
+                    }
+                    else if (isWatchConnected.value && commonNodesList.value.isNullOrEmpty().not()){
+                        Text(
+                            text = "App is installed on your wear device(s):",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 0.dp),
+                            textAlign = TextAlign.Left,
+                        )
+                        Text(
+                            text = "${commonNodesList.value?.joinToString(", ") {it.displayName}}",
+                            color = colorScheme.onPrimaryContainer,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            modifier = Modifier.padding(start = 16.dp, top = 8.dp, end = 16.dp, bottom = 16.dp),
+                            textAlign = TextAlign.Left,
+                        )
+                        Text(
+                            text = stringResource(id = R.string.uninstall),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = colorScheme.onSurfaceVariant,
+                            fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(16.dp),
                             textAlign = TextAlign.Left,
                         )

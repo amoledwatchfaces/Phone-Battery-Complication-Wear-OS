@@ -27,8 +27,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000370
-        versionName = "3.7.0"
+        versionCode = 10000372
+        versionName = "3.7.2"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -64,23 +64,23 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.6.5"
+    val composeUiVersion = "1.6.6"
     val composeWearVersion = "1.3.1"
 
     // WEAR OS
     implementation ("com.google.android.gms:play-services-wearable:18.1.0")
     implementation ("androidx.wear.watchface:watchface:1.2.1")
-    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha02")
+    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha03")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     // COMPOSE
-    implementation ("androidx.core:core-ktx:1.12.0")
+    implementation ("androidx.core:core-ktx:1.13.0")
     implementation ("androidx.compose.ui:ui:$composeUiVersion")
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.8.2")
+    implementation ("androidx.activity:activity-compose:1.9.0")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
@@ -94,7 +94,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
 
     // Used for Datastore
-    implementation ("androidx.datastore:datastore-preferences:1.0.0")
+    implementation ("androidx.datastore:datastore-preferences:1.1.0")
 
     // SPLASH SCREEN
     implementation ("androidx.core:core-splashscreen:1.0.1")

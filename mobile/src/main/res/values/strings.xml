@@ -63,8 +63,7 @@
 
 
     <string name="note_text">
-        If you downloaded the application mistakenly or for some other reason it
-        is not possible to set up complication, contact us at:
+        If for some reason it is not possible to set up complication, contact us at:
     </string>
 
     <string name="uninstall">
