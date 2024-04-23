@@ -83,6 +83,13 @@ class MobileListener : WearableListenerService() {
                             this.updateComplication(MobileBatteryComplicationService::class.java)
                             TileService.getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java)
                         }
+                        ACTIVE_SYNC_PATH -> {
+                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
+                            ioScope.launch {
+                                repository.setActiveSyncState(state)
+                            }
+                            dataEvents.release()
+                        }
                         URI -> {
                             processDataItem(dataEvent.dataItem)
                             dataEvents.release()
@@ -157,14 +164,6 @@ class MobileListener : WearableListenerService() {
                     .setUrgent()
 
                 Wearable.getDataClient(context).putDataItem(request)
-
-                /*
-                val dataItemTask: Task<DataItem> = Wearable.getDataClient(context).putDataItem(request)
-                dataItemTask
-                    .addOnSuccessListener { dataItem -> Log.d(TAG,"Sending Phone Battery request was successful: $dataItem") }
-                    .addOnFailureListener { e -> Log.e(TAG,"Sending request task failed!: $e") }
-                    .addOnCompleteListener{task -> Log.d(TAG,"Sending request Task complete!: $task")}
-                */
             }
             else
                 Log.e(TAG, "Too many updates")

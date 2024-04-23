@@ -8,16 +8,17 @@ import android.content.Intent
 import android.net.Uri
 import android.util.Log
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.PutDataMapRequest
-import com.google.android.gms.wearable.Wearable
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
@@ -33,17 +34,18 @@ import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
 
-class MainViewModel(
-    private val dataRepository: DataRepository
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val capabilityClient: CapabilityClient,
+    private val nodeClient: NodeClient,
+    private val remoteActivityHelper: RemoteActivityHelper,
+    private val dataClient: DataClient,
+    private val dataRepository: DataStoreRepository
 ) : ViewModel(){
 
-    // TODO: Inject all three clients as modules from MainActivity (check Complications Suite wear app location module)
-
-    private lateinit var nodeClient: NodeClient
-    private lateinit var capabilityClient: CapabilityClient
-    private lateinit var remoteActivityHelper: RemoteActivityHelper
     private lateinit var reviewManager: ReviewManager
 
     private var allConnectedNodes: List<Node>? = null
@@ -54,7 +56,7 @@ class MainViewModel(
             Log.d("CAPABILITY","Capability changed: ${capabilityInfo.name}")
             // You can use viewmodel events or other methods to notify the UI
             viewModelScope.launch{
-                findWearDevices()
+                findAllWearDevices()
             }
         }
 
@@ -75,6 +77,7 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
+            capabilityClient.addListener(listener,BuildConfig.CAPABILITY_WEAR_APP)
             dataRepository.activeSync.distinctUntilChanged().collect {}
             dataRepository.notificationsSync.distinctUntilChanged().collect {}
         }
@@ -110,17 +113,8 @@ class MainViewModel(
         }
     }
 
-    fun findAllWearDevices(context: Context){
-        nodeClient = Wearable.getNodeClient(context)
-        capabilityClient = Wearable.getCapabilityClient(context)
-        remoteActivityHelper = RemoteActivityHelper(context)
+    suspend fun findAllWearDevices() {
 
-        capabilityClient.addListener(listener,BuildConfig.CAPABILITY_WEAR_APP)
-
-        viewModelScope.launch { findWearDevices() }
-    }
-
-    suspend fun findWearDevices() {
         loaderStateMutableStateFlow.value = true
         try {
             val connectedNodes = nodeClient.connectedNodes.await()
@@ -156,6 +150,8 @@ class MainViewModel(
                     }
                 if (!commonNodes.isNullOrEmpty()) {
                     commonNodesMutableStateFlow.value = commonNodes
+                }else {
+                    commonNodesMutableStateFlow.value = emptyList()
                 }
                 loaderStateMutableStateFlow.value = false
             } else {
@@ -215,7 +211,7 @@ class MainViewModel(
                 }
                     .asPutDataRequest()
                     .setUrgent()
-                Wearable.getDataClient(context).putDataItem(request)
+                dataClient.putDataItem(request)
             } catch (e: Exception) {
                 if (e is CancellationException) throw e
                 Log.e(TAG, "Error while activating battery sync", e)
@@ -227,18 +223,4 @@ class MainViewModel(
         private const val TAG = "MainViewModel"
     }
 
-}
-
-class MainViewModelFactory(
-    private val dataRepository: DataRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(MainViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return MainViewModel(
-                dataRepository = dataRepository
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }

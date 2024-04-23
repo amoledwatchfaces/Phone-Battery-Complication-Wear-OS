@@ -21,15 +21,18 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
+import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
-import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 const val BATTERY_PATH = "/battery-level"
 const val BATTERY_KEY= "battery-key"
@@ -38,15 +41,20 @@ const val IS_CHARGING_KEY = "is-charging-key"
 private const val REQUEST_PATH = "/request"
 private const val FORCE_UPDATE_KEY = "force-update-key"
 
-private const val ACTIVE_SYNC_PATH = "/active-sync"
-private const val ACTIVE_SYNC_KEY = "active-sync-key"
+const val ACTIVE_SYNC_PATH = "/active-sync"
+const val ACTIVE_SYNC_KEY = "active-sync-key"
 
 private const val NOTIFICATIONS_SYNC_PATH = "/notifications-sync"
 private const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
 
+@AndroidEntryPoint
 class WearListener : WearableListenerService() {
 
-    private val repository by lazy { DataRepository(this) }
+    @Inject
+    lateinit var dataRepository: DataStoreRepository
+    @Inject
+    lateinit var dataClient: DataClient
+
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
@@ -69,7 +77,7 @@ class WearListener : WearableListenerService() {
                                 .asPutDataRequest()
                                 .setUrgent()
 
-                            Wearable.getDataClient(this).putDataItem(request)
+                            dataClient.putDataItem(request)
                             /*
                                     val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
                                     dataItemTask
@@ -85,14 +93,14 @@ class WearListener : WearableListenerService() {
                                 //Log.d(TAG,"Turning Active Sync ON")
                                 BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
                                 ioScope.launch {
-                                    repository.setActiveSyncState(true)
+                                    dataRepository.setActiveSyncState(true)
                                 }
                             }
                             else {
                                 //Log.d(TAG,"Turning Active Sync OFF")
                                 BatteryStatusBroadcastReceiver.unsubscribeFromUpdates(this)
                                 ioScope.launch {
-                                    repository.setActiveSyncState(false)
+                                    dataRepository.setActiveSyncState(false)
                                 }
                             }
                         }
@@ -102,13 +110,13 @@ class WearListener : WearableListenerService() {
                             if (notificationsSyncState) {
                                 //Log.d(TAG,"Turning Active Sync ON")
                                 ioScope.launch {
-                                    repository.setNotificationsSyncState(true)
+                                    dataRepository.setNotificationsSyncState(true)
                                 }
                             }
                             else {
                                 //Log.d(TAG,"Turning Active Sync OFF")
                                 ioScope.launch {
-                                    repository.setNotificationsSyncState(false)
+                                    dataRepository.setNotificationsSyncState(false)
                                 }
                             }
                         }

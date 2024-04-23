@@ -51,7 +51,6 @@ import com.weartools.phonebattcomp.utils.sendFeedbackEmail
 fun InfoScreen(
     context: Context,
     viewModel: MainViewModel
-
 ) {
 
     val listState = rememberLazyListState()

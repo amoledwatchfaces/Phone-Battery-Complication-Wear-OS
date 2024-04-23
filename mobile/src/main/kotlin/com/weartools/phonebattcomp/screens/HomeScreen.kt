@@ -75,7 +75,7 @@ fun HomeScreen(
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state,
         onRefresh = { scope.launch {
-            viewModel.findAllWearDevices(context)
+            viewModel.findAllWearDevices()
         } }
     )
 

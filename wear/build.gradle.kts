@@ -90,8 +90,8 @@ dependencies {
     debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.1.0")

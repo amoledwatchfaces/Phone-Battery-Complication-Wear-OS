@@ -30,16 +30,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.repeatOnLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.weartools.phonebattcomp.DataRepository
 import com.weartools.phonebattcomp.MainViewModel
-import com.weartools.phonebattcomp.MainViewModelFactory
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.ui.components.BottomNavigationBar
 import com.weartools.phonebattcomp.ui.components.ExperimentalWidget
@@ -51,13 +49,9 @@ import kotlinx.coroutines.launch
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun MainApp(
-    dataRepository: DataRepository
+    viewModel: MainViewModel = hiltViewModel()
 ) {
-    val viewModel: MainViewModel = viewModel(
-        factory = MainViewModelFactory(
-            dataRepository = dataRepository
-        )
-    )
+
     val context = LocalContext.current
     val navController = rememberNavController()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -80,7 +74,7 @@ fun MainApp(
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.CREATED) {
-            viewModel.findAllWearDevices(context)
+            viewModel.findAllWearDevices()
         }
     }
     LaunchedEffect(Unit){
@@ -122,7 +116,7 @@ fun MainApp(
                 FloatingActionButton(
                     containerColor = colorScheme.primaryContainer,
                     onClick = { scope.launch {
-                        viewModel.findAllWearDevices(context)
+                        viewModel.findAllWearDevices()
                     } }
                 ){
                     Icon(

@@ -5,8 +5,10 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
-import com.google.android.gms.wearable.Wearable
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -14,10 +16,16 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.io.ByteArrayOutputStream
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NotificationListener : NotificationListenerService() {
 
-    private val repository by lazy { DataRepository(this) }
+    @Inject
+    lateinit var dataRepository: DataStoreRepository
+    @Inject
+    lateinit var dataClient: DataClient
+
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
 
     companion object {
@@ -28,14 +36,14 @@ class NotificationListener : NotificationListenerService() {
     override fun onListenerConnected() {
         super.onListenerConnected()
         serviceScope.launch {
-            if (repository.notificationsSync.first()) sendToWatch()
+            if (dataRepository.notificationsSync.first()) sendToWatch()
         }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         //Log.w(ContentValues.TAG, "Notification Posted!")
         serviceScope.launch {
-            if (repository.notificationsSync.first()) sendToWatch()
+            if (dataRepository.notificationsSync.first()) sendToWatch()
         }
     }
 
@@ -43,7 +51,7 @@ class NotificationListener : NotificationListenerService() {
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         //Log.w(ContentValues.TAG, "Notification Removed!")
         serviceScope.launch {
-            if (repository.notificationsSync.first()) sendToWatch()
+            if (dataRepository.notificationsSync.first()) sendToWatch()
         }
     }
     override fun onDestroy() {
@@ -77,7 +85,7 @@ class NotificationListener : NotificationListenerService() {
         }
         putDataMapReq.setUrgent()
         val putDataReq = putDataMapReq.asPutDataRequest()
-        Wearable.getDataClient(this).putDataItem(putDataReq)
+        dataClient.putDataItem(putDataReq)
     }
 
     private fun drawableToBitmap(drawable: Drawable): Bitmap {

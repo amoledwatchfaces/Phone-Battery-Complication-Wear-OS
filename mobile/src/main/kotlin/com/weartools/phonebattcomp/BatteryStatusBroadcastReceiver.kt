@@ -9,14 +9,20 @@ import android.content.Intent.ACTION_POWER_DISCONNECTED
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
+import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
-import com.google.android.gms.wearable.Wearable
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 import kotlin.coroutines.cancellation.CancellationException
 
+@AndroidEntryPoint
 class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var dataClient: DataClient
 
     private var lastBatteryLevelPercentSent: Int? = null
     private var lastChargingStatus: Boolean? = null
@@ -67,7 +73,7 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                         lastBatteryLevelPercentSent = batteryLevel
                         lastChargingStatus = isCharging
 
-                        Wearable.getDataClient(context).putDataItem(request)
+                        dataClient.putDataItem(request)
                         /** We don't need to listen on completion **/
                         /*
                         val dataItemTask = Wearable.getDataClient(context).putDataItem(request)

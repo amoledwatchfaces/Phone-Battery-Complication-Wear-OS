@@ -18,12 +18,24 @@ package com.weartools.phonebattcomp
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import com.google.android.gms.wearable.DataClient
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class AppUpdateBroadcastReceiver : BroadcastReceiver() {
+
+    @Inject
+    lateinit var dataRepository: DataStoreRepository
+
+    @Inject
+    lateinit var dataClient: DataClient
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
@@ -31,12 +43,22 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
         if( intent?.action != "android.intent.action.MY_PACKAGE_REPLACED" ) {
             return
         }
-        val repository = DataRepository(context)
 
         ioScope.launch {
-            if (repository.activeSync.first()){
+            if (dataRepository.activeSync.first()){
                 BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
             }
+            else {
+                val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
+                    dataMap.putBoolean(ACTIVE_SYNC_KEY, false)
+                    dataMap.putLong("immediate-update", System.currentTimeMillis()) }
+                    .asPutDataRequest()
+                    .setUrgent()
+
+                dataClient.putDataItem(request)
+
+            }
+
         }
     }
 
