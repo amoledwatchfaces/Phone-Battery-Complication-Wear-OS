@@ -5,6 +5,8 @@ plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
     id ("kotlin-parcelize")
+    id ("kotlin-kapt")
+    id ("com.google.dagger.hilt.android")
 }
 
 android {
@@ -27,8 +29,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000379
-        versionName = "3.7.9"
+        versionCode = 10000382
+        versionName = "3.8.2"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -105,4 +107,13 @@ dependencies {
     implementation("androidx.wear.protolayout:protolayout-material:1.1.0")
     implementation("androidx.wear.tiles:tiles:1.3.0")
     implementation ("com.google.code.gson:gson:2.10.1")
+
+    // HILT
+    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation ("com.google.dagger:hilt-android:2.51")
+    kapt ("com.google.dagger:hilt-compiler:2.51")
+}
+// Allow references to generated code
+kapt {
+    correctErrorTypes = true
 }

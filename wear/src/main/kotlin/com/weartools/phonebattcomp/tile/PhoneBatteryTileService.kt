@@ -21,18 +21,22 @@ import androidx.wear.tiles.RequestBuilders
 import androidx.wear.tiles.RequestBuilders.TileRequest
 import androidx.wear.tiles.TileBuilders
 import androidx.wear.tiles.TileService
+import com.google.android.gms.wearable.DataClient
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.weartools.phonebattcomp.MobileListener
-import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class PhoneBatteryTileService : TileService() {
 
-    private lateinit var repo2: DataRepository
+    @Inject lateinit var repository: DataStoreRepository
+    @Inject lateinit var dataClient: DataClient
     override fun onTileRequest(requestParams: TileRequest): ListenableFuture<TileBuilders.Tile> {
-        repo2 = DataRepository(this)
 
         val handler = Handler(mainLooper)
         handler.postDelayed({ getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java) }, 1000)
@@ -47,8 +51,8 @@ class PhoneBatteryTileService : TileService() {
                             TimelineBuilders.TimelineEntry.Builder()
                                 .setLayout(getPhoneBatteryTileLayout(
                                     requestParams.deviceConfiguration,
-                                    runBlocking { repo2.batteryLevel.first() },
-                                    runBlocking { repo2.nodeName.first() }
+                                    runBlocking { repository.batteryLevel.first() },
+                                    runBlocking { repository.nodeName.first() }
                                 )
                                 ).build()
                         ).build()
@@ -123,11 +127,11 @@ class PhoneBatteryTileService : TileService() {
     override fun onTileAddEvent(requestParams: EventBuilders.TileAddEvent) {
         super.onTileAddEvent(requestParams)
         //runBlocking { repo2.storeTileSetState(true) }
-        MobileListener.sendPhoneBatteryRequest(0, applicationContext, true)
+        MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
     }
     override fun onTileEnterEvent(requestParams: EventBuilders.TileEnterEvent) {
         super.onTileEnterEvent(requestParams)
-        MobileListener.sendPhoneBatteryRequest(0, applicationContext, true)
+        MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
     }
 
     companion object {

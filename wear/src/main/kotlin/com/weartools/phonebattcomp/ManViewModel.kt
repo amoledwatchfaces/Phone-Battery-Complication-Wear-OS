@@ -13,26 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weartools.phonebattcomp.data
+package com.weartools.phonebattcomp
 
 import android.content.ComponentName
 import android.content.Context
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import com.weartools.phonebattcomp.MobileListener
+import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchTempComplicationService
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class PassiveDataViewModel(
-    private val dataRepository: DataRepository
-) : ViewModel() {
+@HiltViewModel
+class MainViewModel @Inject constructor(
+    private val dataRepository: DataStoreRepository,
+    private val dataClient: DataClient
+) : ViewModel(){
 
     val batteryLevel = dataRepository.batteryLevel.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
     val nodeName = dataRepository.nodeName.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "Not connected")
@@ -68,16 +72,16 @@ class PassiveDataViewModel(
         }
     }
 
-    fun toggleActiveSync(state: Boolean,context: Context) {
+    fun toggleActiveSync(state: Boolean) {
         viewModelScope.launch {
             dataRepository.setActiveSyncState(state)
-            MobileListener.sendActiveSyncState(state,context)
+            MobileListener.sendActiveSyncState(state,dataClient)
         }
     }
-    fun toggleNotificationsSync(state: Boolean,context: Context) {
+    fun toggleNotificationsSync(state: Boolean) {
         viewModelScope.launch {
             dataRepository.setNotificationsSyncState(state)
-            MobileListener.sendNotificationsSyncState(state,context)
+            MobileListener.sendNotificationsSyncState(state,dataClient)
         }
     }
 
@@ -88,20 +92,6 @@ class PassiveDataViewModel(
         ).run { requestUpdateAll() }
     }
 
-}
-
-class PassiveDataViewModelFactory(
-    private val dataRepository: DataRepository
-) : ViewModelProvider.Factory {
-    override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        if (modelClass.isAssignableFrom(PassiveDataViewModel::class.java)) {
-            @Suppress("UNCHECKED_CAST")
-            return PassiveDataViewModel(
-                dataRepository = dataRepository
-            ) as T
-        }
-        throw IllegalArgumentException("Unknown ViewModel class")
-    }
 }
 
 

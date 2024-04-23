@@ -32,12 +32,15 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUp
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
 
-    private val repository by lazy { DataRepository(this) }
+    @Inject lateinit var repository: DataStoreRepository
 
     override fun onComplicationActivated(
         complicationInstanceId: Int,

@@ -29,19 +29,24 @@ import androidx.wear.watchface.complications.data.SmallImage
 import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
-    private val repository by lazy { DataRepository(this) }
+    @Inject lateinit var repository: DataStoreRepository
+    @Inject lateinit var dataClient: DataClient
 
     override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType)
     {
         super.onComplicationActivated(complicationInstanceId, type)
-        MobileListener.sendPhoneBatteryRequest(0,this,true)
+        MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
@@ -89,7 +94,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
         if (!repository.activeSync.first()) {
             if (!repository.afterMobileResult.first()) {
-                MobileListener.sendPhoneBatteryRequest(repository.lastUpdate.first(), applicationContext, false)
+                MobileListener.sendPhoneBatteryRequest(repository.lastUpdate.first(), dataClient, false)
             }
             else {
                 repository.storeResult(false)

@@ -26,17 +26,24 @@ import android.util.Log
 import android.widget.Toast
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
+import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
+
+    @Inject lateinit var repository: DataStoreRepository
+    @Inject lateinit var dataClient: DataClient
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -44,10 +51,10 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
         val result = goAsync()
 
         scope.launch {
-            val hasMobileApp = DataRepository(context).hasMobileApp.first()
+            val hasMobileApp = repository.hasMobileApp.first()
             try {
                 if (args.providerComponent == ComponentName(context, MobileBatteryComplicationService::class.java) && hasMobileApp.not()) {
-                    MobileListener.sendPhoneBatteryRequest(0, context, true)
+                    MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
                     openAppStoreOnPhone(context = context)
                     Log.d(TAG, "Opening Play Store Listing!")
                     Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()

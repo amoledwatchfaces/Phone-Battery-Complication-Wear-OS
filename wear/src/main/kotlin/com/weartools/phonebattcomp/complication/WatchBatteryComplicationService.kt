@@ -36,12 +36,15 @@ import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.data.DataStoreRepository
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
-    private val repository by lazy { DataRepository(this) }
+    @Inject lateinit var repository: DataStoreRepository
 
     override fun onComplicationActivated(
         complicationInstanceId: Int,
@@ -53,7 +56,6 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
     }
     fun openScreen(): PendingIntent? {
         val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
-        batteryIntent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
         return PendingIntent.getActivity(this, 0, batteryIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 

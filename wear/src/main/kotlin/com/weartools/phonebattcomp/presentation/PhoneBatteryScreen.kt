@@ -41,7 +41,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
@@ -52,10 +51,11 @@ import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.compose.material.OutlinedCompactChip
 import androidx.wear.compose.material.Text
 import androidx.wear.remote.interactions.RemoteActivityHelper
+import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
+import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.PassiveDataViewModel
 import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
 
@@ -66,9 +66,10 @@ fun PhoneBatteryAppScreen(
     nodeName: String,
     batteryLevel: Int,
     tempUnit: Boolean,
-    percentage: Boolean
+    percentage: Boolean,
+    viewModel: MainViewModel,
+    dataClient: DataClient
 ) {
-    val viewModel: PassiveDataViewModel = viewModel()
     val context = LocalContext.current
     var openHowTo by remember{ mutableStateOf(false) }
     var openExperimental by remember{ mutableStateOf(false) }
@@ -95,7 +96,7 @@ fun PhoneBatteryAppScreen(
                 icon = { Icon(imageVector = Icons.Outlined.Smartphone, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
                 title = nodeName,
                 onClick = {
-                    MobileListener.sendPhoneBatteryRequest(0,context,true)
+                    MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
                 }
             )
         }
@@ -184,7 +185,7 @@ fun PhoneBatteryAppScreen(
         })
     }
     if (openExperimental){
-        ExperimentalWidget(viewModel= viewModel,context = context, callback = {
+        ExperimentalWidget(viewModel= viewModel, callback = {
             if (it == -1) {
                 openExperimental = false
                 return@ExperimentalWidget

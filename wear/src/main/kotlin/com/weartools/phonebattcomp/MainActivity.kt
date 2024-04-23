@@ -28,28 +28,32 @@ import androidx.lifecycle.repeatOnLifecycle
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.CapabilityClient.OnCapabilityChangedListener
 import com.google.android.gms.wearable.CapabilityInfo
+import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.Wearable
-import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.presentation.PhoneBatteryApp
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
+    @Inject lateinit var dataRepository: DataStoreRepository
+    @Inject lateinit var dataClient: DataClient
     private lateinit var capabilityClient: CapabilityClient
-    private val repository by lazy { DataRepository(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         installSplashScreen()
 
         capabilityClient = Wearable.getCapabilityClient(this)
-        val passiveDataRepository = (application as MainApplication).dataRepository
 
-        MobileListener.sendPhoneBatteryRequest(0,this,true)
+        MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -62,14 +66,14 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
         setContent {
             PhoneBatteryApp(
-                dataRepository = passiveDataRepository
+                dataClient = dataClient
             )
         }
     }
 
     override fun onResume() {
         super.onResume()
-        MobileListener.sendPhoneBatteryRequest(0,this,true)
+        MobileListener.sendPhoneBatteryRequest(0, dataClient,true)
         capabilityClient.addListener(this, BuildConfig.CAPABILITY_MOBILE_APP)
     }
 
@@ -83,7 +87,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
         Log.d(TAG, "onCapabilityChanged(): $capabilityInfo")
         capabilityInfo.nodes.firstOrNull()?.let {
             lifecycleScope.launch {
-                repository.storeNodeName(it.displayName)
+                dataRepository.storeNodeName(it.displayName)
             }
         }
     }
@@ -98,7 +102,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
             withContext(Dispatchers.Main) {
                 capabilityInfo.nodes.firstOrNull()?.let {
-                    repository.storeNodeName(it.displayName)
+                    dataRepository.storeNodeName(it.displayName)
                 }
             }
         } catch (cancellationException: CancellationException) {

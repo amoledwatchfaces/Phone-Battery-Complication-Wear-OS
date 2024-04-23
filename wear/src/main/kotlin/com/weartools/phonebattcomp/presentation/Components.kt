@@ -1,6 +1,5 @@
 package com.weartools.phonebattcomp.presentation
 
-import android.content.Context
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
@@ -36,8 +35,8 @@ import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
+import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.PassiveDataViewModel
 import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
 
@@ -238,8 +237,7 @@ fun ListItemsWidget(
 
 @Composable
 fun ExperimentalWidget(
-    viewModel: PassiveDataViewModel,
-    context: Context,
+    viewModel: MainViewModel,
     callback: (Int) -> Unit
 ) {
     val state = remember { mutableStateOf(true) }
@@ -305,7 +303,7 @@ fun ExperimentalWidget(
                         secondaryLabelOff = stringResource(id = R.string.active_sync_experimental),
                         checked = activeSync,
                         onCheckedChange = {
-                            viewModel.toggleActiveSync(it, context)
+                            viewModel.toggleActiveSync(it)
                         }
                     )
                 }
@@ -325,7 +323,7 @@ fun ExperimentalWidget(
                         secondaryLabelOff = "Disabled",
                         checked = notificationsSync,
                         onCheckedChange = {
-                            viewModel.toggleNotificationsSync(it, context)
+                            viewModel.toggleNotificationsSync(it)
                         }
                     )
                 }

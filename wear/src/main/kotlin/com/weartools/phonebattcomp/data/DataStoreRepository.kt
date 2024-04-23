@@ -15,7 +15,6 @@
  */
 package com.weartools.phonebattcomp.data
 
-import android.content.Context
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
@@ -23,128 +22,129 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
-import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
-import com.weartools.phonebattcomp.utils.updateComplication
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import javax.inject.Inject
 
-private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "passive_data")
+class DataStoreRepository @Inject constructor(
+    private val dataStore: DataStore<Preferences>
+): Repository {
 
-class DataRepository(private val context: Context) {
+    val preferencesVersion: Flow<Int> = dataStore.data.map { prefs ->
+        prefs[PREFS_VERSION]?: 1
+    }
 
-    val activeSync: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val activeSync: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[ACTIVE_SYNC] ?: false
     }
-    val notificationsSync: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val notificationsSync: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[NOTIFICATIONS_SYNC] ?: true
     }
 
-    val isCharging: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val isCharging: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[IS_CHARGING] ?: false
     }
 
 
-    val nodeName: Flow<String> = context.dataStore.data.map { prefs ->
+    val nodeName: Flow<String> = dataStore.data.map { prefs ->
         prefs[NODE_NAME] ?: "Not connected"
     }
 
-    val tempUnit: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val tempUnit: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[TEMP_UNIT] ?: true
     }
-    val percentage: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val percentage: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[PERCENTAGE] ?: true
     }
 
-    val batteryLevel: Flow<Int> = context.dataStore.data.map { prefs ->
+    val batteryLevel: Flow<Int> = dataStore.data.map { prefs ->
         prefs[BATTERY_LEVEL] ?: 0
     }
 
-    val hasMobileApp: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val hasMobileApp: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[HAS_MOBILE_APP] ?: false
     }
-    val afterMobileResult: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val afterMobileResult: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[AFTER_MOBILE_RESULT] ?: false
     }
-    val isConnected: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val isConnected: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[IS_CONNECTED] ?: false
     }
-    val lastUpdate: Flow<Long> = context.dataStore.data.map { prefs ->
+    val lastUpdate: Flow<Long> = dataStore.data.map { prefs ->
         prefs[LAST_UPDATE] ?: 0
     }
-    val isTileSet: Flow<Boolean> = context.dataStore.data.map { prefs ->
+    val isTileSet: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[IS_TILE_SET] ?: false
     }
 
-    val byteArrayMutableListJsonString: Flow<String> = context.dataStore.data.map {
+    val byteArrayMutableListJsonString: Flow<String> = dataStore.data.map {
         it[BITMAP_LIST_KEY]?: ""
     }
     suspend fun storeByteArrayMutableList(byteArrayMutableList: String) {
-        context.dataStore.edit {
+        dataStore.edit {
             it[BITMAP_LIST_KEY] = byteArrayMutableList
         }
-        context.updateComplication(NotificationsIconsComplicationService::class.java)
     }
 
 
     suspend fun storeNodeName(node: String) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[NODE_NAME] = node
         }
     }
 
     suspend fun storeTempUnit(tempUnit: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[TEMP_UNIT] = tempUnit
         }
     }
 
     suspend fun setActiveSyncState(state: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[ACTIVE_SYNC] = state
         }
     }
     suspend fun setNotificationsSyncState(state: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[NOTIFICATIONS_SYNC] = state
         }
     }
 
     suspend fun setChargingState(state: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[IS_CHARGING] = state
         }
     }
 
     suspend fun storePercentage(percentage: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[PERCENTAGE] = percentage
         }
     }
 
     suspend fun storeBatteryLevel(batteryLevel: Int) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[BATTERY_LEVEL] = batteryLevel
         }
     }
 
     suspend fun storeConnection(isConnected: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[IS_CONNECTED] = isConnected
         }
     }
     suspend fun storeResult(afterMobileResult: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[AFTER_MOBILE_RESULT] = afterMobileResult
         }
     }
     suspend fun storeMobileApp(hasMobileApp: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[HAS_MOBILE_APP] = hasMobileApp
         }
     }
     suspend fun storeTileSetState(set: Boolean) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[IS_TILE_SET] = set
         }
     }
@@ -157,7 +157,7 @@ class DataRepository(private val context: Context) {
         lastUpdate: Long,
         isCharging: Boolean
     ) {
-        context.dataStore.edit { prefs ->
+        dataStore.edit { prefs ->
             prefs[BATTERY_LEVEL] = batteryLevel
             prefs[HAS_MOBILE_APP] = hasMobileApp
             prefs[AFTER_MOBILE_RESULT] = afterMobileResult
@@ -184,6 +184,8 @@ class DataRepository(private val context: Context) {
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
         private val NOTIFICATIONS_SYNC = booleanPreferencesKey("notifications_sync")
         private val IS_CHARGING = booleanPreferencesKey("is_charging")
+
+        val PREFS_VERSION = intPreferencesKey(name = "preferencesVersion")
     }
 }
 

@@ -27,14 +27,17 @@ import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataRepository
+import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.utils.BitmapCreator
+import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import java.util.Base64
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
 
-    private val repository by lazy { DataRepository(this) }
+    @Inject lateinit var repository: DataStoreRepository
 
     /** DRAW NOTIFICATION ICONS **/
     /*
