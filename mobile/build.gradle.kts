@@ -29,8 +29,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000381
-        versionName = "3.8.2"
+        versionCode = 10000383
+        versionName = "3.8.4"
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -80,7 +80,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // ICONS
-    implementation ("androidx.compose.material:material-icons-extended:1.6.6")
+    implementation ("androidx.compose.material:material-icons-extended:1.6.7")
 
     // COMPOSE
     implementation ("androidx.activity:activity-compose:1.9.0")
@@ -88,28 +88,28 @@ dependencies {
     implementation ("androidx.compose.material3:material3:1.2.1")
     implementation ("androidx.compose.material3:material3-window-size-class:1.2.1")
 
-    implementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    implementation(platform("androidx.compose:compose-bom:2024.05.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
 
     implementation ("androidx.compose.material3:material3")
-    implementation ("androidx.compose.material:material:1.6.6")
+    implementation ("androidx.compose.material:material:1.6.7")
 
     // NAVIGATION
     implementation ("androidx.navigation:navigation-compose:2.7.7")
     implementation ("androidx.activity:activity-ktx:1.9.0")
-    implementation ("androidx.core:core-ktx:1.13.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation ("androidx.core:core-ktx:1.13.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
 
     // Used for Datastore
-    implementation ("androidx.datastore:datastore-preferences:1.1.0")
+    implementation ("androidx.datastore:datastore-preferences:1.1.1")
 
     // DEBUG
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.04.01"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.05.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

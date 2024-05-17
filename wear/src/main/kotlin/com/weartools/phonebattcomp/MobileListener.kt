@@ -85,7 +85,7 @@ class MobileListener : WearableListenerService() {
                                 isCharging = isCharging
                             ) }
                             //Log.d(TAG, "Received Phone Battery Level: $level")
-                            this.updateComplication(MobileBatteryComplicationService::class.java)
+                            updateComplication(MobileBatteryComplicationService::class.java)
                             TileService.getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java)
                         }
                         ACTIVE_SYNC_PATH -> {
@@ -93,11 +93,9 @@ class MobileListener : WearableListenerService() {
                             ioScope.launch {
                                 dataRepository.setActiveSyncState(state)
                             }
-                            dataEvents.release()
                         }
                         URI -> {
                             processDataItem(dataEvent.dataItem)
-                            dataEvents.release()
                         }
                     }
                 }
@@ -111,11 +109,13 @@ class MobileListener : WearableListenerService() {
                         lastUpdate = System.currentTimeMillis(),
                         isCharging = false
                     ) }
-                //Log.d(TAG, "Phone Companion Uninstalled!")
-                    this.updateComplication(MobileBatteryComplicationService::class.java)
+                    //Log.d(TAG, "Phone Companion Uninstalled!")
+                    updateComplication(MobileBatteryComplicationService::class.java)
             }
                 else -> { Log.e(ContentValues.TAG, "Unknown data event Type = " + dataEvent.type) }
-        }
+            }
+            /** Release dataEvents after processing them */
+            dataEvents.release()
         }
     }
 
@@ -156,8 +156,8 @@ class MobileListener : WearableListenerService() {
 
         ioScope.launch {
             dataRepository.storeByteArrayMutableList(concatenatedString)
-            this@MobileListener.updateComplication(NotificationsIconsComplicationService::class.java)
         }
+        updateComplication(NotificationsIconsComplicationService::class.java)
     }
 
     companion object {

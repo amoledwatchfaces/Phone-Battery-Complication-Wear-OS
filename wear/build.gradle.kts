@@ -29,8 +29,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000382
-        versionName = "3.8.2"
+        versionCode = 10000384
+        versionName = "3.8.4"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -66,7 +66,7 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.6.6"
+    val composeUiVersion = "1.6.7"
     val composeWearVersion = "1.3.1"
 
     // WEAR OS
@@ -77,15 +77,15 @@ dependencies {
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     // COMPOSE
-    implementation ("androidx.core:core-ktx:1.13.0")
+    implementation ("androidx.core:core-ktx:1.13.1")
     implementation ("androidx.compose.ui:ui:$composeUiVersion")
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
     implementation ("androidx.activity:activity-compose:1.9.0")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.7.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
@@ -96,7 +96,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
     // Used for Datastore
-    implementation ("androidx.datastore:datastore-preferences:1.1.0")
+    implementation ("androidx.datastore:datastore-preferences:1.1.1")
 
     // SPLASH SCREEN
     implementation ("androidx.core:core-splashscreen:1.0.1")

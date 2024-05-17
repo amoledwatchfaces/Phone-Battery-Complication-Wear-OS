@@ -78,56 +78,31 @@ class WearListener : WearableListenerService() {
                                 .setUrgent()
 
                             dataClient.putDataItem(request)
-                            /*
-                                    val dataItemTask: Task<DataItem> = Wearable.getDataClient(this).putDataItem(request)
-                                    dataItemTask
-                                        .addOnSuccessListener { dataItem -> Log.d(TAG,"WL: Sending Phone Battery request was successful: $dataItem") }
-                                        .addOnFailureListener { e -> Log.e(TAG,"WL: Sending request task failed!: $e") }
-                                        .addOnCompleteListener{task -> Log.d(TAG,"WL: Sending request Task complete!: $task")}
-                             */
                         }
                         ACTIVE_SYNC_PATH -> {
-                            //Log.d(TAG,"Active Sync: Received status change info!")
-                            val activeSyncState = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
-                            if (activeSyncState) {
-                                //Log.d(TAG,"Turning Active Sync ON")
-                                BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
-                                ioScope.launch {
-                                    dataRepository.setActiveSyncState(true)
-                                }
-                            }
-                            else {
-                                //Log.d(TAG,"Turning Active Sync OFF")
-                                BatteryStatusBroadcastReceiver.unsubscribeFromUpdates(this)
-                                ioScope.launch {
-                                    dataRepository.setActiveSyncState(false)
-                                }
+                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
+                            Log.d(TAG,"Active Sync Enabled: $state")
+                            BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
+                            ioScope.launch {
+                                dataRepository.setActiveSyncState(state)
                             }
                         }
                         NOTIFICATIONS_SYNC_PATH -> {
-                            //Log.d(TAG,"Active Sync: Received status change info!")
-                            val notificationsSyncState = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(NOTIFICATIONS_SYNC_KEY)
-                            if (notificationsSyncState) {
-                                //Log.d(TAG,"Turning Active Sync ON")
-                                ioScope.launch {
-                                    dataRepository.setNotificationsSyncState(true)
-                                }
-                            }
-                            else {
-                                //Log.d(TAG,"Turning Active Sync OFF")
-                                ioScope.launch {
-                                    dataRepository.setNotificationsSyncState(false)
+                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(NOTIFICATIONS_SYNC_KEY)
+                            Log.d(TAG,"Notifications Sync Enabled: $state")
+                            ioScope.launch {
+                                    dataRepository.setNotificationsSyncState(state)
                                 }
                             }
                         }
                     }
-                }
-
                 DataEvent.TYPE_DELETED -> { Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString()) }
                 else -> { Log.e(TAG, "Unknown data event Type = " + dataEvent.type) }
             }
-            }
+            /** Release dataEvents after processing them */
+            dataEvents.release()
         }
+    }
 
     private val batteryLevel: Int
         get() {
