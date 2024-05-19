@@ -1,6 +1,8 @@
 package com.weartools.phonebattcomp.screens
 
 import android.content.Context
+import android.view.SoundEffectConstants
+import android.view.View
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
@@ -17,10 +19,14 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ContactSupport
 import androidx.compose.material.icons.filled.Shop
+import androidx.compose.material.icons.filled.Shop2
+import androidx.compose.material.icons.outlined.School
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
@@ -29,6 +35,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.MaterialTheme.colorScheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
@@ -63,6 +70,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalMaterialApi::class)
 @Composable
 fun HomeScreen(
+    view: View,
     context: Context,
     viewModel: MainViewModel,
     scope: CoroutineScope,
@@ -152,34 +160,43 @@ fun HomeScreen(
 
             item {
                 ElevatedCard(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp
-                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
-                        .padding(bottom = 20.dp, top = 20.dp)
+                        .padding(bottom = 10.dp, top = 20.dp)
                 ) {
                     Row(
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp, bottom = 0.dp),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
+                            modifier = Modifier.padding(start = 16.dp),
                             text = stringResource(id = R.string.welcome),
                             style = MaterialTheme.typography.titleLarge,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(start = 16.dp, top = 10.dp, bottom = 0.dp),
                             textAlign = TextAlign.Center,
                         )
                         TextButton(
-                            modifier = Modifier.padding(top = 10.dp, bottom = 0.dp, end= 10.dp),
-                            onClick = { context.openGuideLink()})
+                            modifier = Modifier.padding(end = 4.dp),
+                            onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.openGuideLink()})
                         {
-                            Text(
-                                textDecoration = TextDecoration.Underline,
-                                text = stringResource(id = R.string.installation_guides),
-                                color = colorScheme.onPrimaryContainer)
+                                Icon(
+                                    modifier = Modifier.padding(end = 10.dp),
+                                    imageVector = Icons.Outlined.School,
+                                    contentDescription = null,
+                                )
+                                Text(
+                                    textDecoration = TextDecoration.Underline,
+                                    text = stringResource(id = R.string.installation_guides),
+                                    color = colorScheme.onPrimaryContainer)
+
                         }
+
                     }
 
                     Text(
@@ -215,7 +232,7 @@ fun HomeScreen(
                         )
                         Text(
                             text = stringResource(id = R.string.uninstall),
-                            style = MaterialTheme.typography.bodySmall,
+                            style = MaterialTheme.typography.bodyMedium,
                             color = colorScheme.onSurfaceVariant,
                             fontWeight = FontWeight.SemiBold,
                             modifier = Modifier.padding(16.dp),
@@ -251,13 +268,32 @@ fun HomeScreen(
                         .fillMaxWidth(0.9f)
                         .padding(bottom = 20.dp, top = 20.dp)
                 ) {
-                    Text(
-                        text = stringResource(id = R.string.note),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.SemiBold,
-                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 4.dp),
-                        textAlign = TextAlign.Center,
-                    )
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 10.dp, bottom = 0.dp),
+                        horizontalArrangement = Arrangement.Start,
+                        verticalAlignment = Alignment.CenterVertically
+                    ){
+                        Icon(
+                            modifier = Modifier.padding(start = 16.dp, end = 14.dp),
+                            imageVector = Icons.AutoMirrored.Filled.ContactSupport,
+                            contentDescription = "Play Store Portfolio",
+                            tint = colorScheme.onPrimaryContainer
+                        )
+                        Text(
+                            text = stringResource(id = R.string.note),
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.SemiBold,
+                            textAlign = TextAlign.Center,
+                        )
+                        // HIDDEN TEXTBUTTON TO CRATE SAME SPACING AS IN WELCOME
+                        TextButton(
+                            enabled = false,
+                            modifier = Modifier.padding(end = 4.dp),
+                            onClick = {}
+                        ) {}
+                    }
                     Text(
                         text = stringResource(id = R.string.note_text),
                         style = MaterialTheme.typography.bodyLarge,
@@ -267,36 +303,50 @@ fun HomeScreen(
 
                     TextButton(
                         modifier = Modifier.padding(start = 4.dp, end = 16.dp, top = 0.dp, bottom = 4.dp),
-                        onClick = {context.sendFeedbackEmail()}) {
+                        onClick = {
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
+                            context.sendFeedbackEmail()}) {
                         Text(
                             text = stringResource(id = R.string.support),
                             color = colorScheme.onPrimaryContainer,
                             style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold,
                             textAlign = TextAlign.Left,
                         )
                     }
                 }
+            }
 
-
-                // PORTFOLIO
+            // PORTFOLIO
+            item {
                 Text(
                     modifier = Modifier
-                        .padding(top = 10.dp)
+                        .padding(top = 10.dp, bottom = 2.dp)
                         .fillMaxWidth(0.9f),
                     text = stringResource(id = R.string.check_portfolio),
                     style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.Medium,
                     textAlign = TextAlign.Center,
                 )
-                TextButton(
-                    modifier = Modifier.padding(start = 4.dp, end = 16.dp, top = 12.dp, bottom = 4.dp),
-                    onClick = {context.openPlayStorePortfolio()}) {
+                OutlinedButton(
+                    modifier = Modifier.padding( top = 16.dp, bottom = 4.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(),
+                    onClick = {
+                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                        context.openPlayStorePortfolio()
+                    }
+                ) {
+                    Icon(
+                        modifier = Modifier.padding(end = 14.dp),
+                        imageVector = Icons.Default.Shop2,
+                        contentDescription = "Play Store Portfolio",
+                        tint = colorScheme.onPrimaryContainer
+                    )
                     Text(
                         text = stringResource(id = R.string.dev_page),
-                        color = colorScheme.onPrimaryContainer,
-                        fontWeight = FontWeight.SemiBold,
-                        style = MaterialTheme.typography.bodyLarge,
-                        textAlign = TextAlign.Center,
                     )
+
+
                 }
             }
 
@@ -305,7 +355,10 @@ fun HomeScreen(
                 modifier = Modifier
                     .padding(top = 20.dp, bottom = 40.dp)
                     .wrapContentSize(),
-                onClick = { context.openAmoledWebPage() }) {
+                onClick = {
+                    view.playSoundEffect(SoundEffectConstants.CLICK)
+                    context.openAmoledWebPage()
+                }) {
                 Text(
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,

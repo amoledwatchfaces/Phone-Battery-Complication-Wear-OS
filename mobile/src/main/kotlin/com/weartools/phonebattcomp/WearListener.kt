@@ -44,8 +44,8 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 const val ACTIVE_SYNC_PATH = "/active-sync"
 const val ACTIVE_SYNC_KEY = "active-sync-key"
 
-private const val NOTIFICATIONS_SYNC_PATH = "/notifications-sync"
-private const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
+const val NOTIFICATIONS_SYNC_PATH = "/notifications-sync"
+const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
 
 @AndroidEntryPoint
 class WearListener : WearableListenerService() {

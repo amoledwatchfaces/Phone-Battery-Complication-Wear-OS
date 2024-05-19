@@ -3,10 +3,12 @@ package com.weartools.phonebattcomp
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
@@ -73,13 +75,15 @@ class MainViewModel @Inject constructor(
     var message: String = ""
 
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-    val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
+    val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    val backgroundService = dataRepository.backgroundServiceState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
     init {
         viewModelScope.launch {
             capabilityClient.addListener(listener,BuildConfig.CAPABILITY_WEAR_APP)
             dataRepository.activeSync.distinctUntilChanged().collect {}
             dataRepository.notificationsSync.distinctUntilChanged().collect {}
+            dataRepository.backgroundServiceState.distinctUntilChanged().collect {}
         }
     }
 
@@ -217,6 +221,54 @@ class MainViewModel @Inject constructor(
                 Log.e(TAG, "Error while activating battery sync", e)
             }
         }
+    }
+
+    fun setActiveSyncState(state: Boolean) {
+        viewModelScope.launch {
+            dataRepository.setActiveSyncState(state)
+        }
+        val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
+            dataMap.putBoolean(ACTIVE_SYNC_KEY, state)
+            dataMap.putLong("immediate-update", System.currentTimeMillis()) }
+            .asPutDataRequest()
+            .setUrgent()
+
+        dataClient.putDataItem(request)
+    }
+    fun setNotificationsSyncState(state: Boolean) {
+        viewModelScope.launch {
+            dataRepository.setNotificationsSyncState(state)
+        }
+        val request = PutDataMapRequest.create(NOTIFICATIONS_SYNC_PATH).apply{
+            dataMap.putBoolean(NOTIFICATIONS_SYNC_KEY, state)
+            dataMap.putLong("immediate-update", System.currentTimeMillis()) }
+            .asPutDataRequest()
+            .setUrgent()
+
+        dataClient.putDataItem(request)
+    }
+    fun setBackgroundServiceState(state: Boolean) {
+        viewModelScope.launch {
+            dataRepository.setBackgroundServiceState(state)
+        }
+    }
+
+    fun isMyNotificationsServiceRunning(context: Context): Boolean {
+        val activityManager = getSystemService(context, ActivityManager::class.java) as ActivityManager
+        val runningServices = activityManager.getRunningServices(Integer.MAX_VALUE)
+
+        for (service in runningServices) {
+            if (service.service.className == NotificationListener::class.java.name) {
+                viewModelScope.launch {
+                    dataRepository.setBackgroundServiceState(true)
+                }
+                return true
+            }
+        }
+        viewModelScope.launch {
+            dataRepository.setBackgroundServiceState(false)
+        }
+        return false
     }
 
     companion object {

@@ -67,7 +67,14 @@ class MobileListener : WearableListenerService() {
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         //if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
 
-        dataEvents.forEach { dataEvent ->
+        /** Freeze dataEvents after receiving it **/
+        val frozenDataEvents = dataEvents.map {
+            it.freeze()
+        }
+
+        frozenDataEvents.forEach { dataEvent ->
+
+            /** Process dataEvent **/
             when (dataEvent.type) {
                 DataEvent.TYPE_CHANGED -> {
                     when (dataEvent.dataItem.uri.path) {
@@ -92,6 +99,12 @@ class MobileListener : WearableListenerService() {
                             val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
                             ioScope.launch {
                                 dataRepository.setActiveSyncState(state)
+                            }
+                        }
+                        NOTIFICATIONS_SYNC_PATH -> {
+                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(NOTIFICATIONS_SYNC_KEY)
+                            ioScope.launch {
+                                dataRepository.setNotificationsSyncState(state)
                             }
                         }
                         URI -> {

@@ -84,3 +84,10 @@ fun Context.askForNotificationAccess(){
         val intent = Intent(action)
         this.startActivity(intent)
 }
+fun Context.openTwitterSocialLink() {
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.social_twitter))))
+    } catch (e: ActivityNotFoundException) {
+        Log.d(TAG,"No Browser available")
+    }
+}

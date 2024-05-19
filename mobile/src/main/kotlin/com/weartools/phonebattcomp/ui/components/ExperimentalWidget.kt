@@ -28,7 +28,7 @@ fun ExperimentalWidget(
             Icon(
             imageVector = Icons.Default.Notifications,
             contentDescription = "Notifications Complication",
-            tint = MaterialTheme.colorScheme.onPrimaryContainer
+            tint = colorScheme.onPrimaryContainer
         )
 
         },

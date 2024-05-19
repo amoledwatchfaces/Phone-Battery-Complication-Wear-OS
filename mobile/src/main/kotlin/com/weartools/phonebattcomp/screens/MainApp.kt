@@ -5,7 +5,6 @@ import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.material.icons.filled.WatchOff
 import androidx.compose.material3.ExtendedFloatingActionButton
@@ -29,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
@@ -51,8 +51,8 @@ import kotlinx.coroutines.launch
 fun MainApp(
     viewModel: MainViewModel = hiltViewModel()
 ) {
-
     val context = LocalContext.current
+    val view = LocalView.current
     val navController = rememberNavController()
     val lifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
@@ -126,21 +126,6 @@ fun MainApp(
                     )
                 }
             }
-            else {
-                ExtendedFloatingActionButton(
-                    icon = {
-                        Icon(
-                            tint = colorScheme.onSecondaryContainer,
-                            imageVector = Icons.Default.Science,
-                            contentDescription = null,)
-                    },
-                    text = {
-                        Text(color = colorScheme.onSecondaryContainer,text = "Experimental") },
-                    containerColor = colorScheme.surfaceContainer,
-                    onClick = { openDialog = openDialog.not() },
-                    expanded = fabVisibility
-                )
-            }
         },
         floatingActionButtonPosition = FabPosition.End,
         containerColor = colorScheme.surface,
@@ -157,8 +142,9 @@ fun MainApp(
             navController,
             startDestination = Screen.Home.route,
             Modifier.padding(padding)) {
-            composable(Screen.Home.route) { HomeScreen(context, viewModel, scope, isWearableConnected, commonNodesList, listState) }
-            composable(Screen.About.route) { InfoScreen(context, viewModel) }
+            composable(Screen.Home.route) { HomeScreen(view, context, viewModel, scope, isWearableConnected, commonNodesList, listState) }
+            composable(Screen.Experimental.route) { ExperimentalScreen(context, viewModel, lifecycleOwner) }
+            composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }
     }
 

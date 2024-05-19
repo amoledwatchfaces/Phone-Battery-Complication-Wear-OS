@@ -1,6 +1,11 @@
 package com.weartools.phonebattcomp.screens
 
+import android.content.ClipData
+import android.content.ClipboardManager
 import android.content.Context
+import android.view.SoundEffectConstants
+import android.view.View
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +16,10 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CurrencyBitcoin
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.Mail
+import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.RateReview
 import androidx.compose.material.icons.filled.Shop2
 import androidx.compose.material3.Button
@@ -29,6 +38,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -44,11 +54,13 @@ import com.weartools.phonebattcomp.utils.openGithubSocialLink
 import com.weartools.phonebattcomp.utils.openPlayStorePortfolio
 import com.weartools.phonebattcomp.utils.openPrivacyPolicyLink
 import com.weartools.phonebattcomp.utils.openTelegramSocialLink
+import com.weartools.phonebattcomp.utils.openTwitterSocialLink
 import com.weartools.phonebattcomp.utils.sendFeedbackEmail
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InfoScreen(
+    view: View,
     context: Context,
     viewModel: MainViewModel
 ) {
@@ -63,7 +75,9 @@ fun InfoScreen(
             actions = {
                 IconButton(
                     modifier = Modifier.padding(end = 5.dp),
-                    onClick = { context.openPlayStorePortfolio() }) {
+                    onClick = {
+                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                        context.openPlayStorePortfolio() }) {
                     Icon(
                         imageVector = Icons.Default.Shop2,
                         contentDescription = "Play Store Portfolio",
@@ -71,7 +85,7 @@ fun InfoScreen(
                     )
                 }
             },
-            title = { Text(fontWeight = FontWeight.Medium, text = stringResource(id = R.string.info)) },
+            title = { Text(fontWeight = FontWeight.Medium, text = stringResource(id = R.string.app_name)) },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color.Transparent,
             )
@@ -87,51 +101,188 @@ fun InfoScreen(
             // Show the top app bar on top level destinations.
             //val destination = appState.currentTopLevelDestination
             //if (destination != null) {
-            item { Text(
-                modifier = Modifier.padding(bottom = 10.dp),
-                style = MaterialTheme.typography.titleLarge,
-                maxLines = 2,
-                fontWeight = FontWeight.Medium,
-                text = stringResource(id = R.string.app_name)
-            ) }
 
             item {
                 ElevatedCard(
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 6.dp
-                ),
-                modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(bottom = 20.dp, top = 20.dp)
-            ){
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    TextButton(
-                        onClick = { context.openPrivacyPolicyLink() }) {
-                        Text(
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyMedium,
-                            text = stringResource(id = R.string.privacy), color = colorScheme.onPrimaryContainer)
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 6.dp
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(bottom = 20.dp, top = 10.dp)
+                ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp, horizontal = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = colorScheme.onPrimaryContainer,
+                            ),
+                            onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.openPrivacyPolicyLink() }) {
+                            Icon(
+                                modifier = Modifier.padding(end = 8.dp),
+                                imageVector = Icons.Filled.Policy,
+                                contentDescription = null,
+                            )
+                            Text(
+                                fontWeight = FontWeight.Medium,
+                                style = MaterialTheme.typography.bodyMedium,
+                                text = stringResource(id = R.string.privacy)
+                            )
+                        }
+                        TextButton(
+                            colors = ButtonDefaults.textButtonColors(
+                                contentColor = colorScheme.onPrimaryContainer,
+                            ),
+                            onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.sendFeedbackEmail() }) {
+                            Icon(
+                                modifier = Modifier.padding(end = 9.dp),
+                                imageVector = Icons.Filled.Mail,
+                                contentDescription = null,
+                            )
+                            Text(
+                                fontWeight = FontWeight.Medium,
+                                style = MaterialTheme.typography.bodyMedium,
+                                text = stringResource(id = R.string.feedback)
+                            )
+                        }
                     }
-                    TextButton(
-                        onClick = { context.sendFeedbackEmail() }) {
-                        Text(
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyMedium,
-                            text = stringResource(id = R.string.feedback), color = colorScheme.onPrimaryContainer)
+
+                }
+            }
+
+            item {
+                ElevatedCard(
+                    elevation = CardDefaults.cardElevation(
+                        defaultElevation = 6.dp
+                    ),
+                    modifier = Modifier
+                        .fillMaxWidth(0.9f)
+                        .padding(bottom = 20.dp, top = 10.dp)
+                ){
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.SpaceBetween,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(0.9F)
+                                .padding(top = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Column {
+                                Text(
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    text = stringResource(id = R.string.follow_us), fontWeight = FontWeight.Medium)
+                            }
+                            Column {
+                                Row {
+                                    IconButton(onClick = {
+                                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                                        context.openTelegramSocialLink()}) {
+                                        Icon(
+                                            tint = colorScheme.onPrimaryContainer,
+                                            imageVector = ImageVector.vectorResource(id = R.drawable.social_telegram_2),
+                                            contentDescription = null,
+                                        )
+                                    }
+                                    IconButton(onClick = {
+                                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                                        context.openGithubSocialLink()
+                                    }) {
+                                        Icon(
+                                            tint = colorScheme.onPrimaryContainer,
+                                            imageVector = ImageVector.vectorResource(id = R.drawable.social_github),
+                                            contentDescription = null,
+                                        )
+                                    }
+                                    /*
+                                    IconButton(onClick = {
+                                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                                        context.openFacebookSocialLink()}) {
+                                        Icon(
+                                            tint = colorScheme.onPrimaryContainer,
+                                            imageVector = ImageVector.vectorResource(id = R.drawable.social_facebook),
+                                            contentDescription = null,
+                                        )
+                                    }
+
+                                     */
+                                    IconButton(onClick = {
+                                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                                        context.openTwitterSocialLink()
+                                    }) {
+                                        Icon(
+                                            tint = colorScheme.onPrimaryContainer,
+                                            imageVector = ImageVector.vectorResource(id = R.drawable.social_x),
+                                            contentDescription = null,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth(0.9F)
+                                .padding(bottom = 10.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        )  {
+                            Column {
+                                Text(
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    text = stringResource(id = R.string.support_us), fontWeight = FontWeight.Medium)
+                            }
+                            Column {
+                                Row {
+                                    IconButton(onClick = {
+                                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                                        val clipboard = context.getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                                        val clip = ClipData.newPlainText("BTC Address","bc1qvn4m56rjmagr2g9treawwpjmjpeuq5023hyjd2")
+                                        clipboard.setPrimaryClip(clip)
+                                        Toast.makeText(context, "BTC Address copied to clipboard", Toast.LENGTH_LONG).show()
+                                    }) {
+                                        Icon(
+                                            modifier = Modifier
+                                                .padding()
+                                                .rotate(15F),
+                                            tint = colorScheme.onPrimaryContainer,
+                                            imageVector = Icons.Filled.CurrencyBitcoin,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                    IconButton(onClick = {
+                                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                                        context.openBuyMeACoffeeSocialLink()
+                                    }) {
+                                        Icon(
+                                            modifier = Modifier.padding(),
+                                            tint = colorScheme.onPrimaryContainer,
+                                            imageVector = Icons.Filled.LocalCafe,
+                                            contentDescription = null,
+                                        )
+                                    }
+                                }
+                            }
+                        }
+
                     }
                 }
-
             }
-            }
-
 
             item { Text(
-                modifier = Modifier.padding(bottom = 10.dp, top = 0.dp),
-                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 10.dp, top = 10.dp),
+                style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Medium,
                 text = stringResource(id = R.string.liked_watch_face),) }
             item {
@@ -141,7 +292,9 @@ fun InfoScreen(
                         contentColor = colorScheme.onPrimaryContainer
 
                     ),
-                    onClick = { viewModel.showRateDialog(context)}) {
+                    onClick = {
+                        view.playSoundEffect(SoundEffectConstants.CLICK)
+                        viewModel.showRateDialog(context)}) {
                     Text(
                         text = stringResource(id = R.string.leave_review),
                     )
@@ -154,74 +307,13 @@ fun InfoScreen(
                 }
             }
 
-
-
-            item { Text(
-                modifier = Modifier.padding(bottom = 10.dp, top = 30.dp),
-                text = stringResource(id = R.string.follow_us), fontWeight = FontWeight.Medium) }
-            item { Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                Column(
-                    modifier = Modifier.weight(0.33f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    IconButton(onClick = { context.openTelegramSocialLink()  }) {
-                        Icon(
-                            tint = colorScheme.onPrimaryContainer,
-                            imageVector = ImageVector.vectorResource(id = R.drawable.social_telegram),
-                            contentDescription = null,
-                        )
-                    }
-                    Text(
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium,
-                        text = "Telegram",
-                        color = colorScheme.onPrimaryContainer)
-
-                }
-                Column(
-                    modifier = Modifier.weight(0.33f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    IconButton(onClick = { context.openGithubSocialLink() }) {
-                        Icon(
-                            tint = colorScheme.onPrimaryContainer,
-                            imageVector = ImageVector.vectorResource(id = R.drawable.social_github),
-                            contentDescription = null,
-                        )
-                    }
-                    Text(
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium,
-                        text = "GitHub",
-                        color = colorScheme.onPrimaryContainer)
-                }
-                Column(
-                    modifier = Modifier.weight(0.33f),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    IconButton(onClick = { context.openBuyMeACoffeeSocialLink() }) {
-                        Icon(
-                            tint = colorScheme.onPrimaryContainer,
-                            imageVector = ImageVector.vectorResource(id = R.drawable.social_buymeacoffee),
-                            contentDescription = null,
-                        )
-                    }
-                    Text(
-                        fontWeight = FontWeight.Medium,
-                        style = MaterialTheme.typography.bodyMedium,
-                        text = "Buy us a coffee",
-                        color = colorScheme.onPrimaryContainer)
-                }
-            } }
-
             item { TextButton(
                 modifier = Modifier
                     .padding(top = 20.dp, bottom = 40.dp)
                     .wrapContentSize(),
-                onClick = { context.openAmoledWebPage() }) {
+                onClick = {
+                    view.playSoundEffect(SoundEffectConstants.CLICK)
+                    context.openAmoledWebPage() }) {
                 Text(
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.SemiBold,

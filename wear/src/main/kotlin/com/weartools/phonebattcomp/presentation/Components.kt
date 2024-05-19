@@ -290,7 +290,7 @@ fun ExperimentalWidget(
                 }
                 item {
                     SectionText(
-                        text = "Notification Access necessary! (companion app)",
+                        text = "Background Service necessary! (companion app)",
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 5.dp),
