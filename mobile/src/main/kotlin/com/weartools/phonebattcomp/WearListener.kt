@@ -58,9 +58,13 @@ class WearListener : WearableListenerService() {
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
-        //if (Log.isLoggable(TAG, Log.DEBUG)) { Log.d(TAG, "onDataChanged: $dataEvents") }
 
-        dataEvents.forEach { dataEvent ->
+        /** Freeze dataEvents after receiving it **/
+        val frozenDataEvents = dataEvents.map {
+            it.freeze()
+        }
+
+        frozenDataEvents.forEach { dataEvent ->
             when (dataEvent.type) {
                 DataEvent.TYPE_CHANGED -> {
                     when (dataEvent.dataItem.uri.path) {
