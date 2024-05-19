@@ -59,7 +59,7 @@ class WearListener : WearableListenerService() {
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
 
-        /** Freeze dataEvents after receiving it **/
+        /** Freeze dataEvents before processing **/
         val frozenDataEvents = dataEvents.map {
             it.freeze()
         }
