@@ -45,8 +45,7 @@ fun ImageSwitchBox() {
         targetState = currentImageIndex,
         animationSpec = tween(1000), label = "") { index ->
         Image(
-            modifier = Modifier
-                .size(300.dp),
+            modifier = Modifier.size(175.dp),// old = .size(177.dp).offset((-0.5).dp,(-0.5).dp),
             alignment = Alignment.Center,
             painter = images[index],
             contentDescription = "Frame"

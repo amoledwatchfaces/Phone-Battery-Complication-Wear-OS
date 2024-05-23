@@ -37,9 +37,6 @@ class DataStoreRepository @Inject constructor(
     val activeSync: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[ACTIVE_SYNC] ?: false
     }
-    val notificationsSync: Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[NOTIFICATIONS_SYNC] ?: true
-    }
 
     val isCharging: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[IS_CHARGING] ?: false
@@ -102,11 +99,6 @@ class DataStoreRepository @Inject constructor(
     suspend fun setActiveSyncState(state: Boolean) {
         dataStore.edit { prefs ->
             prefs[ACTIVE_SYNC] = state
-        }
-    }
-    suspend fun setNotificationsSyncState(state: Boolean) {
-        dataStore.edit { prefs ->
-            prefs[NOTIFICATIONS_SYNC] = state
         }
     }
 
@@ -182,7 +174,6 @@ class DataStoreRepository @Inject constructor(
 
         private val BITMAP_LIST_KEY = stringPreferencesKey("notify_bitmap_list")
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
-        private val NOTIFICATIONS_SYNC = booleanPreferencesKey("notifications_sync")
         private val IS_CHARGING = booleanPreferencesKey("is_charging")
 
         val PREFS_VERSION = intPreferencesKey(name = "preferencesVersion")

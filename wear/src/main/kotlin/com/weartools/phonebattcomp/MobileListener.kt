@@ -50,8 +50,6 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 private const val ACTIVE_SYNC_PATH = "/active-sync"
 private const val ACTIVE_SYNC_KEY = "active-sync-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
-private const val NOTIFICATIONS_SYNC_PATH = "/notifications-sync"
-private const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
 private const val URI = "/foobar"
 private const val TAG = "MobileListener::"
 
@@ -98,12 +96,6 @@ class MobileListener : WearableListenerService() {
                             val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
                             ioScope.launch {
                                 dataRepository.setActiveSyncState(state)
-                            }
-                        }
-                        NOTIFICATIONS_SYNC_PATH -> {
-                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(NOTIFICATIONS_SYNC_KEY)
-                            ioScope.launch {
-                                dataRepository.setNotificationsSyncState(state)
                             }
                         }
                         URI -> {
@@ -188,29 +180,6 @@ class MobileListener : WearableListenerService() {
             }
             else
                 Log.e(TAG, "Too many updates")
-        }
-
-        fun sendActiveSyncState (state: Boolean, dataClient: DataClient) {
-
-                Log.d(TAG,"Sending Active Sync State: $state")
-
-                val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
-                    dataMap.putBoolean(ACTIVE_SYNC_KEY, state)}
-                    .asPutDataRequest()
-                    .setUrgent()
-
-                dataClient.putDataItem(request)
-        }
-        fun sendNotificationsSyncState (state: Boolean, dataClient: DataClient) {
-
-            Log.d(TAG,"Sending Notifications Sync State: $state")
-
-            val request = PutDataMapRequest.create(NOTIFICATIONS_SYNC_PATH).apply{
-                dataMap.putBoolean(NOTIFICATIONS_SYNC_KEY, state)}
-                .asPutDataRequest()
-                .setUrgent()
-
-            dataClient.putDataItem(request)
         }
     }
 }

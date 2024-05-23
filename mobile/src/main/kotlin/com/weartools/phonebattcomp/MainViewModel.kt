@@ -50,7 +50,6 @@ class MainViewModel @Inject constructor(
 
     private lateinit var reviewManager: ReviewManager
 
-    private var allConnectedNodes: List<Node>? = null
     private var wearNodesWithApp: Set<Node>? = null
 
     private val listener = CapabilityClient.OnCapabilityChangedListener { capabilityInfo ->
@@ -65,11 +64,13 @@ class MainViewModel @Inject constructor(
     private val _isMessageShown = MutableSharedFlow<Boolean>()
     private val loaderStateMutableStateFlow = MutableStateFlow(value = false)
     private val watchAvailableStateMutableStateFlow = MutableStateFlow(value = false)
+    private val connectedNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
     private val commonNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
 
     val isMessageShownFlow = _isMessageShown.asSharedFlow()
     val loaderStateStateFlow: StateFlow<Boolean> = loaderStateMutableStateFlow.asStateFlow()
     val watchAvailableStateStateFlow: StateFlow<Boolean> = watchAvailableStateMutableStateFlow.asStateFlow()
+    val connectedNodesStateFlow: StateFlow<List<Node>?> = connectedNodesMutableStateFlow.asStateFlow()
     val commonNodesStateFlow: StateFlow<List<Node>?> = commonNodesMutableStateFlow.asStateFlow()
 
     var message: String = ""
@@ -124,7 +125,7 @@ class MainViewModel @Inject constructor(
             val connectedNodes = nodeClient.connectedNodes.await()
 
             withContext(Dispatchers.Main) {
-                allConnectedNodes = connectedNodes
+                connectedNodesMutableStateFlow.value = connectedNodes
                 delay(1_000L)
                 updateUI()
             }
@@ -150,8 +151,8 @@ class MainViewModel @Inject constructor(
 
                 // Find common nodes
                 val commonNodes = wearNodesWithApp?.filter {
-                        it in (allConnectedNodes?.toSet() ?: emptySet())
-                    }
+                    it in (connectedNodesStateFlow.value?.toSet() ?: emptySet())
+                }
                 if (!commonNodes.isNullOrEmpty()) {
                     commonNodesMutableStateFlow.value = commonNodes
                 }else {
@@ -167,11 +168,12 @@ class MainViewModel @Inject constructor(
 
     @SuppressLint("StringFormatInvalid")
     private fun updateUI() {
-        val allConnectedNodes = allConnectedNodes
+        val allConnectedNodes = connectedNodesStateFlow.value
         when {
             allConnectedNodes.isNullOrEmpty() -> {
                 loaderStateMutableStateFlow.value = false
                 watchAvailableStateMutableStateFlow.value = false
+                commonNodesMutableStateFlow.value = emptyList()
                 message = "No wearable devices found…"
                 setMessageShown()
             }
@@ -239,13 +241,6 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             dataRepository.setNotificationsSyncState(state)
         }
-        val request = PutDataMapRequest.create(NOTIFICATIONS_SYNC_PATH).apply{
-            dataMap.putBoolean(NOTIFICATIONS_SYNC_KEY, state)
-            dataMap.putLong("immediate-update", System.currentTimeMillis()) }
-            .asPutDataRequest()
-            .setUrgent()
-
-        dataClient.putDataItem(request)
     }
     fun setBackgroundServiceState(state: Boolean) {
         viewModelScope.launch {

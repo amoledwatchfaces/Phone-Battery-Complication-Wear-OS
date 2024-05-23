@@ -56,9 +56,7 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
                     .setUrgent()
 
                 dataClient.putDataItem(request)
-
             }
-
         }
     }
 

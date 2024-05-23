@@ -29,9 +29,6 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val BATTERY_PATH = "/battery-level"
@@ -44,9 +41,6 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 const val ACTIVE_SYNC_PATH = "/active-sync"
 const val ACTIVE_SYNC_KEY = "active-sync-key"
 
-const val NOTIFICATIONS_SYNC_PATH = "/notifications-sync"
-const val NOTIFICATIONS_SYNC_KEY = "notifications-sync-key"
-
 @AndroidEntryPoint
 class WearListener : WearableListenerService() {
 
@@ -54,8 +48,6 @@ class WearListener : WearableListenerService() {
     lateinit var dataRepository: DataStoreRepository
     @Inject
     lateinit var dataClient: DataClient
-
-    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
 
@@ -83,23 +75,8 @@ class WearListener : WearableListenerService() {
 
                             dataClient.putDataItem(request)
                         }
-                        ACTIVE_SYNC_PATH -> {
-                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
-                            Log.d(TAG,"Active Sync Enabled: $state")
-                            BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
-                            ioScope.launch {
-                                dataRepository.setActiveSyncState(state)
-                            }
-                        }
-                        NOTIFICATIONS_SYNC_PATH -> {
-                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(NOTIFICATIONS_SYNC_KEY)
-                            Log.d(TAG,"Notifications Sync Enabled: $state")
-                            ioScope.launch {
-                                    dataRepository.setNotificationsSyncState(state)
-                                }
-                            }
-                        }
                     }
+                }
                 DataEvent.TYPE_DELETED -> { Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString()) }
                 else -> { Log.e(TAG, "Unknown data event Type = " + dataEvent.type) }
             }

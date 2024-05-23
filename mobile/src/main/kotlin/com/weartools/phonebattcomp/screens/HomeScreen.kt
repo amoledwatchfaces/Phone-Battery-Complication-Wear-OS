@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
@@ -20,9 +21,10 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ContactSupport
+import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.Shop
 import androidx.compose.material.icons.filled.Shop2
-import androidx.compose.material.icons.outlined.School
+import androidx.compose.material.icons.filled.SmartDisplay
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -76,9 +78,11 @@ fun HomeScreen(
     scope: CoroutineScope,
     isWatchConnected: State<Boolean>,
     commonNodesList: State<List<Node>?>,
+    connectedNodesList: State<List<Node>?>,
     listState: LazyListState
 ) {
     val state by viewModel.loaderStateStateFlow.collectAsState()
+    val nodesListEmpty = commonNodesList.value.isNullOrEmpty()
 
     val pullRefreshState = rememberPullRefreshState(
         refreshing = state,
@@ -127,11 +131,12 @@ fun HomeScreen(
             //if (destination != null) {
             item {
                 Box(
+                    modifier = Modifier.offset(y=(-10).dp),
                     contentAlignment = Alignment.Center
                 ) {
                     Canvas(
                         modifier = Modifier
-                            .size(228.dp)
+                            .size(224.dp)
                             .shadow(
                                 clip = true,
                                 shape = CircleShape,
@@ -151,12 +156,35 @@ fun HomeScreen(
                         modifier = Modifier
                             .size(300.dp),
                         alignment = Alignment.Center,
-                        painter = painterResource(id = R.drawable.frame_top),
+                        painter = painterResource(id = R.drawable.frame_800_pixel),
                         contentDescription = "Frame"
                     )
                 }
             }
-            // TODO: IMPLEMENT BASIC APP LOGIC
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.9f),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                )
+                {
+                    Icon(
+                        modifier = Modifier.padding(end = 8.dp).size(18.dp),
+                        imageVector = if (isWatchConnected.value.not()) Icons.Filled.BluetoothConnected
+                        else Icons.Filled.BluetoothConnected,
+                        contentDescription = "StatusIcon",
+                        tint = colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = colorScheme.onSurfaceVariant,
+                        text = if (isWatchConnected.value.not()) "Disconnected  •  Pull to refresh"
+                        else  "Connected  •  "+"${connectedNodesList.value?.joinToString(", ") {it.displayName}}"
+                    )
+                }
+            }
 
             item {
                 ElevatedCard(
@@ -180,23 +208,24 @@ fun HomeScreen(
                             textAlign = TextAlign.Center,
                         )
                         TextButton(
+                            enabled = (nodesListEmpty),
                             modifier = Modifier.padding(end = 4.dp),
                             onClick = {
                                 view.playSoundEffect(SoundEffectConstants.CLICK)
                                 context.openGuideLink()})
                         {
+                            if (nodesListEmpty) {
                                 Icon(
                                     modifier = Modifier.padding(end = 10.dp),
-                                    imageVector = Icons.Outlined.School,
+                                    imageVector = Icons.Filled.SmartDisplay,
                                     contentDescription = null,
                                 )
                                 Text(
                                     textDecoration = TextDecoration.Underline,
                                     text = stringResource(id = R.string.installation_guides),
                                     color = colorScheme.onPrimaryContainer)
-
+                            }
                         }
-
                     }
 
                     Text(
@@ -205,7 +234,7 @@ fun HomeScreen(
                         modifier = Modifier.padding(16.dp),
                         textAlign = TextAlign.Left,
                     )
-                    if(isWatchConnected.value && commonNodesList.value.isNullOrEmpty()){
+                    if(isWatchConnected.value && nodesListEmpty){
                         Text(
                             text = stringResource(id = R.string.connected),
                             style = MaterialTheme.typography.bodyLarge,
@@ -214,7 +243,7 @@ fun HomeScreen(
                             textAlign = TextAlign.Left,
                         )
                     }
-                    else if (isWatchConnected.value && commonNodesList.value.isNullOrEmpty().not()){
+                    else if (isWatchConnected.value && nodesListEmpty.not()){
                         Text(
                             text = "App is installed on your wear device(s):",
                             style = MaterialTheme.typography.bodyLarge,
@@ -245,12 +274,6 @@ fun HomeScreen(
                             text = stringResource(id = R.string.no_devices),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.SemiBold,
-                            modifier = Modifier.padding(16.dp),
-                            textAlign = TextAlign.Left,
-                        )
-                        Text(
-                            text = stringResource(id = R.string.try_reconnect),
-                            style = MaterialTheme.typography.bodyLarge,
                             modifier = Modifier.padding(16.dp),
                             textAlign = TextAlign.Left,
                         )

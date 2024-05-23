@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -35,7 +33,6 @@ import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
-import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
@@ -231,106 +228,6 @@ fun ListItemsWidget(
                                 "Complication type & look depends on the watch face complication implementation method.") }
                 }
             )
-
-    }
-}
-
-@Composable
-fun ExperimentalWidget(
-    viewModel: MainViewModel,
-    callback: (Int) -> Unit
-) {
-    val state = remember { mutableStateOf(true) }
-    val activeSync by viewModel.activeSync.collectAsState()
-    val notificationsSync by viewModel.notificationsSync.collectAsState()
-
-    val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
-    val focusRequester = remember { FocusRequester() }
-
-    LaunchedEffect(Unit) {focusRequester.requestFocus()}
-    Dialog(
-        showDialog = state.value,
-        scrollState = listState,
-        onDismissRequest = { callback.invoke(-1) }
-    )
-    {
-        LocalView.current.viewTreeObserver.addOnWindowFocusChangeListener {
-            if (it) {
-                focusRequester.requestFocus()
-            }
-        }
-        Alert(
-            modifier = Modifier
-                .rotaryWithScroll(
-                    scrollableState = listState,
-                    focusRequester = focusRequester
-                ),
-            backgroundColor = Color.Black,
-            scrollState = listState,
-            title = { Text(
-                modifier = Modifier.padding(bottom = 0.dp),
-                style = MaterialTheme.typography.title3,
-                textAlign = TextAlign.Center,
-                text = "Experimental Settings")},
-            verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
-            contentPadding = PaddingValues(
-                start = 10.dp,
-                end = 10.dp,
-                top = 24.dp,
-                bottom = 52.dp
-            ),
-            content = {
-
-                item { PreferenceCategory(
-                    modifier = Modifier.padding(
-                        top = 0.dp,
-                        bottom = 4.dp
-                    ),
-                    title = "Active Sync: Alpha")
-                }
-                item {
-                    SectionText(
-                        text = "Background Service necessary! (companion app)",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 5.dp),
-                    )
-                }
-                item {
-                    ToggleChip(
-                        label = stringResource(id = R.string.active_sync),
-                        secondaryLabelOn = stringResource(id = R.string.active_sync_experimental),
-                        secondaryLabelOff = stringResource(id = R.string.active_sync_experimental),
-                        checked = activeSync,
-                        onCheckedChange = {
-                            viewModel.toggleActiveSync(it)
-                        }
-                    )
-                }
-                item { PreferenceCategory(title = "Notifications Sync: Optional") }
-                item {
-                    SectionText(
-                        text = "Consider turning it off when you're not using Phone Notifications complication but want to keep Active Sync ON",
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 0.dp, start = 10.dp, end = 10.dp, bottom = 5.dp),
-                    )
-                }
-                item {
-                    ToggleChip(
-                        label = "Notifications Sync",
-                        secondaryLabelOn = "Enabled",
-                        secondaryLabelOff = "Disabled",
-                        checked = notificationsSync,
-                        onCheckedChange = {
-                            viewModel.toggleNotificationsSync(it)
-                        }
-                    )
-                }
-
-
-            }
-        )
 
     }
 }

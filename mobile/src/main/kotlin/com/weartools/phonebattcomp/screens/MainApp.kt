@@ -71,6 +71,7 @@ fun MainApp(
 
     val isWearableConnected = viewModel.watchAvailableStateStateFlow.collectAsState()
     val commonNodesList = viewModel.commonNodesStateFlow.collectAsState()
+    val connectedNodesList = viewModel.connectedNodesStateFlow.collectAsState()
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.CREATED) {
@@ -142,7 +143,7 @@ fun MainApp(
             navController,
             startDestination = Screen.Home.route,
             Modifier.padding(padding)) {
-            composable(Screen.Home.route) { HomeScreen(view, context, viewModel, scope, isWearableConnected, commonNodesList, listState) }
+            composable(Screen.Home.route) { HomeScreen(view, context, viewModel, scope, isWearableConnected, commonNodesList,connectedNodesList, listState) }
             composable(Screen.Experimental.route) { ExperimentalScreen(context, viewModel, lifecycleOwner) }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }

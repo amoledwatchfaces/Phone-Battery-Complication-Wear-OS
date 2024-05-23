@@ -20,7 +20,6 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
-import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchTempComplicationService
@@ -34,8 +33,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val dataRepository: DataStoreRepository,
-    private val dataClient: DataClient
+    private val dataRepository: DataStoreRepository
 ) : ViewModel(){
 
     val batteryLevel = dataRepository.batteryLevel.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
@@ -43,7 +41,6 @@ class MainViewModel @Inject constructor(
     val tempUnit = dataRepository.tempUnit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
     val percentage = dataRepository.percentage.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-    val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
 
     init {
         viewModelScope.launch {
@@ -52,7 +49,6 @@ class MainViewModel @Inject constructor(
             dataRepository.tempUnit.distinctUntilChanged().collect {}
             dataRepository.percentage.distinctUntilChanged().collect {}
             dataRepository.activeSync.distinctUntilChanged().collect {}
-            dataRepository.notificationsSync.distinctUntilChanged().collect {}
         }
     }
 
@@ -69,19 +65,6 @@ class MainViewModel @Inject constructor(
             dataRepository.storePercentage(newEnabledStatus)
             updateComplication(context = context, MobileBatteryComplicationService::class.java)
             updateComplication(context = context, WatchBatteryComplicationService::class.java)
-        }
-    }
-
-    fun toggleActiveSync(state: Boolean) {
-        viewModelScope.launch {
-            dataRepository.setActiveSyncState(state)
-            MobileListener.sendActiveSyncState(state,dataClient)
-        }
-    }
-    fun toggleNotificationsSync(state: Boolean) {
-        viewModelScope.launch {
-            dataRepository.setNotificationsSyncState(state)
-            MobileListener.sendNotificationsSyncState(state,dataClient)
         }
     }
 
