@@ -1,6 +1,7 @@
 package com.weartools.phonebattcomp.screens
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -37,6 +38,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navDeepLink
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.ui.components.BottomNavigationBar
@@ -57,6 +59,7 @@ fun MainApp(
     val lifecycleOwner = LocalLifecycleOwner.current
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
+
 
     val snackbarHostState = remember { SnackbarHostState()}
 
@@ -144,7 +147,15 @@ fun MainApp(
             startDestination = Screen.Home.route,
             Modifier.padding(padding)) {
             composable(Screen.Home.route) { HomeScreen(view, context, viewModel, scope, isWearableConnected, commonNodesList,connectedNodesList, listState) }
-            composable(Screen.Experimental.route) { ExperimentalScreen(context, viewModel, lifecycleOwner) }
+            composable(
+                deepLinks = listOf(
+                    navDeepLink{
+                    uriPattern = "https://amoledwatchfaces.com/phonebattcomp"
+                    action = Intent.ACTION_VIEW
+                }),
+                route = Screen.Experimental.route) {
+                ExperimentalScreen(context, viewModel,lifecycleOwner ,isWearableConnected,commonNodesList, connectedNodesList )
+            }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }
     }

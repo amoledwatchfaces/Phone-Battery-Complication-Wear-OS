@@ -7,13 +7,17 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
@@ -21,6 +25,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +38,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.gms.wearable.Node
 import com.weartools.phonebattcomp.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
@@ -44,7 +50,10 @@ import com.weartools.phonebattcomp.utils.openAmoledWebPage
 fun ExperimentalScreen(
     context: Context,
     viewModel: MainViewModel,
-    lifecycleOwner: LifecycleOwner
+    lifecycleOwner: LifecycleOwner,
+    isWatchConnected: State<Boolean>,
+    commonNodesList: State<List<Node>?>,
+    connectedNodesList: State<List<Node>?>,
 ) {
 
     val listState = rememberLazyListState()
@@ -77,6 +86,31 @@ fun ExperimentalScreen(
                 .fillMaxSize()
 
         ) {
+
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.9f).padding(bottom = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.Center
+                )
+                {
+                    Icon(
+                        modifier = Modifier.padding(end = 8.dp).size(18.dp),
+                        imageVector = if (isWatchConnected.value.not()) Icons.Filled.BluetoothConnected
+                        else Icons.Filled.BluetoothConnected,
+                        contentDescription = "StatusIcon",
+                        tint = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        text = if (isWatchConnected.value.not()) "Disconnected"
+                        else  "Connected  •  "+"${connectedNodesList.value?.joinToString(", ") {it.displayName}}"
+                    )
+                }
+            }
+
             item {
                 ElevatedCard(
                     elevation = CardDefaults.cardElevation(
@@ -86,6 +120,7 @@ fun ExperimentalScreen(
                         .fillMaxWidth(0.9f)
                         .padding(bottom = 20.dp, top = 10.dp)
                 ){
+
                     // Background Service
                     Row(
                         modifier = Modifier
@@ -105,9 +140,11 @@ fun ExperimentalScreen(
                                 fontWeight = FontWeight.Medium,
                                 text = "Important - Notifications Access required")
                         }
-                        Switch(checked = backgroundSyncState, onCheckedChange = {
-                            viewModel.isMyNotificationsServiceRunning(context)
-                            context.askForNotificationAccess()
+                        Switch(
+                            checked = backgroundSyncState,
+                            onCheckedChange = {
+                                viewModel.isMyNotificationsServiceRunning(context)
+                                context.askForNotificationAccess()
                         }
                         )
                     }
@@ -131,7 +168,10 @@ fun ExperimentalScreen(
                                 text = "Battery charging status + live updates")
                         }
 
-                        Switch(enabled = backgroundSyncState, checked = activeSyncState, onCheckedChange = {
+                        Switch(
+                            enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            checked = activeSyncState,
+                            onCheckedChange = {
                             if (it){
                                 viewModel.setActiveSyncState(true)
                                 BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
@@ -161,7 +201,10 @@ fun ExperimentalScreen(
                                 color = Color.Gray,
                                 text = "Only for Phone Notifications Complication")
                         }
-                        Switch(enabled = backgroundSyncState, checked = notificationsSyncState, onCheckedChange = {
+                        Switch(
+                            enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            checked = notificationsSyncState,
+                            onCheckedChange = {
                             if (it){
                                 viewModel.setNotificationsSyncState(true)
                             }

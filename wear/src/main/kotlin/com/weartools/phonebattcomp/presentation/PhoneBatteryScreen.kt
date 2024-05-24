@@ -26,6 +26,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ContactSupport
+import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.material.icons.outlined.Smartphone
@@ -36,6 +37,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -43,8 +45,11 @@ import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.OutlinedButton
+import androidx.wear.compose.material.OutlinedCompactChip
+import androidx.wear.compose.material.Text
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
@@ -139,6 +144,23 @@ fun PhoneBatteryAppScreen(
                 secondaryLabelOff = stringResource(id = R.string.temp_unit_F),
                 checked = tempUnit,
                 onCheckedChange = {viewModel.toggleEnabled(context)}
+            )
+        }
+
+        item{
+            OutlinedCompactChip(
+                colors = ChipDefaults.chipColors(
+                    backgroundColor = Color(0xFF0E1011)
+                ),
+                border = ChipDefaults.outlinedChipBorder(),
+                label = { Text(color = wearColorPalette.secondary, text = "Experimental")},
+                modifier = Modifier.padding(top = 12.dp),
+                icon = {
+                    Icon(imageVector = Icons.Filled.Science, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                },
+                onClick = {
+                    viewModel.openExperimentalSettings(context)
+                }
             )
         }
 

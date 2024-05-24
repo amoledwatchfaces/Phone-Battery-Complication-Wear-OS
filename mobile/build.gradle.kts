@@ -4,6 +4,7 @@ import java.util.Properties
 plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
+    id ("org.jetbrains.kotlin.plugin.compose")
     id ("kotlin-kapt")
     id ("com.google.dagger.hilt.android")
 }
@@ -29,8 +30,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000389
-        versionName = "3.9.0"
+        versionCode = 10000391
+        versionName = "3.9.2"
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -48,9 +49,6 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.8"
     }
 
     buildTypes {

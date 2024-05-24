@@ -44,7 +44,7 @@ fun BottomNavigationBar(
                         // re-selecting the same item
                         launchSingleTop = true
                         // Restore state when re-selecting a previously selected item
-                        restoreState = true
+                        restoreState = false
                     }
                 },
                 icon = {
@@ -83,7 +83,7 @@ fun RowScope.OwnNavigationBarItem(
         modifier = modifier,
         enabled = enabled,
         label = label,
-        alwaysShowLabel = false,
+        alwaysShowLabel = true,
         colors = NavigationBarItemDefaults.colors(
             selectedIconColor = NavigationDefaults.navigationSelectedItemColor(),
             unselectedIconColor = NavigationDefaults.navigationContentColor(),

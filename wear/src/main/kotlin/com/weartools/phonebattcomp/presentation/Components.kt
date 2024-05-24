@@ -226,6 +226,14 @@ fun ListItemsWidget(
                         title = "Which watch faces are the best suited?",
                         text = "This app is compatible with any watch face which has at least one complication slot of SHORT_TEXT, LONG_TEXT or RANGED_VALUE type. " +
                                 "Complication type & look depends on the watch face complication implementation method.") }
+                    item { HowToCard(
+                        title = "Phone Notifications Complication",
+                        text = "This complication is new and requires mobile companion app to have background service enabled in the experimental setting. " +
+                                "Complication simply mirrors phone notifications (not ongoing)") }
+                    item { HowToCard(
+                        title = "Active Sync",
+                        text = "This feature requires mobile companion app to have background service enabled in the experimental setting. " +
+                                "Active Sync provides real-time phone battery updates & charging status") }
                 }
             )
 

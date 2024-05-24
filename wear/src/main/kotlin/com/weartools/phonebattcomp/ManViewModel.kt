@@ -17,8 +17,12 @@ package com.weartools.phonebattcomp
 
 import android.content.ComponentName
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
+import android.widget.Toast
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
@@ -28,8 +32,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
@@ -73,6 +79,24 @@ class MainViewModel @Inject constructor(
             context.applicationContext,
             ComponentName(context.applicationContext, clazz)
         ).run { requestUpdateAll() }
+    }
+
+    fun openExperimentalSettings(context: Context) {
+        viewModelScope.launch {
+            // Intent to launch your MainActivity
+            val launchIntent = Intent(Intent.ACTION_VIEW)
+                .addCategory(Intent.CATEGORY_BROWSABLE)
+                .setData(Uri.parse("https://amoledwatchfaces.com/phonebattcomp"))
+
+            try {
+                RemoteActivityHelper(context).startRemoteActivity(targetIntent = launchIntent,targetNodeId = null).await()
+                Toast.makeText(context,"Check Experimental settings on your phone",Toast.LENGTH_LONG).show()
+            } catch (cancellationException: CancellationException) {
+                // Request was cancelled normally
+            } catch (throwable: Throwable) {
+                Toast.makeText(context,"Companion app not reachable",Toast.LENGTH_LONG).show()
+            }
+        }
     }
 
 }
