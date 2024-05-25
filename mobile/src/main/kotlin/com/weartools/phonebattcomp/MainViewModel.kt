@@ -3,12 +3,11 @@ package com.weartools.phonebattcomp
 
 import android.annotation.SuppressLint
 import android.app.Activity
-import android.app.ActivityManager
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.util.Log
-import androidx.core.content.ContextCompat.getSystemService
+import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
@@ -249,21 +248,11 @@ class MainViewModel @Inject constructor(
     }
 
     fun isMyNotificationsServiceRunning(context: Context): Boolean {
-        val activityManager = getSystemService(context, ActivityManager::class.java) as ActivityManager
-        val runningServices = activityManager.getRunningServices(Integer.MAX_VALUE)
-
-        for (service in runningServices) {
-            if (service.service.className == NotificationListener::class.java.name) {
-                viewModelScope.launch {
-                    dataRepository.setBackgroundServiceState(true)
-                }
-                return true
-            }
-        }
+        val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(context).contains(BuildConfig.APPLICATION_ID)
         viewModelScope.launch {
-            dataRepository.setBackgroundServiceState(false)
+            dataRepository.setBackgroundServiceState(isServiceRunning)
         }
-        return false
+        return isServiceRunning
     }
 
     companion object {
