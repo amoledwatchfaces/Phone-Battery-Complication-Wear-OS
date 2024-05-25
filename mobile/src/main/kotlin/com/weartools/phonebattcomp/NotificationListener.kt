@@ -5,7 +5,6 @@ import android.graphics.Canvas
 import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.data.DataStoreRepository
@@ -36,10 +35,8 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
-        Log.d("NotificationListener", "Listener Connected")
         serviceScope.launch {
             dataRepository.setBackgroundServiceState(true)
-            Log.d("NotificationListener", "Background Service State: ${dataRepository.backgroundServiceState.first()}")
             if (dataRepository.notificationsSync.first()) sendToWatch()
         }
     }
