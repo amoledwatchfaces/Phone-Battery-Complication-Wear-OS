@@ -30,8 +30,8 @@ android {
         minSdk = 26
         //noinspection OldTargetApi
         targetSdk = 33
-        versionCode = 10000394
-        versionName = "3.9.4"
+        versionCode = 10000395
+        versionName = "3.9.6"
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -68,7 +68,7 @@ dependencies {
     // PREVIOUS APP
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
-    implementation ("com.google.android.gms:play-services-wearable:18.1.0")
+    implementation ("com.google.android.gms:play-services-wearable:18.2.0")
 
     implementation ("com.google.android.play:review-ktx:2.0.1")
     implementation ("com.google.android.play:review:2.0.1")
@@ -98,7 +98,7 @@ dependencies {
     implementation ("androidx.navigation:navigation-compose:2.7.7")
     implementation ("androidx.activity:activity-ktx:1.9.0")
     implementation ("androidx.core:core-ktx:1.13.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
 
     // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.1.1")

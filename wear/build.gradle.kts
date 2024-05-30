@@ -30,8 +30,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 33
-        versionCode = 10000392
-        versionName = "3.9.2"
+        versionCode = 10000396
+        versionName = "3.9.6"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -67,7 +67,7 @@ dependencies {
     val composeWearVersion = "1.3.1"
 
     // WEAR OS
-    implementation ("com.google.android.gms:play-services-wearable:18.1.0")
+    implementation ("com.google.android.gms:play-services-wearable:18.2.0")
     implementation ("androidx.wear.watchface:watchface:1.2.1")
     implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha03")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
@@ -81,8 +81,8 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
     implementation ("androidx.activity:activity-compose:1.9.0")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
