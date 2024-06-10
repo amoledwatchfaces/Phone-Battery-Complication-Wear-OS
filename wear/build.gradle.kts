@@ -5,7 +5,7 @@ plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
     id ("kotlin-parcelize")
-    id ("kotlin-kapt")
+    id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
     id("org.jetbrains.kotlin.plugin.compose")
 }
@@ -108,9 +108,5 @@ dependencies {
     // HILT
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation ("com.google.dagger:hilt-android:2.51")
-    kapt ("com.google.dagger:hilt-compiler:2.51")
-}
-// Allow references to generated code
-kapt {
-    correctErrorTypes = true
+    ksp ("com.google.dagger:hilt-compiler:2.51")
 }

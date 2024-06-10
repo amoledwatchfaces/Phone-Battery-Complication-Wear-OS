@@ -22,10 +22,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
@@ -42,7 +40,6 @@ import androidx.navigation.navDeepLink
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.ui.components.BottomNavigationBar
-import com.weartools.phonebattcomp.ui.components.ExperimentalWidget
 import com.weartools.phonebattcomp.ui.components.Screen
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -66,8 +63,6 @@ fun MainApp(
     val fabVisibility by derivedStateOf {
         listState.firstVisibleItemIndex == 0
     }
-
-    var openDialog by remember{ mutableStateOf(false) }
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = navBackStackEntry?.destination
@@ -158,18 +153,5 @@ fun MainApp(
             }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }
-    }
-
-    if (openDialog){
-        ExperimentalWidget(
-            context = context,
-            callback ={
-                if (it == -1) {
-                    openDialog = false
-                    return@ExperimentalWidget
-                }else
-                    openDialog = openDialog.not()
-            } )
-
     }
 }

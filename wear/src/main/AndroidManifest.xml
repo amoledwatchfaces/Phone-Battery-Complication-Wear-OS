@@ -69,7 +69,7 @@
                 android:value="0"/>
             <meta-data
                 android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="SMALL_IMAGE"/>
+                android:value="SMALL_IMAGE, LONG_TEXT"/>
         </service>
 
         <service

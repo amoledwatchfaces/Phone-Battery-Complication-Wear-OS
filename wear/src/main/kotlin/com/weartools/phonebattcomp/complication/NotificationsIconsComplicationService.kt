@@ -20,6 +20,7 @@ import android.graphics.Color
 import android.graphics.drawable.Icon
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.SmallImage
 import androidx.wear.watchface.complications.data.SmallImageComplicationData
@@ -29,6 +30,7 @@ import androidx.wear.watchface.complications.datasource.SuspendingComplicationDa
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.utils.BitmapCreator
+import com.weartools.phonebattcomp.utils.BitmapCreatorLine
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import java.util.Base64
@@ -38,16 +40,6 @@ import javax.inject.Inject
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
 
     @Inject lateinit var repository: DataStoreRepository
-
-    /** DRAW NOTIFICATION ICONS **/
-    /*
-                for ((i, bitmap) in (bitmaps).withIndex()) {
-                    canvas.drawBitmap(bitmap, null, Rect(x + i * (ICON_SIZE + padding), y,
-                            x + i * (ICON_SIZE + padding) + ICON_SIZE, y + ICON_SIZE
-                    ),
-                            textPaint)
-                }
-     */
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         return when (type) {
@@ -62,6 +54,17 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
             )
                 .setTapAction(null)
                 .build()
+
+            ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
+                text = PlainComplicationText.Builder(text = "--").build(),
+                contentDescription = PlainComplicationText.Builder(text = "Notifications").build())
+                .setSmallImage(SmallImage.Builder(
+                    image = Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview),
+                    type = SmallImageType.ICON)
+                    .build())
+                .setTapAction(null)
+                .build()
+
             else -> {null}
         }
     }
@@ -100,8 +103,23 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     else Icon.createWithResource(this, R.drawable.ic_notif_none),
                     type = SmallImageType.ICON)
                     .build(),
-                contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build()
-            )
+                contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build())
+                .setTapAction(null)
+                .build()
+
+            ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
+                text = PlainComplicationText.Builder(text = "--").build(),
+                contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build())
+                .setSmallImage(SmallImage.Builder(
+                    image =
+                    if (noNotification.not()) {
+                        val parts = data.split("|")
+                        val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
+                        Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(byteArrayList)).setTint(Color.WHITE)
+                    }
+                    else Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty()),
+                    type = SmallImageType.ICON)
+                    .build())
                 .setTapAction(null)
                 .build()
 

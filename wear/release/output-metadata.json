@@ -11,9 +11,9 @@
       "type": "SINGLE",
       "filters": [],
       "attributes": [],
-      "versionCode": 10000360,
-      "versionName": "3.6.0",
-      "outputFile": "wear-release.apk"
+      "versionCode": 10000395,
+      "versionName": "3.9.6",
+      "outputFile": "mobile-release.apk"
     }
   ],
   "elementType": "File",
@@ -22,16 +22,16 @@
       "minApi": 28,
       "maxApi": 30,
       "baselineProfiles": [
-        "baselineProfiles/1/wear-release.dm"
+        "baselineProfiles/1/mobile-release.dm"
       ]
     },
     {
       "minApi": 31,
       "maxApi": 2147483647,
       "baselineProfiles": [
-        "baselineProfiles/0/wear-release.dm"
+        "baselineProfiles/0/mobile-release.dm"
       ]
     }
   ],
-  "minSdkVersionForDexing": 27
+  "minSdkVersionForDexing": 26
 }
