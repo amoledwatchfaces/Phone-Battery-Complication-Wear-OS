@@ -49,6 +49,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
     }
 
+    // TODO: IMPORTANT!!! (\uFEFF) is used for combining watch batteries
+
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         return when (type) {
 
@@ -65,7 +67,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 .build()
 
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = "86%").build(),
+                text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
                 .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
                     R.drawable.ic_phone_icon
@@ -74,7 +76,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 .build()
 
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = "100%").build(),
+                text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
                 .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
                     R.drawable.ic_phone_icon
@@ -105,7 +107,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val isWatchConnected = repository.isConnected.first()
         val percentage = if (repository.percentage.first()) "%" else ""
         val level = repository.batteryLevel.first()
-        val level2: String = if (level==0) "-" else "$level$percentage"
+        val level2: String = if (level==0) "-" else "\uFEFF$level$percentage"
         val icon = when {
             isWatchConnected && isCharging -> Icon.createWithResource(this, R.drawable.ic_phone_charging_3)
             isWatchConnected -> Icon.createWithResource(this, R.drawable.ic_phone_icon)
@@ -128,6 +130,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 text = PlainComplicationText.Builder(text = level2).build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                 .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
+                // TODO: SMALL_IMAGE_AMBIENT is used for combining watch batteries
+                .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON).setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch)).build())
                 .setTapAction(complicationPendingIntent)
                 .build()
 
@@ -136,7 +140,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                  contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                  .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
                  .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
-                 // SMALL AMBIENT IMAGE IS USED FOR COMBINED WATCH BATTERIES
+                 // TODO: SMALL_IMAGE_AMBIENT is used for combining watch batteries
                  .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON).setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch)).build())
                  .setTapAction(complicationPendingIntent)
                  .build()

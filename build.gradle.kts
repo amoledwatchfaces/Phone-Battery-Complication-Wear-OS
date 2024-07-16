@@ -12,7 +12,7 @@ tasks.register("clean", Delete::class) {
 
 buildscript {
     dependencies {
-        classpath ("com.android.tools.build:gradle:8.4.1")
+        classpath ("com.android.tools.build:gradle:8.5.1")
     }
     repositories {
         google()

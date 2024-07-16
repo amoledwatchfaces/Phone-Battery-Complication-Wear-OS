@@ -29,9 +29,9 @@ android {
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
-        targetSdk = 33
-        versionCode = 10000396
-        versionName = "3.9.6"
+        targetSdk = 34
+        versionCode = 10000400
+        versionName = "3.9.8"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -63,7 +63,7 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.6.7"
+    val composeUiVersion = "1.6.8"
     val composeWearVersion = "1.3.1"
 
     // WEAR OS
@@ -81,8 +81,8 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
     implementation ("androidx.activity:activity-compose:1.9.0")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.3")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.3")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")

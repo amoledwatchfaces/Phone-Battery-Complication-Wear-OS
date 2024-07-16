@@ -70,11 +70,12 @@ class NotificationListener : NotificationListenerService() {
                 continue
             }
 
-            val bitmap = notification.notification.smallIcon.loadDrawable(this)?.let {
-                drawableToBitmap(
-                    it
-                )
+            val bitmap = notification.notification.smallIcon?.let {
+                it.loadDrawable(this)?.let {
+                    drawable -> drawableToBitmap(drawable)
+                }
             }
+
             if (!bitmaps.any { it.sameAs(bitmap) }) {
                 if (bitmap != null) {
                     bitmaps.add(bitmap)
