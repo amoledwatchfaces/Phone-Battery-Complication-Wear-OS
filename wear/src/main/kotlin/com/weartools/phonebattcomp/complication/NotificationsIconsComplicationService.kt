@@ -48,7 +48,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                 smallImage = SmallImage.Builder(
                     image = Icon.createWithResource(this, R.drawable.ic_notif
                     ),
-                    type = SmallImageType.ICON
+                    type = SmallImageType.PHOTO
                 ).build(),
                 contentDescription = PlainComplicationText.Builder(text = "SMALL_IMAGE.").build()
             )
