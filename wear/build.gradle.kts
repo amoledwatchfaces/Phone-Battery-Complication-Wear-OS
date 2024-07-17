@@ -30,7 +30,7 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 34
-        versionCode = 10000400
+        versionCode = 10000401
         versionName = "3.9.8"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")

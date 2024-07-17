@@ -101,7 +101,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                         }
                     }
                     else Icon.createWithResource(this, R.drawable.ic_notif_none),
-                    type = SmallImageType.ICON)
+                    type = SmallImageType.PHOTO)
                     .build(),
                 contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build())
                 .setTapAction(null)
