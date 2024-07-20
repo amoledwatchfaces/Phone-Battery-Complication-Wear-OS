@@ -98,7 +98,7 @@ object BitmapCreator {
         val paintText = Paint().apply {
             color = Color.WHITE
             textAlign = Paint.Align.CENTER
-            textSize = 40f
+            textSize = if (plus < 10) 40f else 28f
             typeface = Typeface.DEFAULT_BOLD
         }
 

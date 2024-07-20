@@ -31,7 +31,7 @@ class DataStoreRepository @Inject constructor(
 ): Repository {
 
     val preferencesVersion: Flow<Int> = dataStore.data.map { prefs ->
-        prefs[PREFS_VERSION]?: 1
+        prefs[PREFS_VERSION]?: 2
     }
 
     val activeSync: Flow<Boolean> = dataStore.data.map { prefs ->
@@ -73,6 +73,9 @@ class DataStoreRepository @Inject constructor(
     val isTileSet: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[IS_TILE_SET] ?: false
     }
+    val notificationsIconType: Flow<Int> = dataStore.data.map { prefs ->
+        prefs[NOTIF_ICON_TYPE] ?: 1 // 1 = PHOTO, 0 = ICON, Default for this app is 1
+    }
 
     val byteArrayMutableListJsonString: Flow<String> = dataStore.data.map {
         it[BITMAP_LIST_KEY]?: ""
@@ -80,6 +83,12 @@ class DataStoreRepository @Inject constructor(
     suspend fun storeByteArrayMutableList(byteArrayMutableList: String) {
         dataStore.edit {
             it[BITMAP_LIST_KEY] = byteArrayMutableList
+        }
+    }
+
+    suspend fun storeNotifIconType(type: Int) {
+        dataStore.edit { prefs ->
+            prefs[NOTIF_ICON_TYPE] = type
         }
     }
 
@@ -173,6 +182,8 @@ class DataStoreRepository @Inject constructor(
         private val IS_TILE_SET = booleanPreferencesKey("is_tile_set")
 
         private val BITMAP_LIST_KEY = stringPreferencesKey("notify_bitmap_list")
+        private val NOTIF_ICON_TYPE = intPreferencesKey("notifications_icon_type")
+
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
         private val IS_CHARGING = booleanPreferencesKey("is_charging")
 

@@ -36,6 +36,7 @@ fun PhoneBatteryApp(
             val nodeName by viewModel.nodeName.collectAsState()
             val tempUnit by viewModel.tempUnit.collectAsState()
             val percentage by viewModel.percentage.collectAsState()
+            val notificationIconType by viewModel.notificationIconType.collectAsState()
 
             PhoneBatteryAppScreen(
                 listState = listState,
@@ -45,7 +46,8 @@ fun PhoneBatteryApp(
                 tempUnit = tempUnit,
                 percentage = percentage,
                 viewModel = viewModel,
-                dataClient = dataClient
+                dataClient = dataClient,
+                notificationIconType = notificationIconType
             )
         }
     }

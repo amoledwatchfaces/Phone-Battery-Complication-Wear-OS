@@ -25,6 +25,7 @@ import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
+import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchTempComplicationService
 import com.weartools.phonebattcomp.data.DataStoreRepository
@@ -47,6 +48,7 @@ class MainViewModel @Inject constructor(
     val tempUnit = dataRepository.tempUnit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
     val percentage = dataRepository.percentage.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    val notificationIconType = dataRepository.notificationsIconType.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
 
     init {
         viewModelScope.launch {
@@ -55,6 +57,7 @@ class MainViewModel @Inject constructor(
             dataRepository.tempUnit.distinctUntilChanged().collect {}
             dataRepository.percentage.distinctUntilChanged().collect {}
             dataRepository.activeSync.distinctUntilChanged().collect {}
+            dataRepository.notificationsIconType.distinctUntilChanged().collect {}
         }
     }
 
@@ -71,6 +74,12 @@ class MainViewModel @Inject constructor(
             dataRepository.storePercentage(newEnabledStatus)
             updateComplication(context = context, MobileBatteryComplicationService::class.java)
             updateComplication(context = context, WatchBatteryComplicationService::class.java)
+        }
+    }
+    fun storeNotificationIconType(context: Context, type: Int) {
+        viewModelScope.launch {
+            dataRepository.storeNotifIconType(type)
+            updateComplication(context = context, NotificationsIconsComplicationService::class.java)
         }
     }
 

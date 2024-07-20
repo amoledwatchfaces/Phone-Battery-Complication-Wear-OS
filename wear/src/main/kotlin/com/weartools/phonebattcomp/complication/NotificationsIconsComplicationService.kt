@@ -46,8 +46,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
 
             ComplicationType.SMALL_IMAGE -> SmallImageComplicationData.Builder(
                 smallImage = SmallImage.Builder(
-                    image = Icon.createWithResource(this, R.drawable.ic_notif
-                    ),
+                    image = Icon.createWithResource(this, R.drawable.ic_notif),
                     type = SmallImageType.PHOTO
                 ).build(),
                 contentDescription = PlainComplicationText.Builder(text = "SMALL_IMAGE.").build()
@@ -75,13 +74,6 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
         val data = repository.byteArrayMutableListJsonString.first()
         val noNotification = data == ""
 
-
-        /*
-            private fun loadBitmapFromByteArray(byteArray: ByteArray): Bitmap {
-                return BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
-            }
-         */
-
         return when (request.complicationType) {
 
             ComplicationType.SMALL_IMAGE -> SmallImageComplicationData.Builder(
@@ -90,7 +82,6 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     if (noNotification.not()) {
                         val parts = data.split("|")
                         val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
-                        //Log.w(ContentValues.TAG, "Icon List size: ${byteArrayList.size}")
                         if (byteArrayList.size == 1) {
                             Icon.createWithBitmap(BitmapCreator.createSingleBitmap(byteArrayList[0]))
                                 .setTint(Color.WHITE)
@@ -101,7 +92,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                         }
                     }
                     else Icon.createWithResource(this, R.drawable.ic_notif_none),
-                    type = SmallImageType.PHOTO)
+                    type = if (repository.notificationsIconType.first() == 0) SmallImageType.ICON else SmallImageType.PHOTO)
                     .build(),
                 contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build())
                 .setTapAction(null)

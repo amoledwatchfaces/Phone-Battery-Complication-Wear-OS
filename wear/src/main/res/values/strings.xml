@@ -28,6 +28,11 @@
     <string name="percentage_on" translatable="false">Show; e.g. 86 %</string>
     <string name="percentage_off" translatable="false">Hide; e.g. 86</string>
 
+    <!-- Notifications Complication -->
+    <string name="notifications_section" translatable="false">Phone Notifications Complication</string>
+    <string name="notif_comp_force_icon_type" translatable="false">Icon Type</string>
+    <string name="type_icon" translatable="false">ICON (Forced)</string>
+    <string name="type_photo" translatable="false">PHOTO (Default)</string>
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Phone Battery level</string>

@@ -67,6 +67,7 @@ fun PhoneBatteryAppScreen(
     batteryLevel: Int,
     tempUnit: Boolean,
     percentage: Boolean,
+    notificationIconType: Int,
     viewModel: MainViewModel,
     dataClient: DataClient
 ) {
@@ -144,6 +145,21 @@ fun PhoneBatteryAppScreen(
                 secondaryLabelOff = stringResource(id = R.string.temp_unit_F),
                 checked = tempUnit,
                 onCheckedChange = {viewModel.toggleEnabled(context)}
+            )
+        }
+
+        item { PreferenceCategory(title = stringResource(id = R.string.notifications_section)) }
+        item {
+            ToggleChip(
+                label = stringResource(id = R.string.notif_comp_force_icon_type),
+                secondaryLabelOn = stringResource(id = R.string.type_icon),
+                secondaryLabelOff = stringResource(id = R.string.type_photo),
+                checked = notificationIconType == 0,
+                onCheckedChange = {
+                    viewModel.storeNotificationIconType(
+                        context, if (it) 0 else 1
+                    )
+                }
             )
         }
 
