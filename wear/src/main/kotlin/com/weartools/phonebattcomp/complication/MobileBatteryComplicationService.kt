@@ -69,19 +69,22 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                    R.drawable.ic_phone_icon
-                )).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon))
+                    // TODO: MONOCHROMATIC_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
+                    .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch))
+                    .build())
                 .setTapAction(null)
                 .build()
 
             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                    R.drawable.ic_phone_icon
-                )).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
                 .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
+                .setSmallImage(smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon), type = SmallImageType.ICON)
+                    // TODO: SMALL_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
+                    .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
+                    .build())
                 .setTapAction(null)
                 .build()
             else -> {null}
