@@ -73,6 +73,9 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     // TODO: MONOCHROMATIC_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
                     .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch))
                     .build())
+                //.setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
+                //  .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
+                //  .build())
                 .setTapAction(null)
                 .build()
 
