@@ -113,7 +113,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         val isWatchConnected = repository.isConnected.first()
         val percentage = if (repository.percentage.first()) "%" else ""
         val level = repository.batteryLevel.first()
-        val level2: String = if (level==0) "-" else "\uFEFF$level$percentage"
+        val level2: String = if (level==0) "\uFEFF-" else "\uFEFF$level$percentage"
         val icon = when {
             isWatchConnected && isCharging -> Icon.createWithResource(this, R.drawable.ic_phone_charging_3)
             isWatchConnected -> Icon.createWithResource(this, R.drawable.ic_phone_icon)
