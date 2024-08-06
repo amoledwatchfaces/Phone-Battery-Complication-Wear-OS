@@ -129,9 +129,13 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
                 text = PlainComplicationText.Builder(text = level2).build(),
                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
-                // TODO: SMALL_IMAGE_AMBIENT is used for combining watch batteries
-                .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON).setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                .setMonochromaticImage(MonochromaticImage.Builder(image = icon)
+                    // TODO: MONOCHROMATIC_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
+                    .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch))
+                    .build())
+                //.setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
+                //  .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
+                //  .build())
                 .setTapAction(complicationPendingIntent)
                 .build()
 
@@ -140,8 +144,10 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                  contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                  .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
                  .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
-                 // TODO: SMALL_IMAGE_AMBIENT is used for combining watch batteries
-                 .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON).setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                 .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
+                     // TODO: SMALL_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
+                     .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
+                     .build())
                  .setTapAction(complicationPendingIntent)
                  .build()
 
