@@ -45,6 +45,8 @@ import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
+import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.OutlinedButton
@@ -56,7 +58,6 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
 
 @Composable
@@ -77,8 +78,8 @@ fun PhoneBatteryAppScreen(
     ScalingLazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .rotaryWithScroll(
-                scrollableState = listState,
+            .rotaryScrollable(
+                RotaryScrollableDefaults.behavior(scrollableState = listState),
                 focusRequester = focusRequester
             ),
         autoCentering = AutoCenteringParams(itemIndex = 1),

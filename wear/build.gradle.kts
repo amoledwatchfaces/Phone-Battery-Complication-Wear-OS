@@ -30,8 +30,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 34
-        versionCode = 10000408
-        versionName = "4.0.8"
+        versionCode = 10000412
+        versionName = "4.1.2"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -63,8 +63,8 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.6.8"
-    val composeWearVersion = "1.3.1"
+    val composeUiVersion = "1.7.0"
+    val composeWearVersion = "1.4.0"
 
     // WEAR OS
     implementation ("com.google.android.gms:play-services-wearable:18.2.0")
@@ -79,10 +79,10 @@ dependencies {
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.9.1")
+    implementation ("androidx.activity:activity-compose:1.9.2")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.4")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.4")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.5")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.5")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
@@ -99,10 +99,10 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // TILE
-    implementation("androidx.wear.protolayout:protolayout-expression:1.1.0")
-    implementation("androidx.wear.protolayout:protolayout:1.1.0")
-    implementation("androidx.wear.protolayout:protolayout-material:1.1.0")
-    implementation("androidx.wear.tiles:tiles:1.3.0")
+    implementation("androidx.wear.protolayout:protolayout-expression:1.2.0")
+    implementation("androidx.wear.protolayout:protolayout:1.2.0")
+    implementation("androidx.wear.protolayout:protolayout-material:1.2.0")
+    implementation("androidx.wear.tiles:tiles:1.4.0")
     implementation ("com.google.code.gson:gson:2.10.1")
 
     // HILT

@@ -13,6 +13,7 @@ import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,12 +28,13 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
     private var lastBatteryLevelPercentSent: Int? = null
     private var lastChargingStatus: Boolean? = null
 
+    var batteryLevel: Int? = null
+    var isCharging: Boolean? = null
+
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
         //Log.i("BSBR", "Received $intent")
         try {
-            var batteryLevel: Int? = null
-            var isCharging: Boolean? = null
             when (intent.action)
             {
                 ACTION_BATTERY_CHANGED -> {
@@ -40,32 +42,28 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                     isCharging = intent.getBatteryChargingStatus()
                 }
                 ACTION_POWER_CONNECTED -> {
-                    batteryLevel = context.registerReceiver(null, IntentFilter(ACTION_BATTERY_CHANGED))?.getBatteryLevelPercent()
+                    batteryLevel = getCurrentBatteryLevel(context)
                     isCharging = true
                 }
                 ACTION_POWER_DISCONNECTED -> {
-                    batteryLevel = context.registerReceiver(null, IntentFilter(ACTION_BATTERY_CHANGED))?.getBatteryLevelPercent()
-                    isCharging = false }
+                    batteryLevel = getCurrentBatteryLevel(context)
+                    isCharging = false
+                }
             }
 
-            /** Won't be using this as I'm already handling null values with -- & isCharging false **/
-            /*
-            if (batteryLevel == null && isCharging == null) {
-                Log.w("BSBR", "Unable to extract battery status")
-                return
-            }
-            */
-
-            GlobalScope.launch {
+            GlobalScope.launch(Dispatchers.IO) {
                 try {
                     if (batteryLevel != lastBatteryLevelPercentSent || isCharging != lastChargingStatus) {
+
+                        val batteryLevelSafe = batteryLevel ?: lastBatteryLevelPercentSent ?: 0
+                        val isChargingSafe = isCharging ?: lastChargingStatus ?: false
 
                         //Log.i("BSBR","Active Sync: Sending Battery Level: $batteryLevel")
                         //Log.i("BSBR","Active Sync: Is Charging?: $isCharging")
 
                         val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                            dataMap.putInt(BATTERY_KEY, batteryLevel?: lastBatteryLevelPercentSent?:0)
-                            dataMap.putBoolean(IS_CHARGING_KEY, isCharging?: lastChargingStatus?: false)
+                            dataMap.putInt(BATTERY_KEY, batteryLevelSafe)
+                            dataMap.putBoolean(IS_CHARGING_KEY, isChargingSafe)
                             }
                             .asPutDataRequest()
                             .setUrgent()
@@ -126,17 +124,12 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
         }
 
         fun getCurrentBatteryLevel(context: Context): Int {
-            val batteryStatus: Intent = context.registerReceiver(null, IntentFilter(ACTION_BATTERY_CHANGED))
-                ?: throw RuntimeException("Unable to get battery status, null intent")
-            return batteryStatus.getBatteryLevelPercent()
+            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
         }
-
         fun getCurrentBatteryChargingStatus(context: Context): Boolean {
-            val batteryStatus: Intent? = IntentFilter(ACTION_BATTERY_CHANGED).let { ifilter ->
-                context.registerReceiver(null, ifilter)
-            }
-            val status: Int = batteryStatus?.getIntExtra(BatteryManager.EXTRA_STATUS, -1) ?: -1
-            return status == BatteryManager.BATTERY_STATUS_CHARGING
+            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+            return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING
         }
     }
 }

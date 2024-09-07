@@ -29,8 +29,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10000409
-        versionName = "4.0.8"
+        versionCode = 10000410
+        versionName = "4.1.0"
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -85,7 +85,7 @@ dependencies {
     implementation ("androidx.compose.material3:material3:1.2.1")
     implementation ("androidx.compose.material3:material3-window-size-class:1.2.1")
 
-    implementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    implementation(platform("androidx.compose:compose-bom:2024.08.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-graphics")
     implementation("androidx.compose.ui:ui-tooling-preview")
@@ -106,7 +106,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.06.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.08.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")

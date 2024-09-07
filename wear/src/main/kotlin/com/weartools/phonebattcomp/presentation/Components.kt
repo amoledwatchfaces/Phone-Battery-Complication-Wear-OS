@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -22,6 +21,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
+import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CompactChip
@@ -34,7 +35,6 @@ import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.presentation.rotary.rotaryWithScroll
 import com.weartools.phonebattcomp.theme.wearColorPalette
 
 @Composable
@@ -188,15 +188,10 @@ fun ListItemsWidget(
             onDismissRequest = { callback.invoke(-1) }
         )
         {
-            LocalView.current.viewTreeObserver.addOnWindowFocusChangeListener {
-                if (it) {
-                    focusRequester.requestFocus()
-                }
-            }
             Alert(
                 modifier = Modifier
-                    .rotaryWithScroll(
-                        scrollableState = listState,
+                    .rotaryScrollable(
+                        RotaryScrollableDefaults.behavior(scrollableState = listState),
                         focusRequester = focusRequester
                     ),
                 backgroundColor = Color.Black,

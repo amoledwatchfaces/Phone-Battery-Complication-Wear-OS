@@ -19,6 +19,7 @@ package com.weartools.phonebattcomp.complication
 import android.graphics.Color
 import android.graphics.drawable.Icon
 import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.PlainComplicationText
@@ -44,75 +45,76 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         return when (type) {
 
-            ComplicationType.SMALL_IMAGE -> SmallImageComplicationData.Builder(
-                smallImage = SmallImage.Builder(
-                    image = Icon.createWithResource(this, R.drawable.ic_notif),
-                    type = SmallImageType.PHOTO
-                ).build(),
-                contentDescription = PlainComplicationText.Builder(text = "SMALL_IMAGE.").build()
-            )
-                .setTapAction(null)
-                .build()
-
-            ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = "--").build(),
-                contentDescription = PlainComplicationText.Builder(text = "Notifications").build())
-                .setSmallImage(SmallImage.Builder(
-                    image = Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview),
-                    type = SmallImageType.ICON)
-                    .build())
-                .setTapAction(null)
-                .build()
+            ComplicationType.SMALL_IMAGE -> {
+                SmallImageComplicationData.Builder(
+                    smallImage = SmallImage.Builder(
+                        image = Icon.createWithResource(this, R.drawable.ic_notif),
+                        type = SmallImageType.PHOTO).build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .build()
+            }
+            ComplicationType.LONG_TEXT -> {
+                LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "--").build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setTitle(PlainComplicationText.Builder(text = "---").build())
+                    .setSmallImage(SmallImage.Builder(
+                        image = Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview),
+                        type = SmallImageType.ICON)
+                        .build())
+                    .build()
+            }
 
             else -> {null}
         }
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
-        //Log.w(TAG, "Refreshing Notifications Complication!")
 
         val data = repository.byteArrayMutableListJsonString.first()
-        val noNotification = data == ""
+        val noNotification = data.isEmpty()
 
         return when (request.complicationType) {
 
-            ComplicationType.SMALL_IMAGE -> SmallImageComplicationData.Builder(
-                smallImage = SmallImage.Builder(
-                    image =
-                    if (noNotification.not()) {
-                        val parts = data.split("|")
-                        val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
-                        if (byteArrayList.size == 1) {
-                            Icon.createWithBitmap(BitmapCreator.createSingleBitmap(byteArrayList[0]))
-                                .setTint(Color.WHITE)
+            ComplicationType.SMALL_IMAGE -> {
+                SmallImageComplicationData.Builder(
+                    smallImage = SmallImage.Builder(
+                        image =
+                        if (noNotification.not()) {
+                            val parts = data.split("|")
+                            val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
+                            if (byteArrayList.size == 1) {
+                                Icon.createWithBitmap(BitmapCreator.createSingleBitmap(byteArrayList[0]))
+                                    .setTint(Color.WHITE)
+                            }
+                            else {
+                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(byteArrayList))
+                                    .setTint(Color.WHITE)
+                            }
                         }
-                        else {
-                            Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(byteArrayList))
-                                .setTint(Color.WHITE)
+                        else Icon.createWithResource(this, R.drawable.ic_notif_none),
+                        type = if (repository.notificationsIconType.first() == 0) SmallImageType.ICON else SmallImageType.PHOTO)
+                        .build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .build()
+            }
+            ComplicationType.LONG_TEXT -> {
+                LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "--").build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setTitle(PlainComplicationText.Builder(text = "---").build())
+                    .setSmallImage(SmallImage.Builder(
+                        image =
+                        if (noNotification.not()) {
+                            val parts = data.split("|")
+                            val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
+                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(byteArrayList)).setTint(Color.WHITE)
                         }
-                    }
-                    else Icon.createWithResource(this, R.drawable.ic_notif_none),
-                    type = if (repository.notificationsIconType.first() == 0) SmallImageType.ICON else SmallImageType.PHOTO)
-                    .build(),
-                contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build())
-                .setTapAction(null)
-                .build()
-
-            ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = "--").build(),
-                contentDescription = PlainComplicationText.Builder(text = "Notification Icons").build())
-                .setSmallImage(SmallImage.Builder(
-                    image =
-                    if (noNotification.not()) {
-                        val parts = data.split("|")
-                        val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
-                        Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(byteArrayList)).setTint(Color.WHITE)
-                    }
-                    else Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty()),
-                    type = SmallImageType.ICON)
-                    .build())
-                .setTapAction(null)
-                .build()
+                        else Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty()),
+                        type = SmallImageType.ICON)
+                        .build())
+                    .build()
+            }
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
