@@ -55,9 +55,8 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
             }
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "--").build(),
+                    text = PlainComplicationText.Builder(text = "---").build(),
                     contentDescription = ComplicationText.EMPTY)
-                    .setTitle(PlainComplicationText.Builder(text = "---").build())
                     .setSmallImage(SmallImage.Builder(
                         image = Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview),
                         type = SmallImageType.ICON)
@@ -100,9 +99,8 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
             }
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "--").build(),
+                    text = PlainComplicationText.Builder(text = "---").build(),
                     contentDescription = ComplicationText.EMPTY)
-                    .setTitle(PlainComplicationText.Builder(text = "---").build())
                     .setSmallImage(SmallImage.Builder(
                         image =
                         if (noNotification.not()) {

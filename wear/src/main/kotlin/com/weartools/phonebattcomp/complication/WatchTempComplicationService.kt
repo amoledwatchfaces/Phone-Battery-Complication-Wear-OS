@@ -17,18 +17,16 @@
 package com.weartools.phonebattcomp.complication
 
 import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.os.BatteryManager
-import android.util.Log
 import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
-import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
@@ -42,67 +40,49 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
 
     @Inject lateinit var repository: DataStoreRepository
 
-    override fun onComplicationActivated(
-        complicationInstanceId: Int,
-        type: ComplicationType)
-    {
-        super.onComplicationActivated(complicationInstanceId, type)
-        Log.d(TAG, "activated: $complicationInstanceId")
+    fun getCurrentBatteryTemperature(): Int {
+        val batteryStatus = this.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
+        return batteryStatus?.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0)?.div(10) ?: 0
     }
 
-    override fun getPreviewData(type: ComplicationType): ComplicationData {
-        return ShortTextComplicationData.Builder(
-            text = PlainComplicationText.Builder(text = "35°").build(),
-            contentDescription = PlainComplicationText.Builder(text = getString(R.string.temp_battery_text)).build())
-            .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                R.drawable.ic_temp
-            )).build())
-            .setTapAction(null)
-            .build()
+    override fun getPreviewData(type: ComplicationType): ComplicationData? {
+        return when (type) {
+
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "35°").build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_temp)).build())
+                    .build()
+            }
+
+            else -> {null}
+        }
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
-        Log.d(TAG, "Updating Watch Temp Complication")
-
 
         val tempunit = repository.tempUnit.first()
-        Log.d(TAG, "Temp Unit: $tempunit")
 
-        val temp = (this.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))!!.getIntExtra(BatteryManager.EXTRA_TEMPERATURE, 0)) / 10
+        val temp = getCurrentBatteryTemperature()
 
         val level = if (tempunit) temp else temp*9/5+32
         val unit = if (tempunit) "°C" else "°F"
 
         return when (request.complicationType) {
 
-            ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = "$level$unit").build(),
-                contentDescription = PlainComplicationText.Builder(text = getString(R.string.temp_battery_at)+level+unit).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                    R.drawable.ic_temp
-                )).build())
-                .setTapAction(complicationPendingIntent)
-                .build()
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "$level$unit").build(),
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.temp_battery_at)+level+unit).build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_temp)).build())
+                    .setTapAction(complicationPendingIntent)
+                    .build()
+            }
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
-        }
-    }
-
-    override fun onComplicationDeactivated(complicationInstanceId: Int) {
-        super.onComplicationDeactivated(complicationInstanceId)
-        Log.d(TAG, "Deactivated: $complicationInstanceId")
-    }
-
-    companion object {
-        private val TAG = WatchTempComplicationService::class.java.simpleName
-        @JvmStatic
-        fun updateComplication(context: Context?) {
-            Log.d(TAG, "Updating Watch Battery Temperature Complication")
-            val componentName = ComponentName(context!!, WatchTempComplicationService::class.java)
-            val req = ComplicationDataSourceUpdateRequester.create(context,componentName)
-            req.requestUpdateAll()
         }
     }
 }

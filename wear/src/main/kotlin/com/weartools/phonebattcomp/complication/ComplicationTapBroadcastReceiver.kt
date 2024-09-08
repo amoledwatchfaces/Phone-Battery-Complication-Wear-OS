@@ -22,6 +22,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Parcelable
 import android.util.Log
 import android.widget.Toast
 import androidx.wear.remote.interactions.RemoteActivityHelper
@@ -37,6 +38,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -100,3 +102,8 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
         )
     }
 }
+@Parcelize
+data class ComplicationToggleArgs(
+    val providerComponent: ComponentName,
+    val complicationInstanceId: Int
+) : Parcelable

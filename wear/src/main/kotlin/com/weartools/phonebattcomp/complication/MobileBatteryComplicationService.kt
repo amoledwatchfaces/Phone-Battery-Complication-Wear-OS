@@ -19,6 +19,7 @@ package com.weartools.phonebattcomp.complication
 import android.content.ComponentName
 import android.graphics.drawable.Icon
 import androidx.wear.watchface.complications.data.ComplicationData
+import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.MonochromaticImage
@@ -49,47 +50,46 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
     }
 
-    // TODO: IMPORTANT!!! (\uFEFF) is used for combining watch batteries
+    /**
+     * IMPORTANT!!! (\uFEFF) is used for combining watch batteries
+     * MONOCHROMATIC_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable) in SHORT_TEXT
+     * SMALL_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable) in LONG_TEXT
+     */
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         return when (type) {
 
-            ComplicationType.RANGED_VALUE -> RangedValueComplicationData.Builder(
-                value = 86f,
-                min = 0f,
-                max = 100f,
-                contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
-                .setText(PlainComplicationText.Builder(text = "86%").build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this,
-                    R.drawable.ic_phone_icon
-                )).build())
-                .setTapAction(null)
-                .build()
+            ComplicationType.RANGED_VALUE -> {
+                RangedValueComplicationData.Builder(
+                    value = 86f,
+                    min = 0f,
+                    max = 100f,
+                    contentDescription = ComplicationText.EMPTY)
+                    .setText(PlainComplicationText.Builder(text = "86%").build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                    .build()
+            }
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon))
+                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                        .build())
+                    .build()
+            }
+            ComplicationType.LONG_TEXT -> {
+                LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                    .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
+                    .setSmallImage(smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon), type = SmallImageType.ICON)
+                        .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                        .build())
+                    .build()
+            }
 
-            ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
-                contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon))
-                    // TODO: MONOCHROMATIC_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
-                    .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
-                    .build())
-                //.setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
-                //  .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
-                //  .build())
-                .setTapAction(null)
-                .build()
-
-            ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
-                contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_preview_desc)).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
-                .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
-                .setSmallImage(smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon), type = SmallImageType.ICON)
-                    // TODO: SMALL_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
-                    .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
-                    .build())
-                .setTapAction(null)
-                .build()
             else -> {null}
         }
     }
@@ -97,8 +97,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
-
-        //Log.d("COMPLICATION UPDATE", "Updating Phone Battery Complication")
 
         if (!repository.activeSync.first()) {
             if (!repository.afterMobileResult.first()) {
@@ -122,7 +120,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
          return when (request.complicationType) {
 
-            ComplicationType.RANGED_VALUE -> RangedValueComplicationData.Builder(
+            ComplicationType.RANGED_VALUE -> {
+                RangedValueComplicationData.Builder(
                     value = level.toFloat(),
                     min = 0f,
                     max = 100f,
@@ -131,31 +130,29 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
                     .setTapAction(complicationPendingIntent)
                     .build()
-
-            ComplicationType.SHORT_TEXT -> ShortTextComplicationData.Builder(
-                text = PlainComplicationText.Builder(text = level2).build(),
-                contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
-                .setMonochromaticImage(MonochromaticImage.Builder(image = icon)
-                    // TODO: MONOCHROMATIC_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
-                    .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
-                    .build())
-                //.setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
-                //  .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
-                //  .build())
-                .setTapAction(complicationPendingIntent)
-                .build()
-
-             ComplicationType.LONG_TEXT -> LongTextComplicationData.Builder(
-                 text = PlainComplicationText.Builder(text = level2).build(),
-                 contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
-                 .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
-                 .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
-                 .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
-                     // TODO: SMALL_IMAGE_AMBIENT is used for dual batteries support (Watch Icon Drawable)
-                     .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
-                     .build())
-                 .setTapAction(complicationPendingIntent)
-                 .build()
+            }
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = level2).build(),
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = icon)
+                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                        .build())
+                    .setTapAction(complicationPendingIntent)
+                    .build()
+            }
+             ComplicationType.LONG_TEXT -> {
+                 LongTextComplicationData.Builder(
+                     text = PlainComplicationText.Builder(text = level2).build(),
+                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
+                     .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
+                     .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
+                     .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
+                         .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                         .build())
+                     .setTapAction(complicationPendingIntent)
+                     .build()
+             }
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
