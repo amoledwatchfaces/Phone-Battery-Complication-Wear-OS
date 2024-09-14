@@ -99,14 +99,14 @@ class WatchBatteryReceiver : BroadcastReceiver() {
                     addAction(ACTION_POWER_CONNECTED)
                     addAction(ACTION_POWER_DISCONNECTED)
                 }
-                context.applicationContext.registerReceiver(receiver, intentFilter)
+                context.registerReceiver(receiver, intentFilter)
             }
             isSubscribed = true
         }
 
         fun unsubscribeFromUpdates(context: Context) {
             try {
-                context.applicationContext.unregisterReceiver(receiver)
+                context.unregisterReceiver(receiver)
             } catch (e: IllegalArgumentException) {
                 // Receiver not registered, ignoring
             }
