@@ -87,7 +87,7 @@ class WatchBatteryReceiver : BroadcastReceiver(){
     lateinit var dataRepository: DataStoreRepository
 
     override fun onReceive(context: Context, intent: Intent) {
-        //Log.i("TestReceiver", "onReceive")
+        //Log.i("WatchBatteryReceiver", "onReceive")
         when (intent.action)
         {
             ACTION_BATTERY_CHANGED -> {
@@ -105,8 +105,8 @@ class WatchBatteryReceiver : BroadcastReceiver(){
         }
 
         if (batteryLevel != batteryLevelSaved || isCharging != isChargingSaved) {
-            //Log.i("BSBR", "level: $batteryLevel")
-            //Log.i("BSBR", "isCharging: $isCharging")
+            //Log.i("WatchBatteryReceiver", "level: $batteryLevel")
+            //Log.i("WatchBatteryReceiver", "isCharging: $isCharging")
             batteryLevelSaved = batteryLevel
             isChargingSaved = isCharging
             context.updateComplication(WatchBatteryComplicationService::class.java)
