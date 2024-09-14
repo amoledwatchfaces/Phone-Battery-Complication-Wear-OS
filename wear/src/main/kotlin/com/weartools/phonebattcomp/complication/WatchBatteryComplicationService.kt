@@ -25,6 +25,7 @@ import android.provider.Settings
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
+import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.MonochromaticImageComplicationData
 import androidx.wear.watchface.complications.data.PlainComplicationText
@@ -77,6 +78,14 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
                     .build()
             }
+            ComplicationType.LONG_TEXT -> {
+                LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "35%").build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                    .setTitle(PlainComplicationText.Builder(text = "Watch Battery").build())
+                    .build()
+            }
             ComplicationType.MONOCHROMATIC_IMAGE -> {
                 MonochromaticImageComplicationData.Builder(
                     monochromaticImage = MonochromaticImage.Builder(Icon.createWithResource(this, R.drawable.ic_battery_7)).build(),
@@ -100,7 +109,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
         val percentage = if (repository.percentage.first()) "%" else ""
         var level = repository.watchBatteryLevel.first()
-        //val isCharging = repository.watchIsCharging.first()
+        val isCharging = repository.watchIsCharging.first()
 
         if (WatchBatteryReceiver.isSubscribed.not()) {
             // Set current battery level with Battery Manager
@@ -108,6 +117,8 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
             // Subscribe to battery updates
             WatchBatteryReceiver.subscribeToUpdates(applicationContext)
         }
+        val icon = if (isCharging) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
+        else { Icon.createWithResource(this, R.drawable.ic_watch) }
 
         return when (request.complicationType) {
 
@@ -118,7 +129,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                     max = 100f,
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
                     .setText(PlainComplicationText.Builder(text = "$level$percentage").build())
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
                     .setTapAction(openScreen())
                     .build()
             }
@@ -126,7 +137,16 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                 ShortTextComplicationData.Builder (
                     text = PlainComplicationText.Builder(text = "$level$percentage").build(),
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
+                    .setTapAction(openScreen())
+                    .build()
+            }
+            ComplicationType.LONG_TEXT -> {
+                LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "$level$percentage").build(),
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
+                    .setTitle(PlainComplicationText.Builder(text = "Watch Battery").build())
                     .setTapAction(openScreen())
                     .build()
             }
