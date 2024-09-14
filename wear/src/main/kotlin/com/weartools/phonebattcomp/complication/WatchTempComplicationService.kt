@@ -31,6 +31,8 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
+import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject

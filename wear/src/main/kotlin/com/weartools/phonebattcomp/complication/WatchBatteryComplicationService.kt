@@ -37,6 +37,7 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.WatchBatteryReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -45,14 +46,14 @@ import javax.inject.Inject
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
     @Inject lateinit var repository: DataStoreRepository
+    private val batteryManager by lazy { applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager }
 
     fun openScreen(): PendingIntent? {
         val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
         return PendingIntent.getActivity(this, 0, batteryIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
     }
 
-    fun getCurrentBatteryLevel(context: Context): Int {
-        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+    fun getCurrentBatteryLevel(): Int {
         return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
@@ -94,11 +95,24 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
             else -> {null}
         }
     }
-
+    override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType) {
+        WatchBatteryReceiver.subscribeToUpdates(applicationContext)
+    }
+    override fun onComplicationDeactivated(complicationInstanceId: Int) {
+        WatchBatteryReceiver.unsubscribeFromUpdates(applicationContext)
+    }
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
         val percentage = if (repository.percentage.first()) "%" else ""
-        val level = getCurrentBatteryLevel(this)
+        var level = repository.watchBatteryLevel.first()
+        //val isCharging = repository.watchIsCharging.first()
+
+        if (WatchBatteryReceiver.isSubscribed.not()) {
+            // Set current battery level with Battery Manager
+            level = getCurrentBatteryLevel()
+            // Subscribe to battery updates
+            WatchBatteryReceiver.subscribeToUpdates(applicationContext)
+        }
 
         return when (request.complicationType) {
 

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.weartools.phonebattcomp.complication
+package com.weartools.phonebattcomp.receiver
 
 import android.app.PendingIntent
 import android.content.BroadcastReceiver
@@ -31,6 +31,7 @@ import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope

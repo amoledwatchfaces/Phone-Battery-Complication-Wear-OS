@@ -34,6 +34,8 @@ import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
+import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
