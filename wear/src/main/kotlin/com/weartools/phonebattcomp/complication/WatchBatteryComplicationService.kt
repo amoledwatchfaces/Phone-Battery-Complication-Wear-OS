@@ -16,9 +16,15 @@
  */
 package com.weartools.phonebattcomp.complication
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
+import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.content.Intent.ACTION_BATTERY_CHANGED
+import android.content.Intent.ACTION_POWER_CONNECTED
+import android.content.Intent.ACTION_POWER_DISCONNECTED
+import android.content.IntentFilter
 import android.graphics.drawable.Icon
 import android.os.BatteryManager
 import android.provider.Settings
@@ -38,13 +44,98 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
-import com.weartools.phonebattcomp.receiver.WatchBatteryReceiver
+import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
+val intentFilter = IntentFilter().apply {
+    addAction(ACTION_BATTERY_CHANGED)
+    addAction(ACTION_POWER_CONNECTED)
+    addAction(ACTION_POWER_DISCONNECTED)
+}
+private fun Intent.getBatteryLevelPercent(): Int {
+    val level: Int = getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
+    val scale: Int = getIntExtra(BatteryManager.EXTRA_SCALE, -1)
+    return level * 100 / scale
+}
+private fun Intent.getBatteryChargingStatus(): Boolean {
+    val status: Int = getIntExtra(BatteryManager.EXTRA_STATUS, -1)
+    return status == BatteryManager.BATTERY_STATUS_CHARGING || status == BatteryManager.BATTERY_STATUS_FULL
+}
+fun getCurrentBatteryLevel(context: Context): Int {
+    val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+    return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+}
+fun getCurrentBatteryChargingStatus(context: Context): Boolean {
+    val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+    return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING
+}
+
+var batteryLevelSaved: Int? = null
+var isChargingSaved: Boolean? = null
+
+var batteryLevel: Int? = null
+var isCharging: Boolean? = null
+
+var isRegistered: Boolean = false
+
+@AndroidEntryPoint
+class WatchBatteryReceiver : BroadcastReceiver(){
+
+    @Inject
+    lateinit var dataRepository: DataStoreRepository
+
+    override fun onReceive(context: Context, intent: Intent) {
+        //Log.i("TestReceiver", "onReceive")
+        when (intent.action)
+        {
+            ACTION_BATTERY_CHANGED -> {
+                batteryLevel = intent.getBatteryLevelPercent()
+                isCharging = intent.getBatteryChargingStatus()
+            }
+            ACTION_POWER_CONNECTED -> {
+                batteryLevel = getCurrentBatteryLevel(context)
+                isCharging = true
+            }
+            ACTION_POWER_DISCONNECTED -> {
+                batteryLevel = getCurrentBatteryLevel(context)
+                isCharging = false
+            }
+        }
+
+        if (batteryLevel != batteryLevelSaved || isCharging != isChargingSaved) {
+            //Log.i("BSBR", "level: $batteryLevel")
+            //Log.i("BSBR", "isCharging: $isCharging")
+            batteryLevelSaved = batteryLevel
+            isChargingSaved = isCharging
+            context.updateComplication(WatchBatteryComplicationService::class.java)
+        }
+    }
+}
+
 @AndroidEntryPoint
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
+
+    override fun onComplicationDeactivated(complicationInstanceId: Int) {
+        super.onComplicationDeactivated(complicationInstanceId)
+        try {
+            this.applicationContext.unregisterReceiver(WatchBatteryReceiver())
+        } catch (e: IllegalArgumentException) {
+            // Receiver not registered, ignoring
+        }
+        isRegistered = false
+    }
+
+    override fun onDestroy() {
+        try {
+            this.applicationContext.unregisterReceiver(WatchBatteryReceiver())
+        } catch (e: IllegalArgumentException) {
+            // Receiver not registered, ignoring
+        }
+        isRegistered = false
+        super.onDestroy()
+    }
 
     @Inject lateinit var repository: DataStoreRepository
     private val batteryManager by lazy { applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager }
@@ -105,18 +196,18 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         }
     }
 
+    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val percentage = if (repository.percentage.first()) "%" else ""
-        var level = repository.watchBatteryLevel.first()
-        val isCharging = repository.watchIsCharging.first()
-
-        if (WatchBatteryReceiver.isSubscribed.not()) {
-            // Set current battery level with Battery Manager
-            level = getCurrentBatteryLevel()
-            // Subscribe to battery updates
-            WatchBatteryReceiver.subscribeToUpdates(applicationContext)
+        if (isRegistered.not()){
+            this.applicationContext.registerReceiver(WatchBatteryReceiver(), intentFilter)
+            isRegistered = true
         }
+
+        val percentage = if (repository.percentage.first()) "%" else ""
+        val level = batteryLevelSaved?: getCurrentBatteryLevel()
+        val isCharging = isChargingSaved?: getCurrentBatteryChargingStatus(this)
+
         val icon = if (isCharging) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
         else { Icon.createWithResource(this, R.drawable.ic_watch) }
 
@@ -197,10 +288,6 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
 
-    }
-    override fun onComplicationDeactivated(complicationInstanceId: Int) {
-        super.onComplicationDeactivated(complicationInstanceId)
-        WatchBatteryReceiver.unsubscribeFromUpdates(applicationContext)
     }
 }
 
