@@ -117,6 +117,8 @@ class WatchBatteryReceiver : BroadcastReceiver(){
 @AndroidEntryPoint
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
+    //TODO: Maybe I should use onComplicationActivated too and simply register receiver here and set isRegistered = true ?
+
     override fun onComplicationDeactivated(complicationInstanceId: Int) {
         super.onComplicationDeactivated(complicationInstanceId)
         try {
@@ -198,6 +200,8 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
     @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
+
+        //Log.i("WatchBatteryComplicationService", "onComplicationRequest")
 
         if (isRegistered.not()){
             this.applicationContext.registerReceiver(WatchBatteryReceiver(), intentFilter)
