@@ -95,12 +95,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
             else -> {null}
         }
     }
-    override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType) {
-        WatchBatteryReceiver.subscribeToUpdates(applicationContext)
-    }
-    override fun onComplicationDeactivated(complicationInstanceId: Int) {
-        WatchBatteryReceiver.unsubscribeFromUpdates(applicationContext)
-    }
+
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
         val percentage = if (repository.percentage.first()) "%" else ""
@@ -181,6 +176,11 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
+
+    }
+    override fun onComplicationDeactivated(complicationInstanceId: Int) {
+        super.onComplicationDeactivated(complicationInstanceId)
+        WatchBatteryReceiver.unsubscribeFromUpdates(applicationContext)
     }
 }
 
