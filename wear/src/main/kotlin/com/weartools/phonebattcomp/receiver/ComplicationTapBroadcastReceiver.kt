@@ -32,12 +32,12 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.hasMobileApp
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.parcelize.Parcelize
 import javax.inject.Inject
@@ -54,7 +54,6 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
         val result = goAsync()
 
         scope.launch {
-            val hasMobileApp = repository.hasMobileApp.first()
             try {
                 if (args.providerComponent == ComponentName(context, MobileBatteryComplicationService::class.java) && hasMobileApp.not()) {
                     MobileListener.sendPhoneBatteryRequest(0, dataClient, true)

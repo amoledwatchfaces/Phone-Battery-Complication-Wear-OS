@@ -29,7 +29,6 @@ import androidx.compose.material.icons.automirrored.outlined.ContactSupport
 import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
-import androidx.compose.material.icons.outlined.Smartphone
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -39,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.AutoCenteringParams
@@ -58,6 +58,8 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsConnected
 import com.weartools.phonebattcomp.theme.wearColorPalette
 
 @Composable
@@ -94,7 +96,13 @@ fun PhoneBatteryAppScreen(
         item {
             DialogChip(
                 text = if (batteryLevel==0) "--" else "$batteryLevel %",
-                icon = { Icon(imageVector = Icons.Outlined.Smartphone, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
+                icon = {
+                    Icon(
+                        painter =
+                        if (phoneIsConnected.not()) painterResource(id = R.drawable.ic_phone_disconnected)
+                        else if (phoneIsCharging) painterResource(id = R.drawable.ic_phone_charging_3) else painterResource(id = R.drawable.ic_phone_icon),
+                        contentDescription = "Play Store Icon",
+                        tint = wearColorPalette.secondaryVariant) },
                 title = nodeName,
                 onClick = {
                     MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
@@ -104,7 +112,11 @@ fun PhoneBatteryAppScreen(
         item {
             DialogChip(
                 text = stringResource(id = R.string.version),
-                icon = { Icon(imageVector = Icons.Outlined.Info, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant) },
+                icon = {
+                    Icon(
+                        imageVector = Icons.Outlined.Info,
+                        contentDescription = "Play Store Icon",
+                        tint = wearColorPalette.secondaryVariant) },
                 title = BuildConfig.VERSION_NAME,
                 onClick = {context.openPlayStore()}
             )

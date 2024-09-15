@@ -30,15 +30,20 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.afterMobileResult
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.hasMobileApp
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.lastUpdate
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLevel
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsConnected
+import com.weartools.phonebattcomp.complication.notificationsByteArrayList
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import java.util.Base64
 import javax.inject.Inject
 
 private const val BATTERY_PATH = "/battery-level"
@@ -52,7 +57,6 @@ private const val ACTIVE_SYNC_KEY = "active-sync-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
 private const val URI = "/foobar"
 private const val TAG = "MobileListener::"
-
 
 @AndroidEntryPoint
 class MobileListener : WearableListenerService() {
@@ -79,15 +83,15 @@ class MobileListener : WearableListenerService() {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
                             val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
                             val isCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
-                            //Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
-                            ioScope.launch { dataRepository.storeResponse(
-                                batteryLevel = level,
-                                hasMobileApp = true,
-                                afterMobileResult = true,
-                                isConnected = true,
-                                lastUpdate = System.currentTimeMillis(),
-                                isCharging = isCharging
-                            ) }
+                            Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
+
+                            phoneBatteryLevel = level
+                            phoneIsCharging = isCharging
+                            phoneIsConnected = true
+                            hasMobileApp = true
+                            afterMobileResult = true
+                            lastUpdate = System.currentTimeMillis()
+
                             //Log.d(TAG, "Received Phone Battery Level: $level")
                             updateComplication(MobileBatteryComplicationService::class.java)
                             TileService.getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java)
@@ -105,14 +109,13 @@ class MobileListener : WearableListenerService() {
                 }
                 DataEvent.TYPE_DELETED -> {
                 //Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString())
-                    ioScope.launch { dataRepository.storeResponse(
-                        batteryLevel = 0,
-                        hasMobileApp = false,
-                        afterMobileResult = false,
-                        isConnected = false,
-                        lastUpdate = System.currentTimeMillis(),
-                        isCharging = false
-                    ) }
+                    phoneBatteryLevel = 0
+                    phoneIsCharging = false
+                    phoneIsConnected = false
+                    hasMobileApp = false
+                    afterMobileResult = false
+                    lastUpdate = System.currentTimeMillis()
+
                     //Log.d(TAG, "Phone Companion Uninstalled!")
                     updateComplication(MobileBatteryComplicationService::class.java)
             }
@@ -126,7 +129,6 @@ class MobileListener : WearableListenerService() {
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
         ioScope.launch{
-            val hasMobileApp = dataRepository.hasMobileApp.first()
             if (capabilityInfo.nodes.size > 0 && hasMobileApp) {
                 if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP) {
                     capabilityInfo.nodes.firstOrNull()?.displayName?.let { dataRepository.storeNodeName(it) }
@@ -134,33 +136,24 @@ class MobileListener : WearableListenerService() {
                 sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
             }
             else {
-                ioScope.launch {
-                    dataRepository.storeConnection(false)
-                    dataRepository.storeResult(true)
-                }
+                phoneIsConnected = false
+                afterMobileResult = true
                 updateComplication(MobileBatteryComplicationService::class.java)
             }
         }
         //Log.d(TAG, "Capability changed: " + capabilityInfo.nodes.size)
     }
 
-
     private fun processDataItem(dataItem: DataItem) {
-        val newBitmaps = mutableListOf<ByteArray>()
         val dataMapItem = DataMapItem.fromDataItem(dataItem)
+        val byteArrayList = mutableListOf<ByteArray>()
         var i = 0
         while (true) {
             val byteArray = dataMapItem.dataMap.getByteArray("icon$i") ?: break
-            newBitmaps.add(byteArray)
+            byteArrayList.add(byteArray)
             i++
         }
-        //Log.w(TAG, "Bitmap list size: ${newBitmaps.size}")
-
-        val concatenatedString = newBitmaps.joinToString("|") { Base64.getEncoder().encodeToString(it) }
-
-        ioScope.launch {
-            dataRepository.storeByteArrayMutableList(concatenatedString)
-        }
+        notificationsByteArrayList = byteArrayList
         updateComplication(NotificationsIconsComplicationService::class.java)
     }
 

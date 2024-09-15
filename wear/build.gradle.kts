@@ -30,8 +30,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 34
-        versionCode = 10000421
-        versionName = "4.2.1"
+        versionCode = 10000424
+        versionName = "4.2.4"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")

@@ -7,10 +7,9 @@ import android.content.Intent.ACTION_POWER_CONNECTED
 import android.content.Intent.ACTION_POWER_DISCONNECTED
 import android.os.BatteryManager
 import android.util.Log
+import com.weartools.phonebattcomp.complication.watchIsCharging
 import com.weartools.phonebattcomp.utils.updateBatteriesComplications
 import dagger.hilt.android.AndroidEntryPoint
-
-var watchIsCharging: Boolean? = null
 
 @AndroidEntryPoint
 class PowerConnectionReceiver : BroadcastReceiver(){

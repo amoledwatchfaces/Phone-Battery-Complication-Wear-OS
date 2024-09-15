@@ -16,15 +16,11 @@
  */
 package com.weartools.phonebattcomp.complication
 
-import android.annotation.SuppressLint
 import android.app.PendingIntent
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
 import android.content.Intent.ACTION_BATTERY_CHANGED
 import android.content.IntentFilter
 import android.graphics.drawable.Icon
-import android.os.BatteryManager
 import android.provider.Settings
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
@@ -42,47 +38,28 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.BatteryChangedReceiver
 import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
-import com.weartools.phonebattcomp.receiver.watchIsCharging
-import com.weartools.phonebattcomp.utils.updateComplication
+import com.weartools.phonebattcomp.receiver.getCurrentBatteryLevel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
-fun Intent.getBatteryLevelPercent(): Int {
-    val level: Int = getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
-    val scale: Int = getIntExtra(BatteryManager.EXTRA_SCALE, -1)
-    return level * 100 / scale
-}
-fun getCurrentBatteryLevel(context: Context): Int {
-    val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-    return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-}
-
+/** Global variables **/
 var watchBatteryLevelSaved: Int? = null
 var watchBatteryLevel: Int? = null
-
+var watchIsCharging: Boolean? = null
 var isRegistered: Boolean = false
-
-class BatteryChangedReceiver : BroadcastReceiver(){
-    override fun onReceive(context: Context, intent: Intent) {
-        //Log.i("WatchBatteryReceiver", "onReceive")
-        when (intent.action)
-        {
-            ACTION_BATTERY_CHANGED -> {
-                watchBatteryLevel = intent.getBatteryLevelPercent()
-                if (watchBatteryLevel != watchBatteryLevelSaved) {
-                    //Log.i("WatchBatteryReceiver", "level: $batteryLevel")
-                    watchBatteryLevelSaved = watchBatteryLevel
-                    context.updateComplication(WatchBatteryComplicationService::class.java)
-                }
-            }
-        }
-    }
-}
 
 @AndroidEntryPoint
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
+
+    @Inject lateinit var repository: DataStoreRepository
+
+    fun openScreen(): PendingIntent? {
+        val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
+        return PendingIntent.getActivity(this, 0, batteryIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+    }
 
     //TODO: Maybe I should use onComplicationActivated too and simply register receiver here and set isRegistered = true ?
 
@@ -104,18 +81,6 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         }
         isRegistered = false
         super.onDestroy()
-    }
-
-    @Inject lateinit var repository: DataStoreRepository
-    private val batteryManager by lazy { applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager }
-
-    fun openScreen(): PendingIntent? {
-        val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
-        return PendingIntent.getActivity(this, 0, batteryIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    }
-
-    fun getCurrentBatteryLevel(): Int {
-        return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
@@ -165,7 +130,6 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         }
     }
 
-    @SuppressLint("UnspecifiedRegisterReceiverFlag")
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
         //Log.i("WatchBatteryComplicationService", "onComplicationRequest")
@@ -176,7 +140,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         }
 
         val percentage = if (repository.percentage.first()) "%" else ""
-        val level = watchBatteryLevelSaved?: getCurrentBatteryLevel()
+        val level = watchBatteryLevelSaved?: getCurrentBatteryLevel(this)
 
         val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
         else { Icon.createWithResource(this, R.drawable.ic_watch) }
@@ -257,7 +221,6 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
-
     }
 }
 

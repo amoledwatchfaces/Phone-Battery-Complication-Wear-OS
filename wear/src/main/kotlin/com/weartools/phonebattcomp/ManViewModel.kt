@@ -43,7 +43,6 @@ class MainViewModel @Inject constructor(
     private val dataRepository: DataStoreRepository
 ) : ViewModel(){
 
-    val batteryLevel = dataRepository.batteryLevel.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 0)
     val nodeName = dataRepository.nodeName.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "Not connected")
     val tempUnit = dataRepository.tempUnit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
     val percentage = dataRepository.percentage.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
@@ -52,7 +51,6 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            dataRepository.batteryLevel.distinctUntilChanged().collect {}
             dataRepository.nodeName.distinctUntilChanged().collect {}
             dataRepository.tempUnit.distinctUntilChanged().collect {}
             dataRepository.percentage.distinctUntilChanged().collect {}

@@ -25,6 +25,7 @@ import com.google.android.gms.wearable.DataClient
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.weartools.phonebattcomp.MobileListener
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLevel
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -51,7 +52,7 @@ class PhoneBatteryTileService : TileService() {
                             TimelineBuilders.TimelineEntry.Builder()
                                 .setLayout(getPhoneBatteryTileLayout(
                                     requestParams.deviceConfiguration,
-                                    runBlocking { repository.batteryLevel.first() },
+                                    phoneBatteryLevel,
                                     runBlocking { repository.nodeName.first() }
                                 )
                                 ).build()
@@ -70,6 +71,7 @@ class PhoneBatteryTileService : TileService() {
         return Layout.Builder()
             .setRoot(
                 EdgeContentLayout.Builder(deviceParameters)
+                    .setResponsiveContentInsetEnabled(true)
                     .setEdgeContent(
                         CircularProgressIndicator.Builder()
                             .setProgress(batteryLevel.toFloat() / 100f)

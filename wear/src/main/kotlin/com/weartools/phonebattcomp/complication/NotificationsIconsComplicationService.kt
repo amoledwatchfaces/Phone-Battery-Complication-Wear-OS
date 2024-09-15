@@ -34,8 +34,10 @@ import com.weartools.phonebattcomp.utils.BitmapCreator
 import com.weartools.phonebattcomp.utils.BitmapCreatorLine
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
-import java.util.Base64
 import javax.inject.Inject
+
+/** Global variables **/
+var notificationsByteArrayList: List<ByteArray> = emptyList()
 
 @AndroidEntryPoint
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
@@ -70,8 +72,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val data = repository.byteArrayMutableListJsonString.first()
-        val noNotification = data.isEmpty()
+        val noNotification = notificationsByteArrayList.isEmpty()
 
         return when (request.complicationType) {
 
@@ -80,14 +81,12 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     smallImage = SmallImage.Builder(
                         image =
                         if (noNotification.not()) {
-                            val parts = data.split("|")
-                            val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
-                            if (byteArrayList.size == 1) {
-                                Icon.createWithBitmap(BitmapCreator.createSingleBitmap(byteArrayList[0]))
+                            if (notificationsByteArrayList.size == 1) {
+                                Icon.createWithBitmap(BitmapCreator.createSingleBitmap(notificationsByteArrayList[0]))
                                     .setTint(Color.WHITE)
                             }
                             else {
-                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(byteArrayList))
+                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(notificationsByteArrayList))
                                     .setTint(Color.WHITE)
                             }
                         }
@@ -104,9 +103,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     .setSmallImage(SmallImage.Builder(
                         image =
                         if (noNotification.not()) {
-                            val parts = data.split("|")
-                            val byteArrayList = parts.map { Base64.getDecoder().decode(it) }.toMutableList()
-                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(byteArrayList)).setTint(Color.WHITE)
+                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(notificationsByteArrayList)).setTint(Color.WHITE)
                         }
                         else Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty()),
                         type = SmallImageType.ICON)
