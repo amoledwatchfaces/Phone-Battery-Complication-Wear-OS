@@ -83,7 +83,7 @@ class MobileListener : WearableListenerService() {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
                             val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
                             val isCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
-                            Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
+                            //Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
 
                             phoneBatteryLevel = level
                             phoneIsCharging = isCharging
