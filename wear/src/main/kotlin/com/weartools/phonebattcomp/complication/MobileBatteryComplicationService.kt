@@ -36,6 +36,7 @@ import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
+import com.weartools.phonebattcomp.receiver.watchIsCharging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
@@ -76,7 +77,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon))
-                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch))
                         .build())
                     .build()
             }
@@ -87,7 +88,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
                     .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
                     .setSmallImage(smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon), type = SmallImageType.ICON)
-                        .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                        .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
                         .build())
                     .build()
             }
@@ -119,6 +120,8 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             isWatchConnected -> Icon.createWithResource(this, R.drawable.ic_phone_icon)
             else -> Icon.createWithResource(this, R.drawable.ic_phone_disconnected)
         }
+        val watchIcon = if (watchIsCharging) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
+        else { Icon.createWithResource(this, R.drawable.ic_watch) }
 
          return when (request.complicationType) {
 
@@ -138,7 +141,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     text = PlainComplicationText.Builder(text = level2).build(),
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level2).build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = icon)
-                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                        .setAmbientImage(watchIcon)
                         .build())
                     .setTapAction(complicationPendingIntent)
                     .build()
@@ -150,7 +153,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                      .setMonochromaticImage(MonochromaticImage.Builder(image = icon).build())
                      .setTitle(PlainComplicationText.Builder(text = "Phone Battery").build())
                      .setSmallImage(smallImage = SmallImage.Builder(image = icon, type = SmallImageType.ICON)
-                         .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch_icon_combined_smaller))
+                         .setAmbientImage(watchIcon)
                          .build())
                      .setTapAction(complicationPendingIntent)
                      .build()

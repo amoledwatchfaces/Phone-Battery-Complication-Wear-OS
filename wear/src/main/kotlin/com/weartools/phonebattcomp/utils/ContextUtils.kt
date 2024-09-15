@@ -7,6 +7,8 @@ import android.content.Intent
 import android.net.Uri
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
+import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 
 fun Context.openPlayStore() {
     try {
@@ -19,6 +21,11 @@ fun Context.openPlayStore() {
 fun Context.updateComplication(service: Class<out SuspendingComplicationDataSourceService>) {
     ComplicationDataSourceUpdateRequester.create(this, ComponentName(this, service))
         .run { requestUpdateAll() }
+}
+
+fun Context.updateBatteriesComplications() {
+    this.updateComplication(MobileBatteryComplicationService::class.java)
+    this.updateComplication(WatchBatteryComplicationService::class.java)
 }
 
 

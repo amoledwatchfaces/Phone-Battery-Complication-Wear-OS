@@ -31,7 +31,7 @@ class DataStoreRepository @Inject constructor(
 ): Repository {
 
     val preferencesVersion: Flow<Int> = dataStore.data.map { prefs ->
-        prefs[PREFS_VERSION]?: 3
+        prefs[PREFS_VERSION]?: 4
     }
 
     val activeSync: Flow<Boolean> = dataStore.data.map { prefs ->
@@ -41,7 +41,6 @@ class DataStoreRepository @Inject constructor(
     val isCharging: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[IS_CHARGING] ?: false
     }
-
 
     val nodeName: Flow<String> = dataStore.data.map { prefs ->
         prefs[NODE_NAME] ?: "Not connected"
@@ -57,14 +56,6 @@ class DataStoreRepository @Inject constructor(
     val batteryLevel: Flow<Int> = dataStore.data.map { prefs ->
         prefs[BATTERY_LEVEL] ?: 0
     }
-
-    val watchBatteryLevel: Flow<Int> = dataStore.data.map { prefs ->
-        prefs[WATCH_BATTERY_LEVEL] ?: 0
-    }
-    val watchIsCharging: Flow<Boolean> = dataStore.data.map { prefs ->
-        prefs[WATCH_IS_CHARGING] ?: false
-    }
-
 
     val hasMobileApp: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[HAS_MOBILE_APP] ?: false
@@ -136,17 +127,6 @@ class DataStoreRepository @Inject constructor(
             prefs[BATTERY_LEVEL] = batteryLevel
         }
     }
-    suspend fun storeWatchBatteryLevel(batteryLevel: Int) {
-        dataStore.edit { prefs ->
-            prefs[WATCH_BATTERY_LEVEL] = batteryLevel
-        }
-    }
-    suspend fun setWatchChargingState(state: Boolean) {
-        dataStore.edit { prefs ->
-            prefs[WATCH_IS_CHARGING] = state
-        }
-    }
-
     suspend fun storeConnection(isConnected: Boolean) {
         dataStore.edit { prefs ->
             prefs[IS_CONNECTED] = isConnected
@@ -205,8 +185,6 @@ class DataStoreRepository @Inject constructor(
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
         private val IS_CHARGING = booleanPreferencesKey("is_charging")
 
-        private val WATCH_BATTERY_LEVEL = intPreferencesKey("watch_battery_level")
-        private val WATCH_IS_CHARGING = booleanPreferencesKey("watch_is_charging")
 
         val PREFS_VERSION = intPreferencesKey(name = "preferencesVersion")
     }
