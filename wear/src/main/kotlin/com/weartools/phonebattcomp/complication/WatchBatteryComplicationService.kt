@@ -42,6 +42,7 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
 import com.weartools.phonebattcomp.receiver.watchIsCharging
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
@@ -177,7 +178,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         val percentage = if (repository.percentage.first()) "%" else ""
         val level = watchBatteryLevelSaved?: getCurrentBatteryLevel()
 
-        val watchIcon = if (watchIsCharging) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
+        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
         else { Icon.createWithResource(this, R.drawable.ic_watch) }
 
         return when (request.complicationType) {

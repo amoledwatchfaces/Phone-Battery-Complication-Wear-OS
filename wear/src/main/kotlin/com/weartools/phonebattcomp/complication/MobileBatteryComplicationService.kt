@@ -36,6 +36,7 @@ import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
+import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
 import com.weartools.phonebattcomp.receiver.watchIsCharging
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -120,7 +121,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             isWatchConnected -> Icon.createWithResource(this, R.drawable.ic_phone_icon)
             else -> Icon.createWithResource(this, R.drawable.ic_phone_disconnected)
         }
-        val watchIcon = if (watchIsCharging) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
+        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
         else { Icon.createWithResource(this, R.drawable.ic_watch) }
 
          return when (request.complicationType) {
