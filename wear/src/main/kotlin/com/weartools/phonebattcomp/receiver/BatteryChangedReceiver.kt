@@ -13,16 +13,12 @@ import com.weartools.phonebattcomp.utils.updateComplication
 class BatteryChangedReceiver : BroadcastReceiver(){
     override fun onReceive(context: Context, intent: Intent) {
         //Log.i("WatchBatteryReceiver", "onReceive")
-        when (intent.action)
-        {
-            ACTION_BATTERY_CHANGED -> {
-                watchBatteryLevel = intent.getBatteryLevelPercent()
-                if (watchBatteryLevel != watchBatteryLevelSaved) {
-                    //Log.i("WatchBatteryReceiver", "level: $batteryLevel")
-                    watchBatteryLevelSaved = watchBatteryLevel
-                    context.updateComplication(WatchBatteryComplicationService::class.java)
-                }
-            }
+        if (intent.action != ACTION_BATTERY_CHANGED) return
+        watchBatteryLevel = intent.getBatteryLevelPercent()
+        if (watchBatteryLevel != watchBatteryLevelSaved) {
+            //Log.i("WatchBatteryReceiver", "level: $batteryLevel")
+            watchBatteryLevelSaved = watchBatteryLevel
+            context.updateComplication(WatchBatteryComplicationService::class.java)
         }
     }
 }

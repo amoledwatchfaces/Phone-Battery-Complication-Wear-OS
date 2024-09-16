@@ -64,6 +64,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
     //TODO: Maybe I should use onComplicationActivated too and simply register receiver here and set isRegistered = true ?
 
     override fun onComplicationDeactivated(complicationInstanceId: Int) {
+        //Log.i("WatchBatteryComplicationService", "onComplicationDeactivated")
         super.onComplicationDeactivated(complicationInstanceId)
         try {
             this.applicationContext.unregisterReceiver(BatteryChangedReceiver())
@@ -74,6 +75,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
     }
 
     override fun onDestroy() {
+        //Log.i("WatchBatteryComplicationService", "onDestroy")
         try {
             this.applicationContext.unregisterReceiver(BatteryChangedReceiver())
         } catch (e: IllegalArgumentException) {
