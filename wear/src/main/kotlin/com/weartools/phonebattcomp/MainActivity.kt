@@ -30,6 +30,7 @@ import com.google.android.gms.wearable.CapabilityClient.OnCapabilityChangedListe
 import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.Wearable
+import com.weartools.phonebattcomp.MobileListener.Companion.sendPhoneBatteryRequest
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.presentation.PhoneBatteryApp
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,8 +53,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
         installSplashScreen()
 
         capabilityClient = Wearable.getCapabilityClient(this)
-
-        MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
+        sendPhoneBatteryRequest(0,dataClient,true)
 
         lifecycleScope.launch {
             lifecycle.repeatOnLifecycle(Lifecycle.State.RESUMED) {
@@ -73,7 +73,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
     override fun onResume() {
         super.onResume()
-        MobileListener.sendPhoneBatteryRequest(0, dataClient,true)
+        sendPhoneBatteryRequest(0, dataClient,true)
         capabilityClient.addListener(this, BuildConfig.CAPABILITY_MOBILE_APP)
     }
 
@@ -84,13 +84,28 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
     }
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
-        Log.d(TAG, "onCapabilityChanged(): $capabilityInfo")
-        capabilityInfo.nodes.firstOrNull()?.let {
-            lifecycleScope.launch {
-                dataRepository.storeNodeName(it.displayName)
+        if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP){
+            //Log.d("MainActivity", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
+            if (capabilityInfo.nodes.size > 0){
+                //Log.d("MainActivity", "capability ${capabilityInfo.name} connected!")
+                capabilityInfo.nodes.firstOrNull()?.let {
+                    lifecycleScope.launch {
+                        dataRepository.storeNodeName(it.displayName)
+                    }
+                }
+                //sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
             }
+            /*
+            else {
+                //Log.d("MainActivity", "capability ${capabilityInfo.name} disconnected!")
+                phoneIsConnected = false
+                afterMobileResult = true
+                updateComplication(MobileBatteryComplicationService::class.java)
+            }
+            */
         }
     }
+
 
     private suspend fun findWearDevicesWithApp() {
         Log.d(TAG, "findWearDevicesWithApp()")

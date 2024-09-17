@@ -17,7 +17,7 @@
 package com.weartools.phonebattcomp
 
 import android.annotation.SuppressLint
-import android.content.ContentValues
+import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.wear.tiles.TileService
 import com.google.android.gms.wearable.CapabilityInfo
@@ -55,7 +55,6 @@ private const val ACTIVE_SYNC_PATH = "/active-sync"
 private const val ACTIVE_SYNC_KEY = "active-sync-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
 private const val URI = "/foobar"
-private const val TAG = "MobileListener::"
 
 @AndroidEntryPoint
 class MobileListener : WearableListenerService() {
@@ -113,7 +112,7 @@ class MobileListener : WearableListenerService() {
                     //Log.d(TAG, "Phone Companion Uninstalled!")
                     updateComplication(MobileBatteryComplicationService::class.java)
             }
-                else -> { Log.e(ContentValues.TAG, "Unknown data event Type = " + dataEvent.type) }
+                else -> { Log.e(TAG, "Unknown data event Type = " + dataEvent.type) }
             }
             /** Release dataEvents after processing them */
             dataEvents.release()
@@ -122,20 +121,24 @@ class MobileListener : WearableListenerService() {
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
-        ioScope.launch{
-            if (capabilityInfo.nodes.size > 0) { // Removed condition hasMobileApp?
-                if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP) {
-                    capabilityInfo.nodes.firstOrNull()?.displayName?.let { dataRepository.storeNodeName(it) }
+        if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP){
+            //Log.d("MobileListener", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
+            if (capabilityInfo.nodes.size > 0){
+                //Log.d("MobileListener", "capability ${capabilityInfo.name} connected!")
+                capabilityInfo.nodes.firstOrNull()?.let {
+                    ioScope.launch {
+                        dataRepository.storeNodeName(it.displayName)
+                    }
                 }
                 sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
             }
             else {
+                //Log.d("MobileListener", "capability ${capabilityInfo.name} disconnected!")
                 phoneIsConnected = false
                 afterMobileResult = true
                 updateComplication(MobileBatteryComplicationService::class.java)
             }
         }
-        //Log.d(TAG, "Capability changed: " + capabilityInfo.nodes.size)
     }
 
     private fun processDataItem(dataItem: DataItem) {
