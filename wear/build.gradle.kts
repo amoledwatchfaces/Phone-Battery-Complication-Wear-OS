@@ -30,8 +30,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 34
-        versionCode = 10000426
-        versionName = "4.2.6"
+        versionCode = 10000428
+        versionName = "4.2.8"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
@@ -97,6 +97,9 @@ dependencies {
 
     // SPLASH SCREEN
     implementation ("androidx.core:core-splashscreen:1.0.1")
+
+    // Used for WorkManager
+    implementation ("androidx.work:work-runtime-ktx:2.9.1")
 
     // TILE
     implementation("androidx.wear.protolayout:protolayout-expression:1.2.0")

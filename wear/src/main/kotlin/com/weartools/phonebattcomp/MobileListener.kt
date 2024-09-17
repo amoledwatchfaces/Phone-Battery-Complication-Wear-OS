@@ -81,12 +81,9 @@ class MobileListener : WearableListenerService() {
                     when (dataEvent.dataItem.uri.path) {
                         BATTERY_PATH -> {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
-                            val level = dataMapItem.dataMap.getInt(BATTERY_KEY)
-                            val isCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
-                            //Log.i(TAG, "Received Level: $level, is charging?: $isCharging")
 
-                            phoneBatteryLevel = level
-                            phoneIsCharging = isCharging
+                            phoneBatteryLevel = dataMapItem.dataMap.getInt(BATTERY_KEY)
+                            phoneIsCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
                             phoneIsConnected = true
                             hasMobileApp = true
                             afterMobileResult = true
@@ -129,7 +126,7 @@ class MobileListener : WearableListenerService() {
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
         ioScope.launch{
-            if (capabilityInfo.nodes.size > 0 && hasMobileApp) {
+            if (capabilityInfo.nodes.size > 0) { // Removed condition hasMobileApp?
                 if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP) {
                     capabilityInfo.nodes.firstOrNull()?.displayName?.let { dataRepository.storeNodeName(it) }
                 }

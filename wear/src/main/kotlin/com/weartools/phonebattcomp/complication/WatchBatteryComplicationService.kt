@@ -17,10 +17,10 @@
 package com.weartools.phonebattcomp.complication
 
 import android.app.PendingIntent
+import android.content.Context
 import android.content.Intent
-import android.content.Intent.ACTION_BATTERY_CHANGED
-import android.content.IntentFilter
 import android.graphics.drawable.Icon
+import android.os.BatteryManager
 import android.provider.Settings
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
@@ -36,53 +36,44 @@ import androidx.wear.watchface.complications.data.SmallImageComplicationData
 import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.DataStoreRepository
-import com.weartools.phonebattcomp.receiver.BatteryChangedReceiver
 import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
-import com.weartools.phonebattcomp.receiver.getCurrentBatteryLevel
+import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
+import java.time.Duration
 import javax.inject.Inject
 
 /** Global variables **/
-var watchBatteryLevelSaved: Int? = null
-var watchBatteryLevel: Int? = null
+var watchBatteryLevel: Int = 0
 var watchIsCharging: Boolean? = null
-var isRegistered: Boolean = false
+val oneTimeWorkRequest = OneTimeWorkRequestBuilder<WatchBatteryUpdateWorker>()
+    .setInitialDelay(Duration.ofSeconds(30))
+    .build()
+/** Use WorkManager to update Complication after 30 seconds
+ * because battery level was same and can change anytime soon **/
+fun scheduleComplicationUpdate(context: Context){
+    WorkManager.getInstance(context).enqueueUniqueWork("watch_batt_update", ExistingWorkPolicy.REPLACE, oneTimeWorkRequest)
+}
 
 @AndroidEntryPoint
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
     @Inject lateinit var repository: DataStoreRepository
+    private val batteryManager by lazy { applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager }
+
+    val watchChargingIcon by lazy { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
+    val watchNormalIcon by lazy { Icon.createWithResource(this, R.drawable.ic_watch) }
 
     fun openScreen(): PendingIntent? {
         val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
         return PendingIntent.getActivity(this, 0, batteryIntent, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
-    }
-
-    //TODO: Maybe I should use onComplicationActivated too and simply register receiver here and set isRegistered = true ?
-
-    override fun onComplicationDeactivated(complicationInstanceId: Int) {
-        //Log.i("WatchBatteryComplicationService", "onComplicationDeactivated")
-        super.onComplicationDeactivated(complicationInstanceId)
-        try {
-            this.applicationContext.unregisterReceiver(BatteryChangedReceiver())
-        } catch (e: IllegalArgumentException) {
-            // Receiver not registered, ignoring
-        }
-        isRegistered = false
-    }
-
-    override fun onDestroy() {
-        //Log.i("WatchBatteryComplicationService", "onDestroy")
-        try {
-            this.applicationContext.unregisterReceiver(BatteryChangedReceiver())
-        } catch (e: IllegalArgumentException) {
-            // Receiver not registered, ignoring
-        }
-        isRegistered = false
-        super.onDestroy()
     }
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
@@ -103,14 +94,6 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                     text = PlainComplicationText.Builder(text = "35%").build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
-                    .build()
-            }
-            ComplicationType.LONG_TEXT -> {
-                LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "35%").build(),
-                    contentDescription = ComplicationText.EMPTY)
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_watch)).build())
-                    .setTitle(PlainComplicationText.Builder(text = "Watch Battery").build())
                     .build()
             }
             ComplicationType.MONOCHROMATIC_IMAGE -> {
@@ -134,53 +117,55 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        //Log.i("WatchBatteryComplicationService", "onComplicationRequest")
+        val showPercentage = repository.percentage.first()
+        val newBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
-        if (isRegistered.not()){
-            this.applicationContext.registerReceiver(BatteryChangedReceiver(), IntentFilter(ACTION_BATTERY_CHANGED))
-            isRegistered = true
+        if (watchBatteryLevel != newBatteryLevel || watchBatteryLevel == 0) {
+            watchBatteryLevel = newBatteryLevel
+        }
+        else if (watchIsCharging == true){
+            scheduleComplicationUpdate(this)
+        }
+        else {
+            scheduleComplicationUpdate(this)
         }
 
-        val percentage = if (repository.percentage.first()) "%" else ""
-        val level = watchBatteryLevelSaved?: getCurrentBatteryLevel(this)
-
-        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
-        else { Icon.createWithResource(this, R.drawable.ic_watch) }
+        val level = "$watchBatteryLevel${if (showPercentage) "%" else ""}"
+        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) watchChargingIcon else watchNormalIcon
 
         return when (request.complicationType) {
 
             ComplicationType.RANGED_VALUE -> {
                 RangedValueComplicationData.Builder(
-                    value = level.toFloat(),
+                    value = watchBatteryLevel.toFloat(),
                     min = 0f,
                     max = 100f,
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
-                    .setText(PlainComplicationText.Builder(text = "$level$percentage").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
+                    .setText(PlainComplicationText.Builder(text = level).build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = watchIcon).build())
                     .setTapAction(openScreen())
                     .build()
             }
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder (
-                    text = PlainComplicationText.Builder(text = "$level$percentage").build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
+                    text = PlainComplicationText.Builder(text = level).build(),
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = watchIcon).build())
                     .setTapAction(openScreen())
                     .build()
             }
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "$level$percentage").build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
+                    text = PlainComplicationText.Builder(text = level).build(),
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = watchIcon).build())
                     .setTitle(PlainComplicationText.Builder(text = "Watch Battery").build())
-                    .setTapAction(openScreen())
                     .build()
             }
             ComplicationType.MONOCHROMATIC_IMAGE -> {
                 MonochromaticImageComplicationData.Builder(
                     monochromaticImage = MonochromaticImage.Builder(
-                        Icon.createWithResource(this, when (level) {
+                        Icon.createWithResource(this, when (watchBatteryLevel) {
                             in 0..5 -> R.drawable.ic_batt_low
                             in 6..15 -> R.drawable.ic_battery_1
                             in 16..25 -> R.drawable.ic_battery_2
@@ -194,14 +179,14 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                             else -> R.drawable.ic_battery_10
                         })
                     ).build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
                     .setTapAction(openScreen())
                     .build()
             }
             ComplicationType.SMALL_IMAGE -> {
                 SmallImageComplicationData.Builder(
                     smallImage = SmallImage.Builder(
-                        image = Icon.createWithResource(this, when (level) {
+                        image = Icon.createWithResource(this, when (watchBatteryLevel) {
                             in 0..5 -> R.drawable.ic_batt_low
                             in 6..15 -> R.drawable.ic_battery_1
                             in 16..25 -> R.drawable.ic_battery_2
@@ -216,13 +201,31 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                         }),
                         type = SmallImageType.ICON
                     ).build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$level%").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
                     .setTapAction(openScreen())
                     .build()
             }
 
             else -> {throw IllegalStateException("Unexpected value: ${request.complicationType}") }
         }
+    }
+
+    override fun onComplicationDeactivated(complicationInstanceId: Int) {
+        super.onComplicationDeactivated(complicationInstanceId)
+        WorkManager.getInstance(this).cancelUniqueWork("watch_batt_update")
+    }
+}
+
+class WatchBatteryUpdateWorker(private val appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
+    private val batteryManager by lazy { applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager }
+    override suspend fun doWork(): Result {
+
+        /** When battery level changes, update complication, when not, schedule new update in 30 seconds **/
+        val newBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+        if (watchBatteryLevel != newBatteryLevel){ appContext.updateComplication(WatchBatteryComplicationService::class.java) }
+        else { scheduleComplicationUpdate(appContext) }
+
+        return Result.success()
     }
 }
 

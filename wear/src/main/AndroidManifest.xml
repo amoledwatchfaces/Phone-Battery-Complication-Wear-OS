@@ -139,13 +139,6 @@
         <receiver
             android:name=".receiver.ComplicationTapBroadcastReceiver" />
         <receiver
-            android:name=".receiver.BatteryChangedReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BATTERY_CHANGED" />
-            </intent-filter>
-        </receiver>
-        <receiver
             android:name=".receiver.PowerConnectionReceiver"
             android:exported="true">
             <intent-filter>
