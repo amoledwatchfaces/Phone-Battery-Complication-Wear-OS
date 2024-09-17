@@ -5,8 +5,12 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.widget.Toast
+import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.weartools.phonebattcomp.BuildConfig
+import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 
@@ -28,5 +32,13 @@ fun Context.updateBatteriesComplications() {
     this.updateComplication(WatchBatteryComplicationService::class.java)
 }
 
+fun Context.openAppStoreOnPhone() {
+    val remoteActivityHelper = RemoteActivityHelper(this)
+    val intentAndroid = Intent(Intent.ACTION_VIEW)
+        .addCategory(Intent.CATEGORY_BROWSABLE)
+        .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
+    remoteActivityHelper.startRemoteActivity(intentAndroid,targetNodeId = null)
+    Toast.makeText(this, this.getString(R.string.check_phone), Toast.LENGTH_LONG).show()
+}
 
 

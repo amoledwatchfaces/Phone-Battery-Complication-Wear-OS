@@ -31,7 +31,6 @@ import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.afterMobileResult
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.hasMobileApp
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.lastUpdate
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLevel
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
@@ -85,9 +84,8 @@ class MobileListener : WearableListenerService() {
                             phoneBatteryLevel = dataMapItem.dataMap.getInt(BATTERY_KEY)
                             phoneIsCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
                             phoneIsConnected = true
-                            hasMobileApp = true
                             afterMobileResult = true
-                            lastUpdate = System.currentTimeMillis()
+                            lastUpdate.value = System.currentTimeMillis()
 
                             //Log.d(TAG, "Received Phone Battery Level: $level")
                             updateComplication(MobileBatteryComplicationService::class.java)
@@ -109,9 +107,8 @@ class MobileListener : WearableListenerService() {
                     phoneBatteryLevel = 0
                     phoneIsCharging = false
                     phoneIsConnected = false
-                    hasMobileApp = false
                     afterMobileResult = false
-                    lastUpdate = System.currentTimeMillis()
+                    lastUpdate.value = System.currentTimeMillis()
 
                     //Log.d(TAG, "Phone Companion Uninstalled!")
                     updateComplication(MobileBatteryComplicationService::class.java)

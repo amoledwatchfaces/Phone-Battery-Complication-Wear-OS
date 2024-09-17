@@ -55,9 +55,8 @@ object PhoneBatteryState {
     var phoneBatteryLevel by mutableIntStateOf(0)
     var phoneIsCharging by mutableStateOf(false)
     var phoneIsConnected by mutableStateOf(false)
-    var lastUpdate: Long? = null
-    var afterMobileResult: Boolean = false
-    var hasMobileApp: Boolean = false
+    var afterMobileResult by mutableStateOf(false)
+    var lastUpdate = mutableStateOf<Long?>(null)
 }
 
 @AndroidEntryPoint
@@ -122,8 +121,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
-        val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
-        val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
+        val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(this,ComplicationToggleArgs(ComponentName(this, javaClass),request.complicationInstanceId))
 
         val activeSync = repository.activeSync.first()
         val showPercentage = repository.percentage.first()
@@ -131,7 +129,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         /** When Active Sync is not enabled **/
         if (activeSync.not()) {
             if (afterMobileResult.not()) {
-                MobileListener.sendPhoneBatteryRequest(lastUpdate?:0L, dataClient, false)
+                MobileListener.sendPhoneBatteryRequest(lastUpdate.value?:0L, dataClient, false)
             }
             else {
                 afterMobileResult = false
@@ -139,7 +137,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         }
         /** When Active Sync is enabled but last update time was reset **/
         else {
-            if (lastUpdate == null){
+            if (lastUpdate.value == null){
                 MobileListener.sendPhoneBatteryRequest(0L, dataClient, true)
             }
         }

@@ -19,7 +19,6 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.widget.Toast
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -52,15 +51,16 @@ import androidx.wear.compose.material.Icon
 import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.compose.material.OutlinedCompactChip
 import androidx.wear.compose.material.Text
-import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.complication.PhoneBatteryState.lastUpdate
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsConnected
 import com.weartools.phonebattcomp.theme.wearColorPalette
+import com.weartools.phonebattcomp.utils.openAppStoreOnPhone
 
 @Composable
 fun PhoneBatteryAppScreen(
@@ -105,6 +105,7 @@ fun PhoneBatteryAppScreen(
                         tint = wearColorPalette.secondaryVariant) },
                 title = nodeName,
                 onClick = {
+                    if (lastUpdate.value == null){ context.openAppStoreOnPhone() }
                     MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
                 }
             )
@@ -130,7 +131,7 @@ fun PhoneBatteryAppScreen(
                     Icon(imageVector = Icons.AutoMirrored.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
                 }
                 OutlinedButton(
-                    onClick = { openAppStoreOnPhone(context) }
+                    onClick = { context.openAppStoreOnPhone() }
                 ) {
                     Icon(imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
                 }
@@ -222,12 +223,3 @@ fun Context.openPlayStore() {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
     }
 }
-fun openAppStoreOnPhone(context: Context) {
-    val remoteActivityHelper = RemoteActivityHelper(context)
-    val intentAndroid = Intent(Intent.ACTION_VIEW)
-        .addCategory(Intent.CATEGORY_BROWSABLE)
-        .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
-    remoteActivityHelper.startRemoteActivity(intentAndroid,targetNodeId = null)
-    Toast.makeText(context, context.getString(R.string.check_phone), Toast.LENGTH_LONG).show()
-}
-

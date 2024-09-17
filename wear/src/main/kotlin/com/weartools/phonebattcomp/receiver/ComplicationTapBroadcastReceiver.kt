@@ -21,19 +21,16 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
+import android.os.BatteryManager
 import android.os.Parcelable
-import android.util.Log
-import android.widget.Toast
-import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import com.google.android.gms.wearable.DataClient
-import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MobileListener
-import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.hasMobileApp
+import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
+import com.weartools.phonebattcomp.complication.watchBatteryLevel
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -55,31 +52,27 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
 
         scope.launch {
             try {
-                if (args.providerComponent == ComponentName(context, MobileBatteryComplicationService::class.java) && hasMobileApp.not()) {
-                    MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
-                    openAppStoreOnPhone(context = context)
-                    Log.d(TAG, "Opening Play Store Listing!")
-                    Toast.makeText(context, context.getString(R.string.install_companion), Toast.LENGTH_LONG).show()
-                } else {
-                    ComplicationDataSourceUpdateRequester
-                        .create(context = context, complicationDataSourceComponent = args.providerComponent)
-                        .requestUpdate(args.complicationInstanceId)
+                when (args.providerComponent) {
+                    ComponentName(context, MobileBatteryComplicationService::class.java) -> {
+                        MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
+                    }
+                    ComponentName(context, WatchBatteryComplicationService::class.java) -> {
+                        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
+                        watchBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+                        context.updateComplication(WatchBatteryComplicationService::class.java)
+                    }
+                    else -> {
+                        ComplicationDataSourceUpdateRequester
+                            .create(context = context, complicationDataSourceComponent = args.providerComponent)
+                            .requestUpdate(args.complicationInstanceId)
+                    }
                 }
             } finally {
                 result.finish()
             }
         }
     }
-    fun openAppStoreOnPhone(context: Context) {
-        val remoteActivityHelper = RemoteActivityHelper(context)
-        val intentAndroid = Intent(Intent.ACTION_VIEW)
-            .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
-        remoteActivityHelper.startRemoteActivity(intentAndroid, targetNodeId = null)
-    }
-
     companion object {
-        private val TAG = ComplicationTapBroadcastReceiver::class.java.simpleName
         private const val EXTRA_ARGS = "arguments"
         fun getToggleIntent(
             context: Context,
