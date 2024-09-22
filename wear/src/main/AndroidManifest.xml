@@ -48,6 +48,10 @@
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
                 <data android:scheme="wear" android:host="*" android:path="/active-sync" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:scheme="wear" android:host="*" android:path="/calendar-events" />
+            </intent-filter>
         </service>
 
         <!-- Complications -->
@@ -117,6 +121,19 @@
             <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="300"/>
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="SHORT_TEXT"/>
+        </service>
+        <service
+            android:name=".complication.CalendarEventTimerComplication"
+            android:icon="@drawable/ic_event_upcoming_2"
+            android:label="@string/calendar_event_timer_complication"
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST"/>
+            </intent-filter>
+            <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="2100"/>
+            <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
+                android:value="LONG_TEXT"/>
         </service>
 
         <!-- Tile -->

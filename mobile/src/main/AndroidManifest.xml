@@ -4,6 +4,7 @@
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES" tools:ignore="QueryAllPackagesPermission" />
+    <uses-permission android:name="android.permission.READ_CALENDAR"/>
 
     <application
         android:name=".MainApplication"
@@ -38,8 +39,8 @@
             </intent-filter>
         </activity>
 
-        <service
-            android:name=".NotificationListener"
+        <!-- Services -->
+        <service android:name=".NotificationListener"
             android:enabled="true"
             android:exported="false"
             android:label="NotificationListener"
@@ -56,11 +57,8 @@
                 android:value="ongoing|silent">
             </meta-data>
         </service>
-
-        <service
-            android:name=".WearListener"
+        <service android:name=".WearListener"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
                 <data android:scheme="wear" android:host="*"/>
@@ -72,8 +70,8 @@
             </intent-filter>
         </service>
 
-        <receiver
-            android:name=".BatteryStatusBroadcastReceiver"
+        <!-- Receivers -->
+        <receiver android:name=".BatteryStatusBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_CHANGED" />
@@ -81,8 +79,7 @@
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".BootCompleteBroadcastReceiver"
+        <receiver android:name=".BootCompleteBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -90,9 +87,7 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-
-        <receiver
-            android:name=".AppUpdateBroadcastReceiver"
+        <receiver android:name=".AppUpdateBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />

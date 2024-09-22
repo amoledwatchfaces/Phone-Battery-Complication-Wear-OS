@@ -21,8 +21,11 @@ import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
+import com.weartools.phonebattcomp.complication.CalendarEvent
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 class DataStoreRepository @Inject constructor(
@@ -30,7 +33,7 @@ class DataStoreRepository @Inject constructor(
 ): Repository {
 
     val preferencesVersion: Flow<Int> = dataStore.data.map { prefs ->
-        prefs[PREFS_VERSION]?: 6
+        prefs[PREFS_VERSION]?: 7
     }
     val activeSync: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[ACTIVE_SYNC] ?: false
@@ -90,6 +93,25 @@ class DataStoreRepository @Inject constructor(
         }
     }
 
+
+    // Function to save a list of CalendarEvent to DataStore
+    suspend fun saveEvents(events: List<CalendarEvent>) {
+        val eventsJson = Json.encodeToString(events)
+        dataStore.edit { prefs ->
+            prefs[EVENTS_KEY] = eventsJson
+        }
+    }
+    // Function to retrieve the list of CalendarEvent from DataStore
+    fun getEvents(): Flow<List<CalendarEvent>> {
+        return dataStore.data
+            .map { preferences ->
+                // Retrieve the JSON string from DataStore
+                val eventsJson = preferences[EVENTS_KEY] ?: "[]"
+                // Convert the JSON string back to a list of CalendarEvent
+                Json.decodeFromString(eventsJson)
+            }
+    }
+
     companion object {
         private val NODE_NAME = stringPreferencesKey("node_name")
         private val TEMP_UNIT = booleanPreferencesKey("temp_unit")
@@ -98,6 +120,7 @@ class DataStoreRepository @Inject constructor(
         private val BITMAP_LIST_KEY = stringPreferencesKey("notify_bitmap_list")
         private val NOTIF_ICON_TYPE = intPreferencesKey("notifications_icon_type")
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
+        private val EVENTS_KEY = stringPreferencesKey("calendar_events")
 
         val PREFS_VERSION = intPreferencesKey(name = "preferencesVersion")
     }

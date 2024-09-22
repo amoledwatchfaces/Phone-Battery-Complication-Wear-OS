@@ -21,6 +21,9 @@ class DataStoreRepository @Inject constructor(
     val activeSync: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[ACTIVE_SYNC] ?: false
     }
+    val calendarSync: Flow<Boolean> = dataStore.data.map { prefs ->
+        prefs[CALENDAR_SYNC] ?: false
+    }
     val notificationsSync: Flow<Boolean> = dataStore.data.map { prefs ->
         prefs[NOTIFICATIONS_SYNC] ?: true
     }
@@ -32,6 +35,11 @@ class DataStoreRepository @Inject constructor(
     suspend fun setActiveSyncState(state: Boolean) {
         dataStore.edit { prefs ->
             prefs[ACTIVE_SYNC] = state
+        }
+    }
+    suspend fun setCalendarSyncState(state: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[CALENDAR_SYNC] = state
         }
     }
     suspend fun setNotificationsSyncState(state: Boolean) {
@@ -46,6 +54,7 @@ class DataStoreRepository @Inject constructor(
     }
     companion object {
         private val ACTIVE_SYNC = booleanPreferencesKey("active_sync")
+        private val CALENDAR_SYNC = booleanPreferencesKey("calendar_sync")
         private val BACKGROUND_SERVICE = booleanPreferencesKey("background_service")
         private val NOTIFICATIONS_SYNC = booleanPreferencesKey("notifications_sync")
         val PREFS_VERSION = intPreferencesKey(name = "preferencesVersion")

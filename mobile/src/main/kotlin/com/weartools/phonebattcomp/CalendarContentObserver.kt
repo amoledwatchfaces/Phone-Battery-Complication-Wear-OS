@@ -1,0 +1,109 @@
+package com.weartools.phonebattcomp
+
+import android.Manifest
+import android.content.ContentUris
+import android.content.Context
+import android.content.pm.PackageManager
+import android.database.ContentObserver
+import android.os.Handler
+import android.provider.CalendarContract
+import androidx.core.content.ContextCompat
+import com.google.android.gms.wearable.DataMap
+import com.google.android.gms.wearable.PutDataMapRequest
+import com.google.android.gms.wearable.Wearable
+import java.util.concurrent.TimeUnit
+
+class CalendarContentObserver(handler: Handler, private val context: Context) : ContentObserver(handler) {
+
+
+    override fun onChange(selfChange: Boolean) {
+        super.onChange(selfChange)
+
+        // Calendar data has changed, query the data here if needed
+        //Log.d("CalendarContentObserver", "Calendar content changed!")
+        //Log.d("CalendarContentObserver", "Sending events to wearable!")
+
+        if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
+            queryAllFutureCalendarEventAndSend(context)
+        }
+        else {
+            context.contentResolver.unregisterContentObserver(this)
+        }
+    }
+
+    companion object {
+        fun queryAllFutureCalendarEventAndSend(context: Context) {
+
+            val dataClient = Wearable.getDataClient(context)
+            val events = mutableListOf<CalendarEvent>()
+            val currentTime = System.currentTimeMillis()
+
+            // Use the Instances content URI with the time range
+            val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
+            ContentUris.appendId(builder,currentTime)
+            ContentUris.appendId(builder,currentTime + TimeUnit.DAYS.toMillis(14)) // generate 2 weeks ahead
+
+            // Query for all future events
+            val cursor = context.contentResolver.query(
+                builder.build(),
+                arrayOf(CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.ALL_DAY),
+                "${CalendarContract.Instances.END} >= ? AND ${CalendarContract.Events.ALL_DAY} = ?",
+                arrayOf(currentTime.toString(), "0"),
+                "${CalendarContract.Instances.BEGIN} ASC"
+            )
+
+            cursor?.use {
+                while (it.moveToNext()) {
+                    val eventTitle = it.getString(it.getColumnIndexOrThrow(CalendarContract.Instances.TITLE))
+                    val eventStartTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.BEGIN))
+                    val eventEndTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.END))
+
+                    // Add the event to the list
+                    events.add(CalendarEvent(eventTitle, eventStartTime, eventEndTime))
+                }
+            }
+
+            // Log the number of events found and return the list of events
+            /*
+            Log.i("queryAllFutureEvents", "Found ${events.size} future events.")
+            if (events.isNotEmpty()){
+                Log.i("queryAllFutureEvents", "First Event Title: ${events[0].title}")
+            }
+             */
+
+            val dataMapList = events.map { it.toDataMap() }
+            val putDataMapReq = PutDataMapRequest.create("/calendar-events")
+            putDataMapReq.dataMap.putDataMapArrayList("events", ArrayList(dataMapList))
+            putDataMapReq.setUrgent()
+            dataClient.putDataItem(putDataMapReq.asPutDataRequest())
+        }
+
+        fun Context.arePermissionsGranted(
+            vararg permissions: String
+        ): Boolean {
+            var isGranted = false
+            for (permission in permissions)
+                isGranted = ContextCompat.checkSelfPermission(
+                    this,
+                    permission
+                ) == PackageManager.PERMISSION_GRANTED
+            return isGranted
+        }
+    }
+}
+
+
+
+data class CalendarEvent(
+    val title: String,
+    val startTime: Long,
+    val endTime: Long
+){
+    fun toDataMap(): DataMap {
+        val dataMap = DataMap()
+        dataMap.putString("title", title)
+        dataMap.putLong("startTime", startTime)
+        dataMap.putLong("endTime", endTime)
+        return dataMap
+    }
+}

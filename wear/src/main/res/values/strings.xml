@@ -52,6 +52,9 @@
     <string name="voltage_battery_text">Watch Battery Voltage</string>
     <string name="voltage_volts">Volts</string>
 
+    <!-- Watch Battery Voltage Complication strings -->
+    <string name="calendar_event_timer_complication" translatable="false">Event Timer Complication</string>
+
     <!-- Temperature Units Preferences -->
     <string name="setting_preference_category_title">Watch Battery Temperature Complication</string>
     <string name="temp_unit_pref_title">Temp unit</string>

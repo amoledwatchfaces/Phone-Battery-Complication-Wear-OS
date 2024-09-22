@@ -6,6 +6,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Handler
+import android.provider.CalendarContract
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
@@ -75,6 +77,7 @@ class MainViewModel @Inject constructor(
     var message: String = ""
 
     val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    val calendarSync = dataRepository.calendarSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
     val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
     val backgroundService = dataRepository.backgroundServiceState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
 
@@ -82,6 +85,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             capabilityClient.addListener(listener,BuildConfig.CAPABILITY_WEAR_APP)
             dataRepository.activeSync.distinctUntilChanged().collect {}
+            dataRepository.calendarSync.distinctUntilChanged().collect {}
             dataRepository.notificationsSync.distinctUntilChanged().collect {}
             dataRepository.backgroundServiceState.distinctUntilChanged().collect {}
         }
@@ -236,6 +240,13 @@ class MainViewModel @Inject constructor(
 
         dataClient.putDataItem(request)
     }
+
+    fun setCalendarSyncState(state: Boolean) {
+        viewModelScope.launch {
+            dataRepository.setCalendarSyncState(state)
+        }
+    }
+
     fun setNotificationsSyncState(state: Boolean) {
         viewModelScope.launch {
             dataRepository.setNotificationsSyncState(state)
@@ -253,6 +264,25 @@ class MainViewModel @Inject constructor(
             dataRepository.setBackgroundServiceState(isServiceRunning)
         }
         return isServiceRunning
+    }
+
+    fun changeCalendarContentObserver(register: Boolean, context: Context){
+        val handler = Handler(context.mainLooper)
+        val observer = CalendarContentObserver(handler, context)
+        /** Register Content observer **/
+        if (register){
+            context.contentResolver.registerContentObserver(
+                CalendarContract.Events.CONTENT_URI,
+                true, // true for recursive monitoring of child URIs
+                observer
+            )
+            // Send Events immediately
+            CalendarContentObserver.queryAllFutureCalendarEventAndSend(context)
+        }
+        else {
+            context.contentResolver.unregisterContentObserver(observer)
+        }
+
     }
 
     companion object {

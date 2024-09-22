@@ -38,6 +38,9 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.wearable.Node
 import com.weartools.phonebattcomp.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.MainViewModel
@@ -45,7 +48,7 @@ import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.utils.askForNotificationAccess
 import com.weartools.phonebattcomp.utils.openAmoledWebPage
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
 fun ExperimentalScreen(
     context: Context,
@@ -58,13 +61,27 @@ fun ExperimentalScreen(
 
     val listState = rememberLazyListState()
     val activeSyncState by viewModel.activeSync.collectAsState()
+    val calendarSyncState by viewModel.calendarSync.collectAsState()
     val notificationsSyncState by viewModel.notificationsSync.collectAsState()
     val backgroundSyncState by viewModel.backgroundService.collectAsState()
+
+    val permissionStateCalendar = rememberPermissionState(
+        permission = "android.permission.READ_CALENDAR",
+        onPermissionResult = {
+            if (it){
+                viewModel.setCalendarSyncState(true)
+                viewModel.changeCalendarContentObserver(true, context)
+            }
+        }
+    )
 
 
     LaunchedEffect(Unit) {
         lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.RESUMED) {
             viewModel.isMyNotificationsServiceRunning(context)
+            if (permissionStateCalendar.status.isGranted.not()){
+                viewModel.setCalendarSyncState(false)
+            }
         }
     }
 
@@ -212,6 +229,43 @@ fun ExperimentalScreen(
                                 viewModel.setNotificationsSyncState(false)
                             }
                         })
+                    }
+                    // Calendar Events Sync Switch
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column {
+                            Text(
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                text = "Calendar Events Sync")
+                            Text(
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Gray,
+                                text = "Used in Event Timer Complication")
+                        }
+
+                        Switch(
+                            enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            checked = calendarSyncState,
+                            onCheckedChange = {
+                                if (it){
+                                    if (permissionStateCalendar.status.isGranted){
+                                        viewModel.setCalendarSyncState(true)
+                                        viewModel.changeCalendarContentObserver(true, context)
+                                    }
+                                    else permissionStateCalendar.launchPermissionRequest()
+                                }
+                                else {
+                                    viewModel.setCalendarSyncState(false)
+                                    viewModel.changeCalendarContentObserver(false, context)
+                                }
+                            })
                     }
                 }
 

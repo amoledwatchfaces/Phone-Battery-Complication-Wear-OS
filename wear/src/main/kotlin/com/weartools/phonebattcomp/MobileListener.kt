@@ -25,9 +25,12 @@ import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataItem
+import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
+import com.weartools.phonebattcomp.complication.CalendarEvent
+import com.weartools.phonebattcomp.complication.CalendarEventTimerComplication
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.afterMobileResult
@@ -55,6 +58,10 @@ private const val ACTIVE_SYNC_PATH = "/active-sync"
 private const val ACTIVE_SYNC_KEY = "active-sync-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
 private const val URI = "/foobar"
+
+private const val CALENDAR_EVENTS_PATH = "/calendar-events"
+private const val CALENDAR_EVENTS_KEY = "events"
+
 
 @AndroidEntryPoint
 class MobileListener : WearableListenerService() {
@@ -98,6 +105,15 @@ class MobileListener : WearableListenerService() {
                         }
                         URI -> {
                             processDataItem(dataEvent.dataItem)
+                        }
+                        CALENDAR_EVENTS_PATH -> {
+                            val dataMap = dataEvent.dataItem.data?.let { DataMap.fromByteArray(it) }
+                            val eventDataMaps = dataMap?.getDataMapArrayList(CALENDAR_EVENTS_KEY) ?: emptyList()
+                            // Convert each DataMap back to CalendarEvent
+                            val events = eventDataMaps.map { CalendarEvent.fromDataMap(it) }
+                            // TODO: we're taking only first 200 items to reduce overhead (take(200))
+                            ioScope.launch { dataRepository.saveEvents(events.take(200)) }
+                            updateComplication(CalendarEventTimerComplication::class.java)
                         }
                     }
                 }
@@ -173,3 +189,4 @@ class MobileListener : WearableListenerService() {
         }
     }
 }
+
