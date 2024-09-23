@@ -86,8 +86,7 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
         }
     }
 
-    fun sendCalendarRequest (dataClient: DataClient) {
-        val currentTime = System.currentTimeMillis()
+    fun sendCalendarRequest (currentTime: Long, dataClient: DataClient) {
         // Send request only every 30 minutes to avoid looping requests
         if (currentTime - lastCalendarRequestTime > 1800000 ){
             lastCalendarRequestTime = currentTime
@@ -146,7 +145,7 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
         }
         else {
             // when there is no close event, we want to check phone for new events
-            sendCalendarRequest(dataClient)
+            sendCalendarRequest(currentTime,dataClient)
             icon = drawable.ic_no_upcoming_event
         }
 
