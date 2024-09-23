@@ -146,7 +146,6 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
         else {
             // when there is no close event, we want to check phone for new events
             sendCalendarRequest(currentTime,dataClient)
-            // set name and icon
             icon = drawable.ic_no_upcoming_event
         }
 
