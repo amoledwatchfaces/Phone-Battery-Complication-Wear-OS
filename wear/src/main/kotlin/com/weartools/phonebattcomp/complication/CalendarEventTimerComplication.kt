@@ -125,7 +125,7 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
          */
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
-        var closestEventName = closestEvent?.first ?: "No upcoming events"
+        val closestEventName = closestEvent?.first ?: "No upcoming events"
         val closestEventTime = closestEvent?.second ?: 0L
         //Log.i("CalendarEventTimerComplication", "Nearest or current event: $closestEventName")
 
@@ -147,7 +147,6 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             // when there is no close event, we want to check phone for new events
             sendCalendarRequest(currentTime,dataClient)
             // set name and icon
-            closestEventName = "No upcoming events"
             icon = drawable.ic_no_upcoming_event
         }
 
