@@ -63,10 +63,13 @@
                 <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
                 <data android:scheme="wear" android:host="*"/>
             </intent-filter>
-
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
                 <data android:scheme="wear" android:host="*" android:path="/request"  />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="com.google.android.gms.wearable.DATA_CHANGED" />
+                <data android:scheme="wear" android:host="*" android:path="/calendar-request"  />
             </intent-filter>
         </service>
 

@@ -277,7 +277,7 @@ class MainViewModel @Inject constructor(
                 observer
             )
             // Send Events immediately
-            CalendarContentObserver.queryAllFutureCalendarEventAndSend(context)
+            viewModelScope.launch { CalendarContentObserver.queryAllFutureCalendarEventAndSend(context)}
         }
         else {
             context.contentResolver.unregisterContentObserver(observer)

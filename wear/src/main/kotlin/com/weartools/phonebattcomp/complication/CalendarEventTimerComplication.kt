@@ -36,7 +36,9 @@ import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataMap
+import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.R.drawable
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.utils.updateComplication
@@ -47,11 +49,14 @@ import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 
+private const val CALENDAR_REQUEST_PATH = "/calendar-request"
+private var lastCalendarRequestTime = 0L
+
 @AndroidEntryPoint
 class CalendarEventTimerComplication : SuspendingComplicationDataSourceService() {
 
-    @Inject
-    lateinit var repository: DataStoreRepository
+    @Inject lateinit var repository: DataStoreRepository
+    @Inject lateinit var dataClient: DataClient
 
     private fun openScreen(): PendingIntent? {
 
@@ -78,6 +83,20 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             }
 
             else -> {null}
+        }
+    }
+
+    fun sendCalendarRequest (dataClient: DataClient) {
+        val currentTime = System.currentTimeMillis()
+        // Send request only every 30 minutes to avoid looping requests
+        if (currentTime - lastCalendarRequestTime > 1800000 ){
+            lastCalendarRequestTime = currentTime
+            val request = PutDataMapRequest.create(CALENDAR_REQUEST_PATH).apply {
+                dataMap.putLong("calendarUpdate", currentTime) }
+                .asPutDataRequest()
+                .setUrgent()
+
+            dataClient.putDataItem(request)
         }
     }
 
@@ -126,7 +145,8 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             )
         }
         else {
-            //TODO: Send request to phone to send back new calendar events
+            // when there is no close event, we want to check phone for new events
+            sendCalendarRequest(dataClient)
             icon = drawable.ic_no_upcoming_event
         }
 

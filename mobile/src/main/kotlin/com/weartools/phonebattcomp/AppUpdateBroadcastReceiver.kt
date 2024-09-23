@@ -15,11 +15,15 @@
  */
 package com.weartools.phonebattcomp
 
+import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.os.Handler
+import android.provider.CalendarContract
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
+import com.weartools.phonebattcomp.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -56,6 +60,22 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
                     .setUrgent()
 
                 dataClient.putDataItem(request)
+            }
+
+            if (dataRepository.calendarSync.first()){
+                if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
+                    val handler = Handler(context.mainLooper)
+                    val observer = CalendarContentObserver(handler, context)
+                    // Call the suspend function after the delay
+                    context.contentResolver.registerContentObserver(
+                        CalendarContract.Events.CONTENT_URI,
+                        true, // true for recursive monitoring of child URIs
+                        observer
+                    )
+                }
+                else {
+                    dataRepository.setCalendarSyncState(false)
+                }
             }
         }
     }

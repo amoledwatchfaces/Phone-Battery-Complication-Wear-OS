@@ -16,6 +16,7 @@
  */
 package com.weartools.phonebattcomp
 
+import android.Manifest
 import android.content.ContentValues.TAG
 import android.content.Intent
 import android.content.IntentFilter
@@ -27,8 +28,13 @@ import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
+import com.weartools.phonebattcomp.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 const val BATTERY_PATH = "/battery-level"
@@ -41,8 +47,12 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 const val ACTIVE_SYNC_PATH = "/active-sync"
 const val ACTIVE_SYNC_KEY = "active-sync-key"
 
+private const val CALENDAR_REQUEST_PATH = "/calendar-request"
+
 @AndroidEntryPoint
 class WearListener : WearableListenerService() {
+
+    private val ioScope = CoroutineScope(Dispatchers.IO)
 
     @Inject
     lateinit var dataRepository: DataStoreRepository
@@ -74,6 +84,19 @@ class WearListener : WearableListenerService() {
                                 .setUrgent()
 
                             dataClient.putDataItem(request)
+                        }
+                        CALENDAR_REQUEST_PATH -> {
+                            Log.i(TAG, "Calendar request path received")
+                            ioScope.launch {
+                                if (dataRepository.calendarSync.first()){
+                                    if (applicationContext.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
+                                        CalendarContentObserver.queryAllFutureCalendarEventAndSend(applicationContext)
+                                    }
+                                    else {
+                                        dataRepository.setCalendarSyncState(false)
+                                    }
+                                }
+                            }
                         }
                     }
                 }
