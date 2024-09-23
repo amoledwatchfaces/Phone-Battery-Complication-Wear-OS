@@ -100,11 +100,7 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             dataClient.putDataItem(request)
         }
     }
-    fun isEventOngoing(events: List<CalendarEvent>, closestEventTime: Long): Boolean {
-        return events.any { event -> event.endTime == closestEventTime }
-    }
 
-    /*
     fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
 
         val closestEventTime = events.flatMap { event ->
@@ -125,34 +121,6 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
 
         return closestEventTime
     }
-
-     */
-    fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
-        var closestEvent: Pair<String, Long>? = null
-
-        for (event in events) {
-            val startTime = event.startTime
-            val endTime = event.endTime
-
-            // Check for closest event
-            if (startTime >= currentTime) {
-                if (closestEvent == null || startTime - currentTime < closestEvent.second - currentTime) {
-                    closestEvent = event.title to startTime
-                }
-            }
-            if (endTime >= currentTime) {
-                if (closestEvent == null || endTime - currentTime < closestEvent.second - currentTime) {
-                    closestEvent = event.title to endTime
-                }
-            }
-            // Check if endTime matches the closest event time
-            if (closestEvent != null && (endTime == closestEvent.second || startTime == closestEvent.second)) {
-                icon = drawable.ic_pending_1
-            }
-        }
-        return closestEvent
-    }
-
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
 
