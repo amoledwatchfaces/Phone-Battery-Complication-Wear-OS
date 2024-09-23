@@ -58,6 +58,8 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
     @Inject lateinit var repository: DataStoreRepository
     @Inject lateinit var dataClient: DataClient
 
+    var icon = drawable.ic_event_upcoming_2
+
     private fun openScreen(): PendingIntent? {
 
         val calendarIntent = Intent()
@@ -98,9 +100,14 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             dataClient.putDataItem(request)
         }
     }
+    fun isEventOngoing(events: List<CalendarEvent>, closestEventTime: Long): Boolean {
+        return events.any { event -> event.endTime == closestEventTime }
+    }
 
+    /*
     fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
-        return events.flatMap { event ->
+
+        val closestEventTime = events.flatMap { event ->
             // Use 0L if startTime or endTime is in the past, otherwise use the actual time
             listOf(
                 event.title to event.startTime,
@@ -111,13 +118,46 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
         }.minByOrNull { (_, time) ->
             (time - currentTime) // Find the closest time to currentTime
         }
+
+        if (events.any { event -> event.endTime == closestEventTime?.second }){
+            icon = drawable.ic_pending_1
+        }
+
+        return closestEventTime
     }
+
+     */
+    fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
+        var closestEvent: Pair<String, Long>? = null
+
+        for (event in events) {
+            val startTime = event.startTime
+            val endTime = event.endTime
+
+            // Check for closest event
+            if (startTime >= currentTime) {
+                if (closestEvent == null || startTime - currentTime < closestEvent.second - currentTime) {
+                    closestEvent = event.title to startTime
+                }
+            }
+            if (endTime >= currentTime) {
+                if (closestEvent == null || endTime - currentTime < closestEvent.second - currentTime) {
+                    closestEvent = event.title to endTime
+                }
+            }
+            // Check if endTime matches the closest event time
+            if (closestEvent != null && (endTime == closestEvent.second || startTime == closestEvent.second)) {
+                icon = drawable.ic_pending_1
+            }
+        }
+        return closestEvent
+    }
+
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
 
         val currentTime = System.currentTimeMillis()
         val events = repository.getEvents().first()
-        var icon = drawable.ic_event_upcoming_2
 
         /** When currently some event is running, show countdown to event endTime
          *  else, show countdown to next event startTime
@@ -131,8 +171,6 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
 
         /** Schedule event update when finished / started **/
         if (closestEvent != null){
-            if (closestEventTime == events[0].endTime){ icon = drawable.ic_pending_1}
-
             val delay = closestEventTime - currentTime
            // Log.i("CalendarEventTimerComplication", "Scheduling complication update with delay: ${delay/60000}")
             WorkManager.getInstance(this).enqueueUniqueWork(
