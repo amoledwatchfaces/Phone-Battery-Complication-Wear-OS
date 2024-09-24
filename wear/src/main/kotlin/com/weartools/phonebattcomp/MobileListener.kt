@@ -16,7 +16,6 @@
  */
 package com.weartools.phonebattcomp
 
-import android.annotation.SuppressLint
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.wear.tiles.TileService
@@ -173,7 +172,6 @@ class MobileListener : WearableListenerService() {
 
     companion object {
 
-        @SuppressLint("VisibleForTests")
         fun sendPhoneBatteryRequest (lastUpdateTime: Long, dataClient: DataClient, forceUpdate: Boolean) {
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastUpdateTime >= 5000) {
@@ -187,6 +185,18 @@ class MobileListener : WearableListenerService() {
             }
             else
                 Log.e(TAG, "Too many updates")
+        }
+        fun sendCalendarRequest (currentTime: Long, dataClient: DataClient) {
+            // Send request only every 30 minutes to avoid looping requests
+            if (currentTime - lastCalendarRequestTime > 1800000 ){
+                lastCalendarRequestTime = currentTime
+                val request = PutDataMapRequest.create(CALENDAR_REQUEST_PATH).apply {
+                    dataMap.putLong("calendarUpdate", currentTime) }
+                    .asPutDataRequest()
+                    .setUrgent()
+
+                dataClient.putDataItem(request)
+            }
         }
     }
 }

@@ -5,10 +5,10 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CalendarEvent(
-    val title: String,
-    val startTime: Long,
-    val endTime: Long,
-    val allDay: Int
+    val title: String = "",
+    val startTime: Long = 0L,
+    val endTime: Long = 0L,
+    val allDay: Int = 0
 ){
     companion object {
         fun fromDataMap(dataMap: DataMap): CalendarEvent {

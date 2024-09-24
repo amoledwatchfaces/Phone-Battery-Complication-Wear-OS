@@ -9,9 +9,9 @@ import android.os.Handler
 import android.provider.CalendarContract
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
+import com.weartools.phonebattcomp.data.CalendarEvent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -108,23 +108,5 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
                 ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
             }
         }
-    }
-}
-
-
-
-data class CalendarEvent(
-    val title: String,
-    val startTime: Long,
-    val endTime: Long,
-    val allDay: Int
-){
-    fun toDataMap(): DataMap {
-        val dataMap = DataMap()
-        dataMap.putString("title", title)
-        dataMap.putLong("startTime", startTime)
-        dataMap.putLong("endTime", endTime)
-        dataMap.putInt("allDay", allDay)
-        return dataMap
     }
 }

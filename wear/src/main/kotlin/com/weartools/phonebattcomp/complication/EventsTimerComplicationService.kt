@@ -37,12 +37,10 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.android.gms.wearable.DataClient
-import com.google.android.gms.wearable.PutDataMapRequest
-import com.weartools.phonebattcomp.CALENDAR_REQUEST_PATH
+import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R.drawable
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.DataStoreRepository
-import com.weartools.phonebattcomp.lastCalendarRequestTime
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -83,19 +81,6 @@ class EventsTimerComplicationService : SuspendingComplicationDataSourceService()
             }
 
             else -> {null}
-        }
-    }
-
-    fun sendCalendarRequest (currentTime: Long, dataClient: DataClient) {
-        // Send request only every 30 minutes to avoid looping requests
-        if (currentTime - lastCalendarRequestTime > 1800000 ){
-            lastCalendarRequestTime = currentTime
-            val request = PutDataMapRequest.create(CALENDAR_REQUEST_PATH).apply {
-                dataMap.putLong("calendarUpdate", currentTime) }
-                .asPutDataRequest()
-                .setUrgent()
-
-            dataClient.putDataItem(request)
         }
     }
 
@@ -151,7 +136,7 @@ class EventsTimerComplicationService : SuspendingComplicationDataSourceService()
         }
         else {
             // when there is no close event, we want to check phone for new events
-            sendCalendarRequest(currentTime,dataClient)
+            MobileListener.sendCalendarRequest(currentTime,dataClient)
             icon = drawable.ic_no_upcoming_event
         }
 
