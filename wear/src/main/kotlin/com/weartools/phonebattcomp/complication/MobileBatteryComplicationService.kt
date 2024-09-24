@@ -157,7 +157,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     value = phoneBatteryLevel.toFloat(),
                     min = 0f,
                     max = 100f,
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level).build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())
                     .setText(PlainComplicationText.Builder(text = level).build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = phoneIcon).build())
                     .setTapAction(complicationPendingIntent)
@@ -166,7 +166,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = level).build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level).build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = phoneIcon)
                         .setAmbientImage(watchIcon)
                         .build())
@@ -176,7 +176,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
              ComplicationType.LONG_TEXT -> {
                  LongTextComplicationData.Builder(
                      text = PlainComplicationText.Builder(text = level).build(),
-                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+level).build())
+                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())
                      .setMonochromaticImage(MonochromaticImage.Builder(image = phoneIcon).build())
                      .setTitle(PlainComplicationText.Builder(text = repository.nodeName.first()).build())
                      .setSmallImage(smallImage = SmallImage.Builder(image = phoneIcon, type = SmallImageType.ICON)

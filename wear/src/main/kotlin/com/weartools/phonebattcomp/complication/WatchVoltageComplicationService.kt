@@ -71,9 +71,7 @@ class WatchVoltageComplicationService : SuspendingComplicationDataSourceService(
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = "$level$unit").build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.voltage_battery_at)+level+getString(
-                        R.string.voltage_volts
-                    )).build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.voltage_battery_at)+" $level ${getString(R.string.voltage_volts)}").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_voltage)).build())
                     .setTapAction(complicationPendingIntent)
                     .build()

@@ -52,7 +52,7 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
 
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "35°").build(),
+                    text = PlainComplicationText.Builder(text = "35°C").build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_temp)).build())
                     .build()
@@ -78,7 +78,7 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = "$level$unit").build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.temp_battery_at)+level+unit).build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.temp_battery_at)+" $level$unit").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_temp)).build())
                     .setTapAction(complicationPendingIntent)
                     .build()

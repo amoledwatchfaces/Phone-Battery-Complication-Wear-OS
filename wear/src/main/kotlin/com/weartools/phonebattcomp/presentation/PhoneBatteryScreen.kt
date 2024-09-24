@@ -183,7 +183,7 @@ fun PhoneBatteryAppScreen(
                     backgroundColor = Color(0xFF0E1011)
                 ),
                 border = ChipDefaults.outlinedChipBorder(),
-                label = { Text(color = wearColorPalette.secondary, text = "Experimental")},
+                label = { Text(color = wearColorPalette.secondary, text = stringResource(R.string.experimental))},
                 modifier = Modifier.padding(top = 12.dp),
                 icon = {
                     Icon(imageVector = Icons.Filled.Science, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)

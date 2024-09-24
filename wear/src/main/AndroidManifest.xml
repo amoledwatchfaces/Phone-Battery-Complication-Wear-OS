@@ -58,7 +58,7 @@
         <service
             android:name=".complication.NotificationsIconsComplicationService"
             android:icon="@drawable/ic_notif"
-            android:label="Phone Notifications"
+            android:label="@string/phone_notifications_complication"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
             android:exported="true">
             <intent-filter>

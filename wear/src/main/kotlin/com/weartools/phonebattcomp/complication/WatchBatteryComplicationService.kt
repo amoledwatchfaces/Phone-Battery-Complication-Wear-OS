@@ -140,7 +140,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                     value = watchBatteryLevel.toFloat(),
                     min = 0f,
                     max = 100f,
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+" $watchBatteryLevel%").build())
                     .setText(PlainComplicationText.Builder(text = level).build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = watchIcon).build())
                     .setTapAction(openScreen())
@@ -149,7 +149,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder (
                     text = PlainComplicationText.Builder(text = level).build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+" $watchBatteryLevel%").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = watchIcon).build())
                     .setTapAction(openScreen())
                     .build()
@@ -157,9 +157,9 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = level).build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+" $watchBatteryLevel%").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = watchIcon).build())
-                    .setTitle(PlainComplicationText.Builder(text = "Watch Battery").build())
+                    .setTitle(PlainComplicationText.Builder(text = getString(R.string.watch_battery_text)).build())
                     .build()
             }
             ComplicationType.MONOCHROMATIC_IMAGE -> {
@@ -179,7 +179,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                             else -> R.drawable.ic_battery_10
                         })
                     ).build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+" $watchBatteryLevel%").build())
                     .setTapAction(openScreen())
                     .build()
             }
@@ -201,7 +201,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
                         }),
                         type = SmallImageType.ICON
                     ).build(),
-                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+"$watchBatteryLevel%").build())
+                    contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+" $watchBatteryLevel%").build())
                     .setTapAction(openScreen())
                     .build()
             }
