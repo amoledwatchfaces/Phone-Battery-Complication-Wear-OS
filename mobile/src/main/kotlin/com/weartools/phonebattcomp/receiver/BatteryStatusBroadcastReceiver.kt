@@ -1,16 +1,16 @@
-package com.weartools.phonebattcomp
+package com.weartools.phonebattcomp.receiver
 
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.content.Intent.ACTION_BATTERY_CHANGED
-import android.content.Intent.ACTION_POWER_CONNECTED
-import android.content.Intent.ACTION_POWER_DISCONNECTED
 import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
+import com.weartools.phonebattcomp.BATTERY_KEY
+import com.weartools.phonebattcomp.BATTERY_PATH
+import com.weartools.phonebattcomp.IS_CHARGING_KEY
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
@@ -37,15 +37,15 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
         try {
             when (intent.action)
             {
-                ACTION_BATTERY_CHANGED -> {
+                Intent.ACTION_BATTERY_CHANGED -> {
                     batteryLevel = intent.getBatteryLevelPercent()
                     isCharging = intent.getBatteryChargingStatus()
                 }
-                ACTION_POWER_CONNECTED -> {
+                Intent.ACTION_POWER_CONNECTED -> {
                     batteryLevel = getCurrentBatteryLevel(context)
                     isCharging = true
                 }
-                ACTION_POWER_DISCONNECTED -> {
+                Intent.ACTION_POWER_DISCONNECTED -> {
                     batteryLevel = getCurrentBatteryLevel(context)
                     isCharging = false
                 }
@@ -105,9 +105,9 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                 unsubscribeFromUpdates(context)
 
                 val intentFilter = IntentFilter().apply {
-                    addAction(ACTION_BATTERY_CHANGED)
-                    addAction(ACTION_POWER_CONNECTED)
-                    addAction(ACTION_POWER_DISCONNECTED)
+                    addAction(Intent.ACTION_BATTERY_CHANGED)
+                    addAction(Intent.ACTION_POWER_CONNECTED)
+                    addAction(Intent.ACTION_POWER_DISCONNECTED)
                 }
                 context.applicationContext.registerReceiver(receiver, intentFilter)
             }
@@ -133,7 +133,6 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
         }
     }
 }
-
 private fun Intent.getBatteryLevelPercent(): Int {
     val level: Int = getIntExtra(BatteryManager.EXTRA_LEVEL, -1)
     val scale: Int = getIntExtra(BatteryManager.EXTRA_SCALE, -1)

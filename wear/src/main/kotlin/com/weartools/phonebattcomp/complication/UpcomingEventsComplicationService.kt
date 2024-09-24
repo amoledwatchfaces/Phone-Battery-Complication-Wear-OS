@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
+import android.text.format.DateFormat
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -37,28 +38,33 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.android.gms.wearable.DataClient
-import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.PutDataMapRequest
+import com.weartools.phonebattcomp.CALENDAR_REQUEST_PATH
 import com.weartools.phonebattcomp.R.drawable
+import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.lastCalendarRequestTime
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
-import kotlinx.serialization.Serializable
+import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
 import javax.inject.Inject
 
-private const val CALENDAR_REQUEST_PATH = "/calendar-request"
-private var lastCalendarRequestTime = 0L
-
 @AndroidEntryPoint
-class CalendarEventTimerComplication : SuspendingComplicationDataSourceService() {
+class UpcomingEventsComplicationService : SuspendingComplicationDataSourceService() {
 
     @Inject lateinit var repository: DataStoreRepository
     @Inject lateinit var dataClient: DataClient
 
     var icon = drawable.ic_event_upcoming_2
+    var eventIsAllDay = false
+    var eventIsOngoing = false
+    var eventIsToday = true
 
     private fun openScreen(): PendingIntent? {
 
@@ -77,10 +83,10 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
 
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "Meeting").build(),
+                    text = PlainComplicationText.Builder(text = "Coffee Chat").build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
-                    .setTitle(PlainComplicationText.Builder(text = "30m").build())
+                    .setTitle(PlainComplicationText.Builder(text = "09:00").build())
                     .build()
             }
 
@@ -100,10 +106,28 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             dataClient.putDataItem(request)
         }
     }
+    fun convertUtcToLocalTime(utcTime: Long, is24h: Boolean): String {
+        // Define the time format based on is24h
+        val fmt = if (is24h) "HH:mm" else "h:mm a" // Add "a" for AM/PM in 12-hour format
+
+        // Create a SimpleDateFormat with the chosen format
+        val dateFormat = SimpleDateFormat(fmt, Locale.getDefault())
+
+        // Set the time zone to the device's default time zone
+        dateFormat.timeZone = TimeZone.getDefault()
+
+        // Format the UTC time to the local time
+        return dateFormat.format(Date(utcTime))
+    }
+    fun checkIfEventIsToday(currentTime: Long, startTime: Long) {
+        val todayStartMillis = currentTime - (currentTime % 86400000) // 86400000 milliseconds in a day
+        eventIsToday = startTime >= todayStartMillis && startTime < todayStartMillis + 86400000
+    }
 
     fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
 
-        val closestEventTime = events.flatMap { event ->
+        val closestEventTime = events
+            .flatMap { event ->
             // Use 0L if startTime or endTime is in the past, otherwise use the actual time
             listOf(
                 event.title to event.startTime,
@@ -115,8 +139,24 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             (time - currentTime) // Find the closest time to currentTime
         }
 
-        if (events.any { event -> event.endTime == closestEventTime?.second }){
-            icon = drawable.ic_pending_1
+        // check if event is running and if it is all day event
+        val ongoingEvent = events.firstOrNull { event -> event.endTime == closestEventTime?.second }
+        if (ongoingEvent != null) {
+            // set event as ongoing
+            eventIsOngoing = true
+            if (ongoingEvent.allDay == 1) {
+                eventIsAllDay = true // mark ongoing event as allDay
+                icon = drawable.ic_calendar_today // set allDay Icon
+            } else {
+                icon = drawable.ic_today // or update icon for non-allDay ongoing event
+            }
+        }
+
+        // if closestEventTime is not null and ongoingEvent is null, that means that
+        // closestEventTime must be the start time of an event, therefore, we can check if the
+        // start of the event is Today
+        if (closestEventTime != null && ongoingEvent == null) {
+            checkIfEventIsToday(currentTime, closestEventTime.second)
         }
 
         return closestEventTime
@@ -125,12 +165,8 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
 
         val currentTime = System.currentTimeMillis()
+        val is24h = DateFormat.is24HourFormat(this)
         val events = repository.getEvents().first()
-
-        /** When currently some event is running, show countdown to event endTime
-         *  else, show countdown to next event startTime
-         *  else show 'no upcoming events'
-         */
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
         val closestEventName = closestEvent?.first ?: "No upcoming events"
@@ -142,9 +178,9 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
             val delay = closestEventTime - currentTime
            // Log.i("CalendarEventTimerComplication", "Scheduling complication update with delay: ${delay/60000}")
             WorkManager.getInstance(this).enqueueUniqueWork(
-                "calendar_update_work",
+                "upcoming_event_work",
                 ExistingWorkPolicy.REPLACE,
-                OneTimeWorkRequestBuilder<CalendarEventComplicationUpdateWorker>()
+                OneTimeWorkRequestBuilder<UpcomingEventsComplicationUpdateWorker>()
                     .setInitialDelay(Duration.ofMillis(delay))
                     .build()
             )
@@ -163,8 +199,11 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
                     .setTitle(
-                        if (closestEvent == null) { null }
-                        else { TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime))).build() })
+                        if (closestEvent == null || eventIsAllDay) { null } // Do not show title if no event or allDay event
+                        else if (eventIsOngoing) { PlainComplicationText.Builder(text = "Now").build()} // Show "Now" if event is ongoing
+                        else if (eventIsToday) { PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime,is24h)).build()} // Show  event local time if event is today
+                        else { TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime))).build() } // Show countdown to event in future
+                    )
                     .setTapAction(openScreen())
                     .build()
             }
@@ -173,34 +212,11 @@ class CalendarEventTimerComplication : SuspendingComplicationDataSourceService()
         }
     }
 }
-class CalendarEventComplicationUpdateWorker(private val appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
+class UpcomingEventsComplicationUpdateWorker(private val appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
     override suspend fun doWork(): Result {
         //Log.i("CalendarEventComplicationUpdateWorker", "Updating Calendar Event Complication")
-        appContext.updateComplication(CalendarEventTimerComplication::class.java)
+        appContext.updateComplication(UpcomingEventsComplicationService::class.java)
         return Result.success()
     }
 }
 
-@Serializable
-data class CalendarEvent(
-    val title: String,
-    val startTime: Long,
-    val endTime: Long
-){
-    fun toDataMap(): DataMap {
-        val dataMap = DataMap()
-        dataMap.putString("title", title)
-        dataMap.putLong("startTime", startTime)
-        dataMap.putLong("endTime", endTime)
-        return dataMap
-    }
-    companion object {
-        fun fromDataMap(dataMap: DataMap): CalendarEvent {
-            return CalendarEvent(
-                title = dataMap.getString("title") ?: "",
-                startTime = dataMap.getLong("startTime"),
-                endTime = dataMap.getLong("endTime")
-            )
-        }
-    }
-}

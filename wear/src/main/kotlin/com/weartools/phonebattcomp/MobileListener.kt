@@ -29,8 +29,6 @@ import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
-import com.weartools.phonebattcomp.complication.CalendarEvent
-import com.weartools.phonebattcomp.complication.CalendarEventTimerComplication
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.afterMobileResult
@@ -39,8 +37,10 @@ import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLe
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
 import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsConnected
 import com.weartools.phonebattcomp.complication.notificationsByteArrayList
+import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
+import com.weartools.phonebattcomp.utils.updateCalendarComplications
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -61,7 +61,8 @@ private const val URI = "/foobar"
 
 private const val CALENDAR_EVENTS_PATH = "/calendar-events"
 private const val CALENDAR_EVENTS_KEY = "events"
-
+const val CALENDAR_REQUEST_PATH = "/calendar-request"
+var lastCalendarRequestTime = 0L
 
 @AndroidEntryPoint
 class MobileListener : WearableListenerService() {
@@ -113,7 +114,7 @@ class MobileListener : WearableListenerService() {
                             val events = eventDataMaps.map { CalendarEvent.fromDataMap(it) }
                             // TODO: we're taking only first 200 items to reduce overhead (take(200))
                             ioScope.launch { dataRepository.saveEvents(events.take(200)) }
-                            updateComplication(CalendarEventTimerComplication::class.java)
+                            updateCalendarComplications()
                         }
                     }
                 }

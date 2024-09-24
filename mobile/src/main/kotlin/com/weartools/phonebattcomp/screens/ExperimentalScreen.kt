@@ -42,7 +42,7 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.wearable.Node
-import com.weartools.phonebattcomp.BatteryStatusBroadcastReceiver
+import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.utils.askForNotificationAccess

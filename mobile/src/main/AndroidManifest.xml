@@ -74,7 +74,7 @@
         </service>
 
         <!-- Receivers -->
-        <receiver android:name=".BatteryStatusBroadcastReceiver"
+        <receiver android:name=".receiver.BatteryStatusBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BATTERY_CHANGED" />
@@ -82,7 +82,7 @@
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
             </intent-filter>
         </receiver>
-        <receiver android:name=".BootCompleteBroadcastReceiver"
+        <receiver android:name=".receiver.BootCompleteBroadcastReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>
@@ -90,7 +90,7 @@
                 <action android:name="android.intent.action.QUICKBOOT_POWERON" />
             </intent-filter>
         </receiver>
-        <receiver android:name=".AppUpdateBroadcastReceiver"
+        <receiver android:name=".receiver.AppUpdateBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />

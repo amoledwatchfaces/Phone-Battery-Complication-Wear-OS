@@ -123,9 +123,22 @@
                 android:value="SHORT_TEXT"/>
         </service>
         <service
-            android:name=".complication.CalendarEventTimerComplication"
+            android:name=".complication.EventsTimerComplicationService"
+            android:icon="@drawable/ic_calendar_clock"
+            android:label="@string/events_timer_complication"
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST"/>
+            </intent-filter>
+            <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="2100"/>
+            <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
+                android:value="LONG_TEXT"/>
+        </service>
+        <service
+            android:name=".complication.UpcomingEventsComplicationService"
             android:icon="@drawable/ic_event_upcoming_2"
-            android:label="@string/calendar_event_timer_complication"
+            android:label="@string/upcoming_events_complications"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
             android:exported="true">
             <intent-filter>

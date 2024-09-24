@@ -1,4 +1,4 @@
-package com.weartools.phonebattcomp
+package com.weartools.phonebattcomp.receiver
 
 import android.Manifest
 import android.content.ContentUris
@@ -71,8 +71,8 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
             val cursor = context.contentResolver.query(
                 builder.build(),
                 arrayOf(CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.ALL_DAY),
-                "${CalendarContract.Instances.END} >= ? AND ${CalendarContract.Events.ALL_DAY} = ?",
-                arrayOf(currentTime.toString(), "0"),
+                null,
+                null,
                 "${CalendarContract.Instances.BEGIN} ASC"
             )
 
@@ -81,9 +81,10 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
                     val eventTitle = it.getString(it.getColumnIndexOrThrow(CalendarContract.Instances.TITLE))
                     val eventStartTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.BEGIN))
                     val eventEndTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.END))
+                    val isAllDay = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.ALL_DAY))
 
                     // Add the event to the list
-                    events.add(CalendarEvent(eventTitle, eventStartTime, eventEndTime))
+                    events.add(CalendarEvent(eventTitle, eventStartTime, eventEndTime, isAllDay))
                 }
             }
 
@@ -115,13 +116,15 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
 data class CalendarEvent(
     val title: String,
     val startTime: Long,
-    val endTime: Long
+    val endTime: Long,
+    val allDay: Int
 ){
     fun toDataMap(): DataMap {
         val dataMap = DataMap()
         dataMap.putString("title", title)
         dataMap.putLong("startTime", startTime)
         dataMap.putLong("endTime", endTime)
+        dataMap.putInt("allDay", allDay)
         return dataMap
     }
 }

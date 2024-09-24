@@ -16,12 +16,6 @@
     <string name="faq">FAQ</string>
     <string name="version">Version</string>
 
-    <string name="active_sync">Active Sync</string>
-    <string name="active_sync_on">Enabled</string>
-    <string name="active_sync_off">Disabled</string>
-    <string name="active_sync_experimental">More frequent complication updates ++ charging
-        status</string>
-
     <!-- Percentage -->
     <string name="percentage_section" translatable="false">Phone / Watch Battery Complication</string>
     <string name="percentage_toggle" translatable="false">Percentage (%)</string>
@@ -52,8 +46,9 @@
     <string name="voltage_battery_text">Watch Battery Voltage</string>
     <string name="voltage_volts">Volts</string>
 
-    <!-- Watch Battery Voltage Complication strings -->
-    <string name="calendar_event_timer_complication" translatable="false">Event Timer Complication</string>
+    <!-- Calendar Complications -->
+    <string name="events_timer_complication" translatable="false">Events timer</string>
+    <string name="upcoming_events_complications" translatable="false">Upcoming events</string>
 
     <!-- Temperature Units Preferences -->
     <string name="setting_preference_category_title">Watch Battery Temperature Complication</string>

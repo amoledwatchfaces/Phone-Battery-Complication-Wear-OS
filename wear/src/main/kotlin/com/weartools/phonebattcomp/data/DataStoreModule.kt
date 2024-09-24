@@ -74,7 +74,7 @@ abstract class DataStoreModule {
                             var version = currentData[intPreferencesKey("preferencesVersion")]
                             version = version ?: 0
 
-                            return version < 7
+                            return version < 8
                         }
                     }
                 )

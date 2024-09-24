@@ -13,7 +13,7 @@
  *   See the License for the specific language governing permissions and
  *   limitations under the License.
  */
-package com.weartools.phonebattcomp
+package com.weartools.phonebattcomp.receiver
 
 import android.Manifest
 import android.content.BroadcastReceiver
@@ -23,8 +23,10 @@ import android.os.Handler
 import android.provider.CalendarContract
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
-import com.weartools.phonebattcomp.CalendarContentObserver.Companion.arePermissionsGranted
+import com.weartools.phonebattcomp.ACTIVE_SYNC_KEY
+import com.weartools.phonebattcomp.ACTIVE_SYNC_PATH
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

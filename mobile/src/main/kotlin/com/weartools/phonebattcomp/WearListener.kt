@@ -28,8 +28,10 @@ import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
-import com.weartools.phonebattcomp.CalendarContentObserver.Companion.arePermissionsGranted
+import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
+import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

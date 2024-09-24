@@ -11,7 +11,9 @@ import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUp
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.complication.EventsTimerComplicationService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
+import com.weartools.phonebattcomp.complication.UpcomingEventsComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 
 fun Context.openPlayStore() {
@@ -30,6 +32,11 @@ fun Context.updateComplication(service: Class<out SuspendingComplicationDataSour
 fun Context.updateBatteriesComplications() {
     this.updateComplication(MobileBatteryComplicationService::class.java)
     this.updateComplication(WatchBatteryComplicationService::class.java)
+}
+
+fun Context.updateCalendarComplications() {
+    this.updateComplication(EventsTimerComplicationService::class.java)
+    this.updateComplication(UpcomingEventsComplicationService::class.java)
 }
 
 fun Context.openAppStoreOnPhone() {

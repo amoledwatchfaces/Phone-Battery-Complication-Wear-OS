@@ -3,6 +3,7 @@ package com.weartools.phonebattcomp
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -21,6 +22,8 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
+import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -284,9 +287,4 @@ class MainViewModel @Inject constructor(
         }
 
     }
-
-    companion object {
-        private const val TAG = "MainViewModel"
-    }
-
 }
