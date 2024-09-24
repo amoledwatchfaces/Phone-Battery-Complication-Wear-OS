@@ -227,6 +227,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                                 .build()
                             /** Show Localized 'in x minutes' when event start time is under 2 hours but today **/
                             eventIsToday && (eventUpdateDelay <= 7200000) -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
+                                .setDisplayAsNow(false)
                                 .setText("${getString(R.string.event_in)} ^1")
                                 .build()
                             /** Show normal event start time (HH:mm) when start time is above 2 hours but today  **/
