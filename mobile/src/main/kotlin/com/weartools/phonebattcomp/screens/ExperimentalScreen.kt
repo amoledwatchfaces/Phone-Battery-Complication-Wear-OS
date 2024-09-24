@@ -42,9 +42,9 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.wearable.Node
-import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.utils.askForNotificationAccess
 import com.weartools.phonebattcomp.utils.openAmoledWebPage
 
@@ -247,7 +247,7 @@ fun ExperimentalScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 fontWeight = FontWeight.Medium,
                                 color = Color.Gray,
-                                text = "Used in Event Timer Complication")
+                                text = "Upcoming Event & Event Timer Complication")
                         }
 
                         Switch(
