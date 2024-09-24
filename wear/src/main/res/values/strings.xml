@@ -47,8 +47,8 @@
     <string name="voltage_volts">Volts</string>
 
     <!-- Calendar Complications -->
-    <string name="events_timer_complication" translatable="false">Events timer</string>
-    <string name="upcoming_events_complications" translatable="false">Upcoming events</string>
+    <string name="events_timer_complication" translatable="false">Event timer</string>
+    <string name="upcoming_events_complications" translatable="false">Upcoming event</string>
 
     <!-- Temperature Units Preferences -->
     <string name="setting_preference_category_title">Watch Battery Temperature Complication</string>

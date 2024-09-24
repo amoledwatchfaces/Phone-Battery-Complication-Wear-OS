@@ -123,7 +123,7 @@
                 android:value="SHORT_TEXT"/>
         </service>
         <service
-            android:name=".complication.EventsTimerComplicationService"
+            android:name=".complication.EventTimerComplicationService"
             android:icon="@drawable/ic_calendar_clock"
             android:label="@string/events_timer_complication"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -136,7 +136,7 @@
                 android:value="LONG_TEXT"/>
         </service>
         <service
-            android:name=".complication.UpcomingEventsComplicationService"
+            android:name=".complication.UpcomingEventComplicationService"
             android:icon="@drawable/ic_event_upcoming_2"
             android:label="@string/upcoming_events_complications"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
