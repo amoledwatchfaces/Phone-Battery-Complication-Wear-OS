@@ -36,4 +36,14 @@
     <!-- Temperature Units Preferences -->
     <string name="setting_preference_category_title">Voliteľný prvok - Teplota batérie hodiniek</string>
     <string name="temp_unit_pref_title">Jednotky teploty</string>
+
+    <!-- Calendar Complications -->
+    <string name="events_timer_complication">Časovač udalostí</string>
+    <string name="upcoming_events_complications">Nadchádzajúce udalosti</string>
+    <string name="event_today">Dnes</string>
+    <string name="event_no_upcoming_events">Žiadne udalosti</string>
+    <string name="event_no_events_today">Žiadne udalosti</string>
+    <string name="event_in">o</string>
+    <string name="preview_meeting">Meeting</string>
+    <string name="preview_coffee_chat">Pracovná porada</string>
 </resources>

@@ -21,6 +21,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
 import android.text.format.DateFormat
+import android.text.format.DateUtils
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -39,6 +40,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
+import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.R.drawable
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.DataStoreRepository
@@ -48,6 +50,7 @@ import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -63,6 +66,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
     var eventIsAllDay = false
     var eventIsOngoing = false
     var eventIsToday = true
+    var eventUpdateDelay = 0L
 
     private fun openScreen(): PendingIntent? {
 
@@ -81,7 +85,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
 
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "Coffee Chat").build(),
+                    text = PlainComplicationText.Builder(text = getString(R.string.preview_coffee_chat)).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
                     .setTitle(PlainComplicationText.Builder(text = "09:00").build())
@@ -98,9 +102,40 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             timeZone = TimeZone.getDefault()
         }.format(Date(utcTime))
     }
-    fun isToday(time: Long): Boolean {
-        val todayStartMillis = System.currentTimeMillis() - (System.currentTimeMillis() % 86400000) // 86400000 milliseconds in a day
-        return time in todayStartMillis until (todayStartMillis + 86400000)
+    fun getTodayIcon(): Int {
+        return when (LocalDate.now().dayOfMonth){
+            1 -> drawable.ic_cal_01
+            2 -> drawable.ic_cal_02
+            3 -> drawable.ic_cal_03
+            4 -> drawable.ic_cal_04
+            5 -> drawable.ic_cal_05
+            6 -> drawable.ic_cal_06
+            7 -> drawable.ic_cal_07
+            8 -> drawable.ic_cal_08
+            9 -> drawable.ic_cal_09
+            10 -> drawable.ic_cal_10
+            11 -> drawable.ic_cal_11
+            12 -> drawable.ic_cal_12
+            13 -> drawable.ic_cal_13
+            14 -> drawable.ic_cal_14
+            15 -> drawable.ic_cal_15
+            16 -> drawable.ic_cal_16
+            17 -> drawable.ic_cal_17
+            18 -> drawable.ic_cal_18
+            19 -> drawable.ic_cal_19
+            20 -> drawable.ic_cal_20
+            21 -> drawable.ic_cal_21
+            22 -> drawable.ic_cal_22
+            23 -> drawable.ic_cal_23
+            24 -> drawable.ic_cal_24
+            25 -> drawable.ic_cal_25
+            26 -> drawable.ic_cal_26
+            27 -> drawable.ic_cal_27
+            28 -> drawable.ic_cal_28
+            29 -> drawable.ic_cal_29
+            30 -> drawable.ic_cal_30
+            else -> drawable.ic_cal_31
+        }
     }
     fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
         var closestEvent: CalendarEvent? = null
@@ -124,10 +159,17 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
         closestEvent?.let { event ->
             eventIsOngoing = currentTime in event.startTime..event.endTime
             eventIsAllDay = event.allDay == 1
-            eventIsToday = isToday(event.startTime)
+            eventIsToday = DateUtils.isToday(event.startTime)
+
+            //Log.i("CalendarEventTimerComplication", "Event title: ${event.title}")
+            //Log.i("CalendarEventTimerComplication", "Event isOngoing: $eventIsOngoing")
+            //Log.i("CalendarEventTimerComplication", "Event isAllDay: $eventIsAllDay")
+            //Log.i("CalendarEventTimerComplication", "Event startTime: ${event.startTime}")
+            //Log.i("CalendarEventTimerComplication", "Event endTime: ${event.endTime}")
+            //Log.i("CalendarEventTimerComplication", "Event isToday: $eventIsToday")
 
             icon = when {
-                eventIsAllDay -> drawable.ic_calendar_today
+                eventIsAllDay -> getTodayIcon()
                 eventIsOngoing -> drawable.ic_today
                 else -> drawable.ic_event_upcoming_2
             }
@@ -143,18 +185,18 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
         val events = repository.getEvents().first()
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
-        val (closestEventName, closestEventTime) = closestEvent?.let { it.first to it.second } ?: ("No upcoming events" to 0L)
+        val (closestEventName, closestEventTime) = closestEvent?.let { it.first to it.second } ?: (getString(R.string.event_no_upcoming_events) to 0L)
         //Log.i("CalendarEventTimerComplication", "Nearest or current event: $closestEventName")
 
         /** Schedule event update when finished / started, only when delay is in future to avoid loop **/
         closestEvent?.let {
-            val delay = closestEventTime - currentTime
-            if (delay > 0) {
+            eventUpdateDelay = closestEventTime - currentTime
+            if (eventUpdateDelay > 0L) {
                 WorkManager.getInstance(this).enqueueUniqueWork(
                     "upcoming_event_work",
                     ExistingWorkPolicy.REPLACE,
                     OneTimeWorkRequestBuilder<UpcomingEventComplicationUpdateWorker>()
-                        .setInitialDelay(Duration.ofMillis(delay))
+                        .setInitialDelay(Duration.ofMillis(eventUpdateDelay))
                         .build()
                 )
             }
@@ -169,17 +211,30 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(
-                        text = if (eventIsAllDay && eventIsToday.not()) "No events today"
+                        text = if (eventIsAllDay && eventIsToday.not()) getString(R.string.event_no_events_today)
                         else closestEventName
                     ).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
                     .setTitle(
                         when {
-                            closestEvent == null || eventIsAllDay -> null
-                            eventIsOngoing -> PlainComplicationText.Builder(text = "Now").build()
+                            /** Do not show Title when event is all day and today **/
+                            closestEvent == null -> null
+                            /** Show 'Today' if event is all day and ongoing **/
+                            eventIsAllDay && eventIsOngoing -> PlainComplicationText.Builder(text = getString(R.string.event_today)).build()
+                            /** Show Localized 'Now' when event is ongoing **/
+                            eventIsOngoing -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_SINGLE_UNIT, CountDownTimeReference(Instant.now()))
+                                .build()
+                            /** Show Localized 'in x minutes' when event start time is under 2 hours but today **/
+                            eventIsToday && (eventUpdateDelay <= 7200000) -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
+                                .setText("${getString(R.string.event_in)} ^1")
+                                .build()
+                            /** Show normal event start time (HH:mm) when start time is above 2 hours but today  **/
                             eventIsToday -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
-                            else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime))).build()
+                            /** Show Localized 'in x days' when event start time is not today  **/
+                            else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
+                                .setText("${getString(R.string.event_in)} ^1")
+                                .build()
                         }
                     )
                     .setTapAction(openScreen())

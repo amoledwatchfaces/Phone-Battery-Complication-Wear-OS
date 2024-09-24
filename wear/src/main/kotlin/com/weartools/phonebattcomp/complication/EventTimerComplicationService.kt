@@ -38,6 +38,7 @@ import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
+import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.R.drawable
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.DataStoreRepository
@@ -73,7 +74,7 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
 
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "Meeting").build(),
+                    text = PlainComplicationText.Builder(text = getString(R.string.preview_meeting)).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
                     .setTitle(PlainComplicationText.Builder(text = "1h 30m").build())
@@ -118,7 +119,7 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
          */
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
-        val closestEventName = closestEvent?.first ?: "No upcoming events"
+        val closestEventName = closestEvent?.first ?: getString(R.string.event_no_upcoming_events)
         val closestEventTime = closestEvent?.second ?: 0L
         //Log.i("CalendarEventTimerComplication", "Nearest or current event: $closestEventName")
 

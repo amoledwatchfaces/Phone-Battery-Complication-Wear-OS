@@ -47,8 +47,14 @@
     <string name="voltage_volts">Volts</string>
 
     <!-- Calendar Complications -->
-    <string name="events_timer_complication" translatable="false">Event timer</string>
-    <string name="upcoming_events_complications" translatable="false">Upcoming event</string>
+    <string name="events_timer_complication">Event timer</string>
+    <string name="upcoming_events_complications">Upcoming event</string>
+    <string name="event_today">Today</string>
+    <string name="event_no_upcoming_events">No upcoming events</string>
+    <string name="event_no_events_today">No events today</string>
+    <string name="event_in">in</string>
+    <string name="preview_meeting">Meeting</string>
+    <string name="preview_coffee_chat">Coffee Chat</string>
 
     <!-- Temperature Units Preferences -->
     <string name="setting_preference_category_title">Watch Battery Temperature Complication</string>

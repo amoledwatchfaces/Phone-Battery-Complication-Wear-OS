@@ -7,7 +7,6 @@ import android.content.pm.PackageManager
 import android.database.ContentObserver
 import android.os.Handler
 import android.provider.CalendarContract
-import android.util.Log
 import androidx.core.content.ContextCompat
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
@@ -19,6 +18,7 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
 class CalendarContentObserver(handler: Handler, private val context: Context) : ContentObserver(handler) {
@@ -39,7 +39,7 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
         debounceJob = scope.launch {
             delay(debounceDelay) // Wait for the debounce delay
 
-            Log.d("CalendarContentObserver", "onChange!")
+            //Log.d("CalendarContentObserver", "onChange!")
 
             if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
                 // Call the suspend function after the delay
@@ -56,7 +56,9 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
     companion object {
         fun queryAllFutureCalendarEventAndSend(context: Context) {
 
-            Log.d("CalendarContentObserver", "Getting Calendar Events!")
+            //Log.d("CalendarContentObserver", "Getting Calendar Events!")
+            val offsetMillis = TimeZone.getDefault().getOffset(System.currentTimeMillis())
+            //Log.d("CalendarContentObserver", "UTC offset: ${offsetMillis/(1000 * 60 * 60)}")
 
             val dataClient = Wearable.getDataClient(context)
             val events = mutableListOf<CalendarEvent>()
@@ -83,8 +85,14 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
                     val eventEndTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.END))
                     val isAllDay = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.ALL_DAY))
 
-                    // Add the event to the list
-                    events.add(CalendarEvent(eventTitle, eventStartTime, eventEndTime, isAllDay))
+                    if (isAllDay == 1){
+                        // Calendar sets all-day events to start at 00:00 AM UTC+0 which is not corrected by offset
+                        // We need to subtract offset so UTC+0 really defines local day midnight
+                        events.add(CalendarEvent(eventTitle, eventStartTime-offsetMillis, eventEndTime-offsetMillis, isAllDay))
+                    }
+                    else {
+                        events.add(CalendarEvent(eventTitle, eventStartTime, eventEndTime, isAllDay))
+                    }
                 }
             }
 
