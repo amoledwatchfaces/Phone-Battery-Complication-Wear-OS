@@ -220,6 +220,8 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                         when {
                             /** Do not show Title when event is all day and today **/
                             closestEvent == null -> null
+                            /** Do not show Title when closest event is all day but not today **/
+                            eventIsAllDay && eventIsToday.not() -> null
                             /** Show 'Today' if event is all day and ongoing **/
                             eventIsAllDay && eventIsOngoing -> PlainComplicationText.Builder(text = getString(R.string.event_today)).build()
                             /** Show Localized 'Now' when event is ongoing **/
@@ -233,7 +235,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                             /** Show normal event start time (HH:mm) when start time is above 2 hours but today  **/
                             eventIsToday -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
                             /** Show Localized 'in x days' when event start time is not today  **/
-                            else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
+                            else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
                                 .setText("${getString(R.string.event_in)} ^1")
                                 .build()
                         }
