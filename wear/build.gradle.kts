@@ -33,12 +33,13 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 34
-        versionCode = 10000463
-        versionName = "4.6.3"
+        versionCode = 10000465
+        versionName = "4.6.5"
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
-        buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
+        buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=$applicationId\"")
         versionNameSuffix = "-wear"
+        versionCode = 20000 + (versionCode ?: 0)
     }
 
     buildTypes {
@@ -49,6 +50,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
         }
     }
+
 
     buildFeatures {
         compose = true

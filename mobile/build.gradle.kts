@@ -31,12 +31,13 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 26
         targetSdk = 35
-        versionCode = 10000464
-        versionName = "4.6.4"
+        versionCode = 10000465
+        versionName = "4.6.5"
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
-        buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
+        buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=$applicationId\"")
         versionNameSuffix = "-mobile"
+        versionCode = 10000 + (versionCode ?: 0)
     }
 
     testBuildType = "debug"
