@@ -24,8 +24,8 @@ import androidx.wear.tiles.TileService
 import com.google.android.gms.wearable.DataClient
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
+import com.weartools.phonebattcomp.MainApplication
 import com.weartools.phonebattcomp.MobileListener
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLevel
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -37,7 +37,10 @@ class PhoneBatteryTileService : TileService() {
 
     @Inject lateinit var repository: DataStoreRepository
     @Inject lateinit var dataClient: DataClient
+
     override fun onTileRequest(requestParams: TileRequest): ListenableFuture<TileBuilders.Tile> {
+
+        val batteryState = application as MainApplication
 
         val handler = Handler(mainLooper)
         handler.postDelayed({ getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java) }, 1000)
@@ -52,7 +55,7 @@ class PhoneBatteryTileService : TileService() {
                             TimelineBuilders.TimelineEntry.Builder()
                                 .setLayout(getPhoneBatteryTileLayout(
                                     requestParams.deviceConfiguration,
-                                    phoneBatteryLevel,
+                                    batteryState.phoneBatteryLevel,
                                     runBlocking { repository.nodeName.first() }
                                 )
                                 ).build()

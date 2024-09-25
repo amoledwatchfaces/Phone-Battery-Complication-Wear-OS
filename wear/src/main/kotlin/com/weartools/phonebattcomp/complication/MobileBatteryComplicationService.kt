@@ -18,10 +18,6 @@ package com.weartools.phonebattcomp.complication
 
 import android.content.ComponentName
 import android.graphics.drawable.Icon
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -35,13 +31,9 @@ import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.google.android.gms.wearable.DataClient
+import com.weartools.phonebattcomp.MainApplication
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.afterMobileResult
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.lastUpdate
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLevel
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsConnected
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
@@ -49,15 +41,6 @@ import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
-
-/** Global variables **/
-object PhoneBatteryState {
-    var phoneBatteryLevel by mutableIntStateOf(0)
-    var phoneIsCharging by mutableStateOf(false)
-    var phoneIsConnected by mutableStateOf(false)
-    var afterMobileResult by mutableStateOf(false)
-    var lastUpdate = mutableStateOf<Long?>(null)
-}
 
 @AndroidEntryPoint
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
@@ -123,29 +106,33 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(this,ComplicationToggleArgs(ComponentName(this, javaClass),request.complicationInstanceId))
 
+        val batteryState = application as MainApplication
+
         val activeSync = repository.activeSync.first()
         val showPercentage = repository.percentage.first()
 
         /** When Active Sync is not enabled **/
         if (activeSync.not()) {
-            if (afterMobileResult.not()) {
-                MobileListener.sendPhoneBatteryRequest(lastUpdate.value?:0L, dataClient, false)
+            if (batteryState.afterMobileResult.not()) {
+                MobileListener.sendPhoneBatteryRequest(batteryState.lastUpdate.value?:0L, dataClient, false)
             }
             else {
-                afterMobileResult = false
+                batteryState.afterMobileResult = false
             }
         }
         /** When Active Sync is enabled but last update time was reset **/
         else {
-            if (lastUpdate.value == null){
+            if (batteryState.lastUpdate.value == null){
                 MobileListener.sendPhoneBatteryRequest(0L, dataClient, true)
             }
         }
+        //Log.i("MobileBatteryComplicationService", "lastUpdate: ${batteryState.lastUpdate.value}")
+        //Log.i("MobileBatteryComplicationService", "batteryLevel: ${batteryState.phoneBatteryLevel}")
 
-        val level = if (phoneBatteryLevel == 0) "\uFEFF-" else "\uFEFF$phoneBatteryLevel${if (showPercentage) "%" else ""}"
+        val level = if (batteryState.phoneBatteryLevel == 0) "\uFEFF-" else "\uFEFF${batteryState.phoneBatteryLevel}${if (showPercentage) "%" else ""}"
         val phoneIcon = when {
-            phoneIsConnected && phoneIsCharging -> phoneChargingIcon
-            phoneIsConnected -> phoneConnectedIcon
+            batteryState.phoneIsConnected && batteryState.phoneIsCharging -> phoneChargingIcon
+            batteryState.phoneIsConnected -> phoneConnectedIcon
             else -> phoneDisconnectedIcon
         }
         val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) watchChargingIcon else watchNormalIcon
@@ -154,7 +141,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
             ComplicationType.RANGED_VALUE -> {
                 RangedValueComplicationData.Builder(
-                    value = phoneBatteryLevel.toFloat(),
+                    value = batteryState.phoneBatteryLevel.toFloat(),
                     min = 0f,
                     max = 100f,
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())

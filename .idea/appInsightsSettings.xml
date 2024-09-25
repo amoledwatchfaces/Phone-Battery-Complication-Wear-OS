@@ -19,30 +19,6 @@
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="SEVEN_DAYS" />
-              <option name="versions">
-                <list>
-                  <VersionSetting>
-                    <option name="buildVersion" value="10000414" />
-                    <option name="displayName" value="10000414" />
-                    <option name="displayVersion" value="10000414" />
-                    <option name="tracks">
-                      <list>
-                        <option value="PRODUCTION" />
-                      </list>
-                    </option>
-                  </VersionSetting>
-                  <VersionSetting>
-                    <option name="buildVersion" value="10000410" />
-                    <option name="displayName" value="10000410" />
-                    <option name="displayVersion" value="10000410" />
-                    <option name="tracks">
-                      <list>
-                        <option value="PRODUCTION" />
-                      </list>
-                    </option>
-                  </VersionSetting>
-                </list>
-              </option>
               <option name="visibilityType" value="ALL" />
             </InsightsFilterSettings>
           </value>
@@ -60,32 +36,6 @@
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
               <option name="timeIntervalDays" value="THIRTY_DAYS" />
-              <option name="versions">
-                <list>
-                  <VersionSetting>
-                    <option name="buildVersion" value="10000463" />
-                    <option name="displayName" value="4.6.3-wear (10000463)" />
-                    <option name="displayVersion" value="4.6.3-wear" />
-                    <option name="tracks">
-                      <list>
-                        <option value="INTERNAL" />
-                        <option value="OPEN_TESTING" />
-                      </list>
-                    </option>
-                  </VersionSetting>
-                  <VersionSetting>
-                    <option name="buildVersion" value="10000460" />
-                    <option name="displayName" value="4.6.0 (10000460)" />
-                    <option name="displayVersion" value="4.6.0" />
-                    <option name="tracks">
-                      <list>
-                        <option value="OPEN_TESTING" />
-                        <option value="INTERNAL" />
-                      </list>
-                    </option>
-                  </VersionSetting>
-                </list>
-              </option>
               <option name="visibilityType" value="ALL" />
             </InsightsFilterSettings>
           </value>

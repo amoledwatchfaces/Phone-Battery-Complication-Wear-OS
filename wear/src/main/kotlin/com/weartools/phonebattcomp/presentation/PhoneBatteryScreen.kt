@@ -55,12 +55,10 @@ import androidx.wear.compose.material.OutlinedCompactChip
 import androidx.wear.compose.material.Text
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
+import com.weartools.phonebattcomp.MainApplication
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.lastUpdate
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsConnected
 import com.weartools.phonebattcomp.theme.wearColorPalette
 import com.weartools.phonebattcomp.utils.openAppStoreOnPhone
 
@@ -69,14 +67,14 @@ fun PhoneBatteryAppScreen(
     listState: ScalingLazyListState = rememberScalingLazyListState(),
     focusRequester: FocusRequester,
     nodeName: String,
-    batteryLevel: Int,
     tempUnit: Boolean,
     percentage: Boolean,
     notificationIconType: Int,
     viewModel: MainViewModel,
-    dataClient: DataClient
+    dataClient: DataClient,
 ) {
     val context = LocalContext.current
+    val application = context.applicationContext as MainApplication
     var openHowTo by remember{ mutableStateOf(false) }
 
     ScalingLazyColumn(
@@ -102,17 +100,17 @@ fun PhoneBatteryAppScreen(
         //item { PreferenceCategory(title = stringResource(id = R.string.app_info)) }
         item {
             DialogChip(
-                text = if (batteryLevel==0) "--" else "$batteryLevel %",
+                text = if (application.phoneBatteryLevel==0) "--" else "${application.phoneBatteryLevel} %",
                 icon = {
                     Icon(
                         painter =
-                        if (phoneIsConnected.not()) painterResource(id = R.drawable.ic_phone_disconnected)
-                        else if (phoneIsCharging) painterResource(id = R.drawable.ic_phone_charging_3) else painterResource(id = R.drawable.ic_phone_icon),
+                        if (application.phoneIsConnected.not()) painterResource(id = R.drawable.ic_phone_disconnected)
+                        else if (application.phoneIsCharging) painterResource(id = R.drawable.ic_phone_charging_3) else painterResource(id = R.drawable.ic_phone_icon),
                         contentDescription = "Play Store Icon",
                         tint = wearColorPalette.secondaryVariant) },
                 title = nodeName,
                 onClick = {
-                    if (lastUpdate.value == null){ context.openAppStoreOnPhone() }
+                    if (application.lastUpdate.value == null){ context.openAppStoreOnPhone() }
                     MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
                 }
             )

@@ -15,7 +15,6 @@ import androidx.wear.compose.material.TimeText
 import androidx.wear.compose.material.scrollAway
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MainViewModel
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLevel
 import com.weartools.phonebattcomp.theme.PhoneBatteryAppTheme
 
 @Composable
@@ -40,7 +39,6 @@ fun PhoneBatteryApp(
                 listState = listState,
                 focusRequester = focusRequester,
                 nodeName = nodeName,
-                batteryLevel = phoneBatteryLevel,
                 tempUnit = tempUnit,
                 percentage = percentage,
                 viewModel = viewModel,

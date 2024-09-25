@@ -30,11 +30,6 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.afterMobileResult
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.lastUpdate
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneBatteryLevel
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsCharging
-import com.weartools.phonebattcomp.complication.PhoneBatteryState.phoneIsConnected
 import com.weartools.phonebattcomp.complication.notificationsByteArrayList
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.DataStoreRepository
@@ -72,6 +67,8 @@ class MobileListener : WearableListenerService() {
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
+        super.onDataChanged(dataEvents)
+        val batteryState = application as MainApplication
 
         /** Freeze dataEvents before processing **/
         val frozenDataEvents = dataEvents.map {
@@ -87,13 +84,15 @@ class MobileListener : WearableListenerService() {
                         BATTERY_PATH -> {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
 
-                            phoneBatteryLevel = dataMapItem.dataMap.getInt(BATTERY_KEY)
-                            phoneIsCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
-                            phoneIsConnected = true
-                            afterMobileResult = true
-                            lastUpdate.value = System.currentTimeMillis()
+                            batteryState.phoneBatteryLevel = dataMapItem.dataMap.getInt(BATTERY_KEY)
+                            batteryState.phoneIsCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
+                            batteryState.phoneIsConnected = true
+                            batteryState.afterMobileResult = true
+                            batteryState.lastUpdate.value = System.currentTimeMillis()
 
-                            //Log.d(TAG, "Received Phone Battery Level: $level")
+
+                            //Log.d("MobileListener", "Received Phone Battery Level: ${batteryState.phoneBatteryLevel}")
+                            //Log.d("MobileListener", "Update time: ${batteryState.lastUpdate.value}")
                             updateComplication(MobileBatteryComplicationService::class.java)
                             TileService.getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java)
                         }
@@ -119,11 +118,11 @@ class MobileListener : WearableListenerService() {
                 }
                 DataEvent.TYPE_DELETED -> {
                 //Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString())
-                    phoneBatteryLevel = 0
-                    phoneIsCharging = false
-                    phoneIsConnected = false
-                    afterMobileResult = false
-                    lastUpdate.value = System.currentTimeMillis()
+                    batteryState.phoneBatteryLevel = 0
+                    batteryState.phoneIsCharging = false
+                    batteryState.phoneIsConnected = false
+                    batteryState.afterMobileResult = false
+                    batteryState.lastUpdate.value = System.currentTimeMillis()
 
                     //Log.d(TAG, "Phone Companion Uninstalled!")
                     updateComplication(MobileBatteryComplicationService::class.java)
@@ -137,6 +136,7 @@ class MobileListener : WearableListenerService() {
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
+        val batteryState = application as MainApplication
         if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP){
             //Log.d("MobileListener", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
             if (capabilityInfo.nodes.size > 0){
@@ -150,8 +150,8 @@ class MobileListener : WearableListenerService() {
             }
             else {
                 //Log.d("MobileListener", "capability ${capabilityInfo.name} disconnected!")
-                phoneIsConnected = false
-                afterMobileResult = true
+                batteryState.phoneIsConnected = false
+                batteryState.afterMobileResult = true
                 updateComplication(MobileBatteryComplicationService::class.java)
             }
         }
