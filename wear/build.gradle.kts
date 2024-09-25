@@ -8,7 +8,8 @@ plugins {
     id ("kotlinx-serialization")
     id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
-    id("org.jetbrains.kotlin.plugin.compose")
+    id ("org.jetbrains.kotlin.plugin.compose")
+    id ("com.google.gms.google-services")
 }
 
 android {
@@ -67,14 +68,14 @@ dependencies {
     val composeUiVersion = "1.7.2"
     val composeWearVersion = "1.4.0"
 
-    // WEAR OS
+    // Wearable
     implementation ("com.google.android.gms:play-services-wearable:18.2.0")
     implementation ("androidx.wear.watchface:watchface:1.2.1")
     implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha04")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
-    // COMPOSE
+    // Compose
     implementation ("androidx.core:core-ktx:1.13.1")
     implementation ("androidx.compose.ui:ui:$composeUiVersion")
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
@@ -93,27 +94,31 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
 
-    // Used for Datastore
+    // Datastore
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
 
     // Serialization
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
-    // SPLASH SCREEN
+    // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
-    // Used for WorkManager
+    // WorkManager
     implementation ("androidx.work:work-runtime-ktx:2.9.1")
 
-    // TILE
+    // Tile
     implementation("androidx.wear.protolayout:protolayout-expression:1.2.0")
     implementation("androidx.wear.protolayout:protolayout:1.2.0")
     implementation("androidx.wear.protolayout:protolayout-material:1.2.0")
     implementation("androidx.wear.tiles:tiles:1.4.0")
     implementation ("com.google.code.gson:gson:2.10.1")
 
-    // HILT
+    // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation ("com.google.dagger:hilt-android:2.51")
     ksp ("com.google.dagger:hilt-compiler:2.51")
+
+    // Firebase
+    implementation (platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation ("com.google.firebase:firebase-analytics")
 }
