@@ -10,6 +10,7 @@ plugins {
     id ("com.google.dagger.hilt.android")
     id ("org.jetbrains.kotlin.plugin.compose")
     id ("com.google.gms.google-services")
+    id ("com.google.firebase.crashlytics")
 }
 
 android {
@@ -120,5 +121,6 @@ dependencies {
 
     // Firebase
     implementation (platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation ("com.google.firebase:firebase-crashlytics")
     implementation ("com.google.firebase:firebase-analytics")
 }
