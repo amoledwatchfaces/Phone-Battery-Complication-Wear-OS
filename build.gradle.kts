@@ -13,6 +13,11 @@ tasks.register("clean", Delete::class) {
 }
 
 buildscript {
+
+    /** Set version for wear & mobile modules **/
+    val versionCode by extra(10000466)
+    val versionName by extra("4.6.6")
+
     dependencies {
         classpath ("com.android.tools.build:gradle:8.6.1")
         classpath ("org.jetbrains.kotlin:kotlin-serialization:2.0.0")

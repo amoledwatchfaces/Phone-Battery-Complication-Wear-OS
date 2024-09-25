@@ -14,6 +14,8 @@ plugins {
 }
 
 android {
+    val appVersionCode: Int by rootProject.extra
+    val appVersionName: String by rootProject.extra
 
     signingConfigs {
         create("release") {
@@ -33,8 +35,8 @@ android {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
         targetSdk = 34
-        versionCode = 10000465
-        versionName = "4.6.5"
+        versionCode = rootProject.extra["versionCode"] as Int
+        versionName = rootProject.extra["versionName"] as String
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=$applicationId\"")
