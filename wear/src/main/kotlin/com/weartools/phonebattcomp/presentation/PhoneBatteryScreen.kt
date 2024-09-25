@@ -39,8 +39,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
@@ -48,6 +48,8 @@ import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.Icon
+import androidx.wear.compose.material.ListHeader
+import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.compose.material.OutlinedCompactChip
 import androidx.wear.compose.material.Text
@@ -84,12 +86,17 @@ fun PhoneBatteryAppScreen(
                 RotaryScrollableDefaults.behavior(scrollableState = listState),
                 focusRequester = focusRequester
             ),
-        autoCentering = AutoCenteringParams(itemIndex = 1),
         state = listState,
     )
     {
-        //SETTINGS TEST
-        item { SettingsText() }
+        item { ListHeader {
+            Text(
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.primary,
+                text = stringResource(id = R.string.app_info),
+                style = MaterialTheme.typography.title3
+            )
+        } }
 
         // APP INFO SECTION
         //item { PreferenceCategory(title = stringResource(id = R.string.app_info)) }

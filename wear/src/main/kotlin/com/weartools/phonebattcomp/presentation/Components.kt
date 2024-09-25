@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -14,7 +13,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -34,7 +32,6 @@ import androidx.wear.compose.material.ToggleChip
 import androidx.wear.compose.material.ToggleChipDefaults
 import androidx.wear.compose.material.dialog.Alert
 import androidx.wear.compose.material.dialog.Dialog
-import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.theme.wearColorPalette
 
 @Composable
@@ -127,19 +124,6 @@ fun ToggleChip(
                 contentDescription = "compose_toggle"
             )
         }
-    )
-}
-
-@Composable
-fun SettingsText(modifier: Modifier = Modifier) {
-    Text(
-        modifier = modifier
-            .padding(top = 2.dp, bottom = 2.dp)
-            .offset(y = (-7).dp),
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colors.primary,
-        text = stringResource(id = R.string.app_info),
-        style = MaterialTheme.typography.title3
     )
 }
 
