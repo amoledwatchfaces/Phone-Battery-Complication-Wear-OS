@@ -38,6 +38,7 @@ android {
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=com.weartools.phonebattcomp\"")
+        versionNameSuffix = "-wear"
     }
 
     buildTypes {
