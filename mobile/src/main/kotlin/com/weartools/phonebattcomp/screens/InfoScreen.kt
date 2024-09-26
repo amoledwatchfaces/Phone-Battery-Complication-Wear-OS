@@ -45,7 +45,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.utils.openAmoledWebPage
@@ -321,6 +323,17 @@ fun InfoScreen(
                     text = stringResource(id = R.string.website),
                     color = Color.Gray)
             } }
+
+            item {
+                Text(
+                    modifier = Modifier.align(Alignment.End).padding(top = 140.dp),
+                    textAlign = TextAlign.Center,
+                    color = Color.DarkGray,
+                    style = MaterialTheme.typography.bodyMedium,
+                    text = stringResource(R.string.version)+" "+BuildConfig.VERSION_NAME,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         }
     }
 
