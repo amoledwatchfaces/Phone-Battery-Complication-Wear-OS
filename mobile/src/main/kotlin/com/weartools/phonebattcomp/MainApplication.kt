@@ -2,6 +2,7 @@ package com.weartools.phonebattcomp
 
 import android.app.Application
 import android.content.Context
+import android.os.BatteryManager
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.gms.wearable.CapabilityClient
@@ -55,4 +56,13 @@ class DataClientModule {
     fun provideDataClient(
         @ApplicationContext context: Context
     ): DataClient =  Wearable.getDataClient(context)
+}
+
+@Module
+@InstallIn(SingletonComponent::class)
+class BatteryManagerModule {
+    @Provides
+    fun provideBatteryManager(
+        @ApplicationContext context: Context
+    ): BatteryManager =  context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
 }

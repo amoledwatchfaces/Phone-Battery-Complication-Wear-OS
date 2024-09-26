@@ -22,8 +22,8 @@ import kotlin.coroutines.cancellation.CancellationException
 @AndroidEntryPoint
 class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
 
-    @Inject
-    lateinit var dataClient: DataClient
+    @Inject lateinit var dataClient: DataClient
+    @Inject lateinit var batteryManager: BatteryManager
 
     private var lastBatteryLevelPercentSent: Int? = null
     private var lastChargingStatus: Boolean? = null
@@ -42,11 +42,11 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                     isCharging = intent.getBatteryChargingStatus()
                 }
                 Intent.ACTION_POWER_CONNECTED -> {
-                    batteryLevel = getCurrentBatteryLevel(context)
+                    batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
                     isCharging = true
                 }
                 Intent.ACTION_POWER_DISCONNECTED -> {
-                    batteryLevel = getCurrentBatteryLevel(context)
+                    batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
                     isCharging = false
                 }
             }
@@ -121,15 +121,6 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                 // Receiver not registered, ignoring
             }
             isSubscribed = false
-        }
-
-        fun getCurrentBatteryLevel(context: Context): Int {
-            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-            return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-        }
-        fun getCurrentBatteryChargingStatus(context: Context): Boolean {
-            val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-            return batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING
         }
     }
 }

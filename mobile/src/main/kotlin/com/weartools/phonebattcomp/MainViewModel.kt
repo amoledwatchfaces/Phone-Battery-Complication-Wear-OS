@@ -7,6 +7,7 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.BatteryManager
 import android.os.Handler
 import android.provider.CalendarContract
 import android.util.Log
@@ -49,7 +50,8 @@ class MainViewModel @Inject constructor(
     private val nodeClient: NodeClient,
     private val remoteActivityHelper: RemoteActivityHelper,
     private val dataClient: DataClient,
-    private val dataRepository: DataStoreRepository
+    private val dataRepository: DataStoreRepository,
+    private val batteryManager: BatteryManager
 ) : ViewModel(){
 
     private lateinit var reviewManager: ReviewManager
@@ -218,8 +220,8 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                    dataMap.putInt(BATTERY_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryLevel(context))
-                    dataMap.putBoolean(IS_CHARGING_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryChargingStatus(context))
+                    dataMap.putInt(BATTERY_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
+                    dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
                 }
                     .asPutDataRequest()
                     .setUrgent()

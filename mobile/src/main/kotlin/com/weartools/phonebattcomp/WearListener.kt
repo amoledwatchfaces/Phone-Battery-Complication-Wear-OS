@@ -18,8 +18,6 @@ package com.weartools.phonebattcomp
 
 import android.Manifest
 import android.content.ContentValues.TAG
-import android.content.Intent
-import android.content.IntentFilter
 import android.os.BatteryManager
 import android.util.Log
 import com.google.android.gms.wearable.DataClient
@@ -28,10 +26,9 @@ import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
-import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.data.DataStoreRepository
-import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
+import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -56,10 +53,9 @@ class WearListener : WearableListenerService() {
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
-    @Inject
-    lateinit var dataRepository: DataStoreRepository
-    @Inject
-    lateinit var dataClient: DataClient
+    @Inject lateinit var dataRepository: DataStoreRepository
+    @Inject lateinit var dataClient: DataClient
+    @Inject lateinit var batteryManager: BatteryManager
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
 
@@ -73,11 +69,11 @@ class WearListener : WearableListenerService() {
                 DataEvent.TYPE_CHANGED -> {
                     when (dataEvent.dataItem.uri.path) {
                         REQUEST_PATH -> {
-                            val level = batteryLevel
+                            val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
                             val forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY)
                             val request = PutDataMapRequest.create(BATTERY_PATH).apply{
                                 dataMap.putInt(BATTERY_KEY, level)
-                                dataMap.putBoolean(IS_CHARGING_KEY, BatteryStatusBroadcastReceiver.getCurrentBatteryChargingStatus(applicationContext))
+                                dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
                                 if (forceUpdate){
                                     dataMap.putLong("immediate-update", System.currentTimeMillis())
                                 }
@@ -109,13 +105,4 @@ class WearListener : WearableListenerService() {
             dataEvents.release()
         }
     }
-
-    private val batteryLevel: Int
-        get() {
-            val batteryStatus = registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
-            val level = batteryStatus?.getIntExtra(BatteryManager.EXTRA_LEVEL, -1) ?: -1
-            val scale = batteryStatus?.getIntExtra(BatteryManager.EXTRA_SCALE, -1) ?: -1
-            return 100 * level / scale
-        }
-
 }
