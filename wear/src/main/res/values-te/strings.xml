@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s‌లో</string>
+  <string name="next_event_long_text_preview">దంత వైద్యుని అపాయింట్‌మెంట్</string>
+  <string name="next_event_text_complication_selection_menu">తర్వాతి ఈవెంట్</string>
+  <string name="no_upcoming_events_long_text">ఈ రోజు ఈవెంట్‌లు ఏవీ లేవు</string>
+  <string name="no_upcoming_events_long_text_description">మీ Google Calendarలోని తదుపరి ఇరవై నాలుగు గంటలలో ఈవెంట్‌లు ఏవీ లేవు.</string>
+  <string name="no_upcoming_events_short_text">ఏం లేవు</string>
+  <string name="no_upcoming_events_short_text_description">మీ Google Calendarలోని తదుపరి ఇరవై నాలుగు గంటలలో ఈవెంట్‌లు ఏవీ లేవు.</string>
+  <string name="no_upcoming_events_text">మీకు ఈ రోజు ఈవెంట్‌లు ఏవీ లేవు</string>
+  <string name="now">ఇప్పుడు</string>
+  <string name="today">ఈ రోజు</string>
+  <string name="tomorrow">రేపు</string>
+</resources>

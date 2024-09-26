@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">בעוד %1$s</string>
+  <string name="next_event_long_text_preview">תור לרופא שיניים</string>
+  <string name="next_event_text_complication_selection_menu">האירוע הבא</string>
+  <string name="no_upcoming_events_long_text">אין אירועים היום</string>
+  <string name="no_upcoming_events_long_text_description">‏אין לך אף אירוע ביומן Google ב-24 השעות הקרובות.</string>
+  <string name="no_upcoming_events_short_text">אין</string>
+  <string name="no_upcoming_events_short_text_description">‏אין לך אף אירוע ביומן Google ב-24 השעות הקרובות.</string>
+  <string name="no_upcoming_events_text">לא נקבע לך כלום להיום</string>
+  <string name="now">עכשיו</string>
+  <string name="today">היום</string>
+  <string name="tomorrow">מחר</string>
+</resources>

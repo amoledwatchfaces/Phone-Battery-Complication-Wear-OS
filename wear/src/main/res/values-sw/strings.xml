@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">baada ya %1$s</string>
+  <string name="next_event_long_text_preview">Miadi na daktari wa meno</string>
+  <string name="next_event_text_complication_selection_menu">Tukio linalofuata</string>
+  <string name="no_upcoming_events_long_text">Hakuna matukio leo</string>
+  <string name="no_upcoming_events_long_text_description">Huna matukio kwenye Kalenda ya Google katika saa ishirini na nne zijazo.</string>
+  <string name="no_upcoming_events_short_text">Hakuna</string>
+  <string name="no_upcoming_events_short_text_description">Huna matukio kwenye Kalenda ya Google katika saa ishirini na nne zijazo.</string>
+  <string name="no_upcoming_events_text">Siku yako haina matukio</string>
+  <string name="now">Sasa</string>
+  <string name="today">Leo</string>
+  <string name="tomorrow">Kesho</string>
+</resources>

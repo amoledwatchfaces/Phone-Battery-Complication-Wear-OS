@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">in %1$s</string>
+  <string name="next_event_long_text_preview">Tandartsafspraak</string>
+  <string name="next_event_text_complication_selection_menu">Volgende geleentheid</string>
+  <string name="no_upcoming_events_long_text">Geen geleenthede vandag</string>
+  <string name="no_upcoming_events_long_text_description">Jy het nie in die volgende 24 uur enige geleenthede in die Google Kalender nie.</string>
+  <string name="no_upcoming_events_short_text">Geen</string>
+  <string name="no_upcoming_events_short_text_description">Jy het nie in die volgende 24 uur enige geleenthede in die Google Kalender nie.</string>
+  <string name="no_upcoming_events_text">Jy het niks aan vandag nie</string>
+  <string name="now">Nou</string>
+  <string name="today">Vandag</string>
+  <string name="tomorrow">Môre</string>
+</resources>

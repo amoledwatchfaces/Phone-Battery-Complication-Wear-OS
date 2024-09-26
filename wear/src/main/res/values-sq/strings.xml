@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">për %1$s</string>
+  <string name="next_event_long_text_preview">Vizitë te dentisti</string>
+  <string name="next_event_text_complication_selection_menu">Ngjarja tjetër</string>
+  <string name="no_upcoming_events_long_text">Asnjë ngjarje sot</string>
+  <string name="no_upcoming_events_long_text_description">Nuk ke asnjë ngjarje në \"Kalendarin e Google\" për njëzet e katër orët e ardhshme.</string>
+  <string name="no_upcoming_events_short_text">Asnjë</string>
+  <string name="no_upcoming_events_short_text_description">Nuk ke asnjë ngjarje në \"Kalendarin e Google\" për njëzet e katër orët e ardhshme.</string>
+  <string name="no_upcoming_events_text">Nuk ke asnjë ngjarje sot</string>
+  <string name="now">Tani</string>
+  <string name="today">Sot</string>
+  <string name="tomorrow">Nesër</string>
+</resources>

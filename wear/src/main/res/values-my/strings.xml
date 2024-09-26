@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s အတွင်း</string>
+  <string name="next_event_long_text_preview">သွားဆရာဝန် ရက်ချိန်း</string>
+  <string name="next_event_text_complication_selection_menu">နောက်အစီအစဉ်</string>
+  <string name="no_upcoming_events_long_text">ယနေ့ အစီအစဉ် မရှိပါ</string>
+  <string name="no_upcoming_events_long_text_description">သင့်အတွက် Google Calendar ၌ နောက်နှစ်ဆယ့်လေးနာရီအတွင်း အစီအစဉ် မရှိပါ။</string>
+  <string name="no_upcoming_events_short_text">မရှိ</string>
+  <string name="no_upcoming_events_short_text_description">သင့်အတွက် Google Calendar ၌ နောက်နှစ်ဆယ့်လေးနာရီအတွင်း အစီအစဉ် မရှိပါ။</string>
+  <string name="no_upcoming_events_text">သင့်တစ်နေ့တာတွင် ဘာမျှမရှိပါ</string>
+  <string name="now">ယခု</string>
+  <string name="today">ယနေ့</string>
+  <string name="tomorrow">နက်ဖြန်</string>
+</resources>

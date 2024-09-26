@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">dalam %1$s</string>
+  <string name="next_event_long_text_preview">Janji temu dengan dokter gigi</string>
+  <string name="next_event_text_complication_selection_menu">Acara berikutnya</string>
+  <string name="no_upcoming_events_long_text">Tidak ada acara hari ini</string>
+  <string name="no_upcoming_events_long_text_description">Tidak ada acara di Google Kalender untuk dua puluh empat jam ke depan.</string>
+  <string name="no_upcoming_events_short_text">Tidak ada</string>
+  <string name="no_upcoming_events_short_text_description">Tidak ada acara di Google Kalender untuk dua puluh empat jam ke depan.</string>
+  <string name="no_upcoming_events_text">Tidak ada acara</string>
+  <string name="now">Baru saja</string>
+  <string name="today">Hari ini</string>
+  <string name="tomorrow">Besok</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s میں</string>
+  <string name="next_event_long_text_preview">دانتوں کے ڈاکٹر کا اپوائنٹمنٹ</string>
+  <string name="next_event_text_complication_selection_menu">اگلا ایونٹ</string>
+  <string name="no_upcoming_events_long_text">آج کوئی ایونٹ نہیں ہے</string>
+  <string name="no_upcoming_events_long_text_description">‏آپ کے پاس Google کیلنڈر میں اگلے چوبیس گھنٹوں میں کوئی ایونٹ نہیں ہوگا۔</string>
+  <string name="no_upcoming_events_short_text">کوئی نہیں</string>
+  <string name="no_upcoming_events_short_text_description">‏آپ کے پاس Google کیلنڈر میں اگلے چوبیس گھنٹوں میں کوئی ایونٹ نہیں ہوگا۔</string>
+  <string name="no_upcoming_events_text">آج کیلئے کوئی ایونٹ نہیں ہے</string>
+  <string name="now">ابھی</string>
+  <string name="today">آج</string>
+  <string name="tomorrow">آئندہ کل</string>
+</resources>

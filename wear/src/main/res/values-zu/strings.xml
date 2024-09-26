@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">kokuthi %1$s</string>
+  <string name="next_event_long_text_preview">I-aphoyintimenti yakadokotela wamazinyo</string>
+  <string name="next_event_text_complication_selection_menu">Umcimbi olandelayo</string>
+  <string name="no_upcoming_events_long_text">Ayikho imicimbi namhlanje</string>
+  <string name="no_upcoming_events_long_text_description">Awunayo imicimbi ku-Google Calendar emahoreni angamashumi amabili nane alandelayo.</string>
+  <string name="no_upcoming_events_short_text">Lutho</string>
+  <string name="no_upcoming_events_short_text_description">Awunayo imicimbi ku-Google Calendar emahoreni angamashumi amabili nane alandelayo.</string>
+  <string name="no_upcoming_events_text">Usuku lwakho lucacile</string>
+  <string name="now">Manje</string>
+  <string name="today">Namhlanje</string>
+  <string name="tomorrow">Kusasa</string>
+</resources>

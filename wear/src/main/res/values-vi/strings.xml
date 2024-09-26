@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">trong %1$s</string>
+  <string name="next_event_long_text_preview">Lịch hẹn với nha sĩ</string>
+  <string name="next_event_text_complication_selection_menu">Sự kiện tiếp theo</string>
+  <string name="no_upcoming_events_long_text">Không có sự kiện hôm nay</string>
+  <string name="no_upcoming_events_long_text_description">Bạn không có sự kiện trên Lịch Google trong 24 giờ tới.</string>
+  <string name="no_upcoming_events_short_text">Không</string>
+  <string name="no_upcoming_events_short_text_description">Bạn không có sự kiện trên Lịch Google trong 24 giờ tới.</string>
+  <string name="no_upcoming_events_text">Bạn không có lịch trình nào hôm nay</string>
+  <string name="now">Đang diễn ra</string>
+  <string name="today">Hôm nay</string>
+  <string name="tomorrow">Ngày mai</string>
+</resources>

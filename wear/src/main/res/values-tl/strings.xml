@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">sa %1$s</string>
+  <string name="next_event_long_text_preview">Appointment sa dentista</string>
+  <string name="next_event_text_complication_selection_menu">Susunod na event</string>
+  <string name="no_upcoming_events_long_text">Walang event ngayon</string>
+  <string name="no_upcoming_events_long_text_description">"Wala kang event sa Google Calendar sa susunod na dalawampu't apat na oras."</string>
+  <string name="no_upcoming_events_short_text">Wala</string>
+  <string name="no_upcoming_events_short_text_description">"Wala kang event sa Google Calendar sa susunod na dalawampu't apat na oras."</string>
+  <string name="no_upcoming_events_text">Walang nakaiskedyul sa araw na ito</string>
+  <string name="now">Ngayon</string>
+  <string name="today">Ngayong araw</string>
+  <string name="tomorrow">Bukas</string>
+</resources>

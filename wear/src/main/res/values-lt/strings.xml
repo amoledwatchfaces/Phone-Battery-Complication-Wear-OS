@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">po %1$s</string>
+  <string name="next_event_long_text_preview">Odontologo susitikimas</string>
+  <string name="next_event_text_complication_selection_menu">Kitas įvykis</string>
+  <string name="no_upcoming_events_long_text">Šiandien nėra įvykių</string>
+  <string name="no_upcoming_events_long_text_description">„Google“ kalendoriuje nėra įvykių, kurie turėtų įvykti per kitas dvidešimt keturias valandas.</string>
+  <string name="no_upcoming_events_short_text">Nėra</string>
+  <string name="no_upcoming_events_short_text_description">„Google“ kalendoriuje nėra įvykių, kurie turėtų įvykti per kitas dvidešimt keturias valandas.</string>
+  <string name="no_upcoming_events_text">Šiandien neturite jokių įvykių</string>
+  <string name="now">Dabar</string>
+  <string name="today">Šiandien</string>
+  <string name="tomorrow">Rytoj</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s</string>
+  <string name="next_event_long_text_preview">Tish shifokori bilan uchrashuv</string>
+  <string name="next_event_text_complication_selection_menu">Keyingi tadbir</string>
+  <string name="no_upcoming_events_long_text">Bugun tadbir yo‘q</string>
+  <string name="no_upcoming_events_long_text_description">Keyingi yigirma to‘rt soat ichida Google Taqvimda hech qanday tadbiringiz yo‘q.</string>
+  <string name="no_upcoming_events_short_text">Yoʻq</string>
+  <string name="no_upcoming_events_short_text_description">Keyingi yigirma to‘rt soat ichida Google Taqvimda hech qanday tadbiringiz yo‘q.</string>
+  <string name="no_upcoming_events_text">Hech qanday tadbir topilmadi</string>
+  <string name="now">Hozir</string>
+  <string name="today">Bugun</string>
+  <string name="tomorrow">Ertaga</string>
+</resources>

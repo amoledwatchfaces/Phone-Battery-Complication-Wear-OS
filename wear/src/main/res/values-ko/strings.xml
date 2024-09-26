@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s 후</string>
+  <string name="next_event_long_text_preview">치과 예약</string>
+  <string name="next_event_text_complication_selection_menu">다음 일정</string>
+  <string name="no_upcoming_events_long_text">오늘 일정 없음</string>
+  <string name="no_upcoming_events_long_text_description">24시간 이내에 Google Calendar 일정이 없습니다.</string>
+  <string name="no_upcoming_events_short_text">없음</string>
+  <string name="no_upcoming_events_short_text_description">24시간 이내에 Google Calendar 일정이 없습니다.</string>
+  <string name="no_upcoming_events_text">예정된 일정이 없습니다.</string>
+  <string name="now">지금</string>
+  <string name="today">오늘</string>
+  <string name="tomorrow">내일</string>
+</resources>

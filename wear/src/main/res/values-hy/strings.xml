@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$sից</string>
+  <string name="next_event_long_text_preview">Հանդիպում ատամնաբույժի մոտ</string>
+  <string name="next_event_text_complication_selection_menu">Հաջորդ միջոցառումը</string>
+  <string name="no_upcoming_events_long_text">Այսօր միջոցառումներ չկան</string>
+  <string name="no_upcoming_events_long_text_description">Դուք առաջիկա քսանչորս ժամվա ընթացքում Google Օրացույցում միջոցառումներ չունեք։</string>
+  <string name="no_upcoming_events_short_text">Չկա</string>
+  <string name="no_upcoming_events_short_text_description">Դուք առաջիկա քսանչորս ժամվա ընթացքում Google Օրացույցում միջոցառումներ չունեք։</string>
+  <string name="no_upcoming_events_text">Դուք այսօր հանդիպումներ չունեք</string>
+  <string name="now">Հիմա</string>
+  <string name="today">Այսօր</string>
+  <string name="tomorrow">Վաղը</string>
+</resources>

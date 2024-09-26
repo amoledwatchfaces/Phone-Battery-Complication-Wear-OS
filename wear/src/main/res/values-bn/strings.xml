@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s-এর মধ্যে</string>
+  <string name="next_event_long_text_preview">ডেন্টিস্টের অ্যাপয়েন্টমেন্ট</string>
+  <string name="next_event_text_complication_selection_menu">পরবর্তী ইভেন্ট</string>
+  <string name="no_upcoming_events_long_text">আজ কোনও ইভেন্ট নেই</string>
+  <string name="no_upcoming_events_long_text_description">পরবর্তী চব্বিশ ঘণ্টার জন্য Google Calendar-এ আপনার কোনও ইভেন্ট নেই।</string>
+  <string name="no_upcoming_events_short_text">কোনওটিই নয়</string>
+  <string name="no_upcoming_events_short_text_description">পরবর্তী চব্বিশ ঘণ্টার জন্য Google Calendar-এ আপনার কোনও ইভেন্ট নেই।</string>
+  <string name="no_upcoming_events_text">আজকে আপনার কোনও ইভেন্ট নেই</string>
+  <string name="now">এখন</string>
+  <string name="today">আজ</string>
+  <string name="tomorrow">আগামীকাল</string>
+</resources>

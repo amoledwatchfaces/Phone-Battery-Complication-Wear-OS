@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s barru</string>
+  <string name="next_event_long_text_preview">Dentistarako hitzordua</string>
+  <string name="next_event_text_complication_selection_menu">Hurrengo gertaera</string>
+  <string name="no_upcoming_events_long_text">Gaur ez dago gertaerarik</string>
+  <string name="no_upcoming_events_long_text_description">Hurrengo 24 orduetan ez daukazu gertaerarik Google Calendar-en.</string>
+  <string name="no_upcoming_events_short_text">Bat ere ez</string>
+  <string name="no_upcoming_events_short_text_description">Hurrengo 24 orduetan ez daukazu gertaerarik Google Calendar-en.</string>
+  <string name="no_upcoming_events_text">Ez duzu gertaerarik gaur</string>
+  <string name="now">Orain</string>
+  <string name="today">Gaur</string>
+  <string name="tomorrow">Bihar</string>
+</resources>

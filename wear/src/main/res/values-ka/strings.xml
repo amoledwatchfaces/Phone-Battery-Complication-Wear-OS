@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s-ში</string>
+  <string name="next_event_long_text_preview">სტომატოლოგთან ვიზიტი</string>
+  <string name="next_event_text_complication_selection_menu">შემდეგი ღონისძიება</string>
+  <string name="no_upcoming_events_long_text">დღეს მოვლენები არ არის</string>
+  <string name="no_upcoming_events_long_text_description">Google Calendar-ში არ გაქვთ მოვლენა მომდევნო ოცდაოთხი საათის განმავლობაში.</string>
+  <string name="no_upcoming_events_short_text">არცერთი</string>
+  <string name="no_upcoming_events_short_text_description">Google Calendar-ში არ გაქვთ მოვლენა მომდევნო ოცდაოთხი საათის განმავლობაში.</string>
+  <string name="no_upcoming_events_text">თქვენი დღე თავისფალია</string>
+  <string name="now">ახლა</string>
+  <string name="today">დღეს</string>
+  <string name="tomorrow">ხვალ</string>
+</resources>

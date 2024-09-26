@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">праз %1$s</string>
+  <string name="next_event_long_text_preview">Запіс да стаматолага</string>
+  <string name="next_event_text_complication_selection_menu">Наступная падзея</string>
+  <string name="no_upcoming_events_long_text">На сёння падзей няма</string>
+  <string name="no_upcoming_events_long_text_description">На наступныя 24 гадзіны ў вашым Google Календары не запланавана ніякіх падзей.</string>
+  <string name="no_upcoming_events_short_text">Няма</string>
+  <string name="no_upcoming_events_short_text_description">На наступныя 24 гадзіны ў вашым Google Календары не запланавана ніякіх падзей.</string>
+  <string name="no_upcoming_events_text">Няма падзей</string>
+  <string name="now">Зараз</string>
+  <string name="today">Сёння</string>
+  <string name="tomorrow">Заўтра</string>
+</resources>

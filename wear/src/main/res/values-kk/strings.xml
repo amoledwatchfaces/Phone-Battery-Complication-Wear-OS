@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s ішінде</string>
+  <string name="next_event_long_text_preview">Тіс дәрігерінің қабылдауы</string>
+  <string name="next_event_text_complication_selection_menu">Келесі іс-шара</string>
+  <string name="no_upcoming_events_long_text">Бүгінге іс-шара жоқ.</string>
+  <string name="no_upcoming_events_long_text_description">Алдағы жиырма төрт сағатта Google Calendar-да ешқандай іс-шара жоқ.</string>
+  <string name="no_upcoming_events_short_text">Жоқ</string>
+  <string name="no_upcoming_events_short_text_description">Алдағы жиырма төрт сағатта Google Calendar-да ешқандай іс-шара жоқ.</string>
+  <string name="no_upcoming_events_text">Бүгінге ешқандай іс-шара жоқ.</string>
+  <string name="now">Қазір</string>
+  <string name="today">Бүгін</string>
+  <string name="tomorrow">Ертең</string>
+</resources>

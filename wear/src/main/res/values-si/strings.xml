@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$sකින්</string>
+  <string name="next_event_long_text_preview">දන්ත වෛද්‍යවරයෙකු හමුව</string>
+  <string name="next_event_text_complication_selection_menu">මීළඟ සිදුවීම</string>
+  <string name="no_upcoming_events_long_text">අද සිදුවීම් නැත</string>
+  <string name="no_upcoming_events_long_text_description">ඔබට ඉදිරි පැය විසිහතර තුළ Google දිනදර්ශනයේ සිදුවීම් නොමැත.</string>
+  <string name="no_upcoming_events_short_text">කිසිත්.</string>
+  <string name="no_upcoming_events_short_text_description">ඔබට ඉදිරි පැය විසිහතර තුළ Google දිනදර්ශනයේ සිදුවීම් නොමැත.</string>
+  <string name="no_upcoming_events_text">ඔබේ දවස පැහැදිලි වේ</string>
+  <string name="now">දැන්</string>
+  <string name="today">අද</string>
+  <string name="tomorrow">හෙට</string>
+</resources>

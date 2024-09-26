@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">za %1$s</string>
+  <string name="next_event_long_text_preview">Termin kod zubara</string>
+  <string name="next_event_text_complication_selection_menu">Sljedeći događaj</string>
+  <string name="no_upcoming_events_long_text">Danas nema događaja</string>
+  <string name="no_upcoming_events_long_text_description">U sljedeća dvadeset i četiri sata nemate događaja u Google kalendaru.</string>
+  <string name="no_upcoming_events_short_text">Ništa</string>
+  <string name="no_upcoming_events_short_text_description">U sljedeća dvadeset i četiri sata nemate događaja u Google kalendaru.</string>
+  <string name="no_upcoming_events_text">Danas nemate nijedan događaj</string>
+  <string name="now">Sada</string>
+  <string name="today">Danas</string>
+  <string name="tomorrow">Sutra</string>
+</resources>

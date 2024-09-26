@@ -1,5 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Phone Battery Complication</string>
-    <string name="countdown_text">za %1$s</string>
+    <string name="countdown_text">za: %1$s</string>
+    <string name="next_event_long_text_preview">Wizyta u dentysty</string>
+    <string name="next_event_text_complication_selection_menu">Następne wydarzenie</string>
+    <string name="no_upcoming_events_long_text">Brak wydarzeń na dziś</string>
+    <string name="no_upcoming_events_long_text_description">W ciągu najbliższych 24 godzin nie masz żadnych wydarzeń w Kalendarzu Google.</string>
+    <string name="no_upcoming_events_short_text">Brak</string>
+    <string name="no_upcoming_events_short_text_description">W ciągu najbliższych 24 godzin nie masz żadnych wydarzeń w Kalendarzu Google.</string>
+    <string name="no_upcoming_events_text">Brak wydarzeń</string>
+    <string name="now">Teraz</string>
+    <string name="today">Dzisiaj</string>
+    <string name="tomorrow">Jutro</string>
 </resources>

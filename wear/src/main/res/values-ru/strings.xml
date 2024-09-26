@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">через %1$s</string>
+  <string name="next_event_long_text_preview">Визит к стоматологу</string>
+  <string name="next_event_text_complication_selection_menu">След. меропр.</string>
+  <string name="no_upcoming_events_long_text">Сегодня мероприятий нет</string>
+  <string name="no_upcoming_events_long_text_description">В Google Календаре нет мероприятий в ближайшие сутки.</string>
+  <string name="no_upcoming_events_short_text">Нет</string>
+  <string name="no_upcoming_events_short_text_description">В Google Календаре нет мероприятий в ближайшие сутки.</string>
+  <string name="no_upcoming_events_text">Сегодня мероприятий нет</string>
+  <string name="now">Сейчас</string>
+  <string name="today">Сегодня</string>
+  <string name="tomorrow">Завтра</string>
+</resources>

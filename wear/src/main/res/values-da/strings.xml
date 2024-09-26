@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">om %1$s</string>
+  <string name="next_event_long_text_preview">Tandlægeaftale</string>
+  <string name="next_event_text_complication_selection_menu">Næste begivenhed</string>
+  <string name="no_upcoming_events_long_text">Ingen begivenheder i dag</string>
+  <string name="no_upcoming_events_long_text_description">Du har ingen begivenheder i Google Kalender inden for de næste 24 timer.</string>
+  <string name="no_upcoming_events_short_text">Ingen</string>
+  <string name="no_upcoming_events_short_text_description">Du har ingen begivenheder i Google Kalender inden for de næste 24 timer.</string>
+  <string name="no_upcoming_events_text">Din dag er fri</string>
+  <string name="now">Nu</string>
+  <string name="today">I dag</string>
+  <string name="tomorrow">I morgen</string>
+</resources>

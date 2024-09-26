@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">ใน %1$s</string>
+  <string name="next_event_long_text_preview">การนัดทำฟัน</string>
+  <string name="next_event_text_complication_selection_menu">กิจกรรมถัดไป</string>
+  <string name="no_upcoming_events_long_text">ไม่มีกิจกรรมในวันนี้</string>
+  <string name="no_upcoming_events_long_text_description">คุณไม่มีกิจกรรมใน Google ปฏิทินในอีก 24 ชั่วโมงข้างหน้า</string>
+  <string name="no_upcoming_events_short_text">ไม่มี</string>
+  <string name="no_upcoming_events_short_text_description">คุณไม่มีกิจกรรมใน Google ปฏิทินในอีก 24 ชั่วโมงข้างหน้า</string>
+  <string name="no_upcoming_events_text">คุณไม่มีกิจกรรมใดๆ</string>
+  <string name="now">ตอนนี้</string>
+  <string name="today">วันนี้</string>
+  <string name="tomorrow">วันพรุ่งนี้</string>
+</resources>

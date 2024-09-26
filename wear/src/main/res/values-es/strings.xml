@@ -56,7 +56,14 @@
 
     <!-- From Google Calendar -->
     <string name="countdown_text">en %1$s</string>
+    <string name="next_event_long_text_preview">Cita en el dentista</string>
+    <string name="next_event_text_complication_selection_menu">Siguiente evento</string>
+    <string name="no_upcoming_events_long_text">No hay eventos hoy</string>
+    <string name="no_upcoming_events_long_text_description">No tienes eventos en Google Calendar en las próximas veinticuatro horas.</string>
+    <string name="no_upcoming_events_short_text">Ninguno</string>
+    <string name="no_upcoming_events_short_text_description">No tienes eventos en Google Calendar en las próximas veinticuatro horas.</string>
+    <string name="no_upcoming_events_text">Hoy no tienes eventos</string>
+    <string name="now">Ahora</string>
     <string name="today">Hoy</string>
-    <string name="no_upcoming_events_long_text">Sin evento hoy</string>
-    <string name="next_event_long_text_preview">Charla en el café</string>
+    <string name="tomorrow">Mañana</string>
 </resources>

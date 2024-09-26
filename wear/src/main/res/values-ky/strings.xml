@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s кийин</string>
+  <string name="next_event_long_text_preview">Тиш доктурга баруу</string>
+  <string name="next_event_text_complication_selection_menu">Кийинки иш-чара</string>
+  <string name="no_upcoming_events_long_text">Бүгүн иш-чара жок</string>
+  <string name="no_upcoming_events_long_text_description">Кийинки жыйырма төрт саат ичинде Google Жылнаамада иш-чараңыз жок.</string>
+  <string name="no_upcoming_events_short_text">Жок</string>
+  <string name="no_upcoming_events_short_text_description">Кийинки жыйырма төрт саат ичинде Google Жылнаамада иш-чараңыз жок.</string>
+  <string name="no_upcoming_events_text">Бүгүн иш-чара жок</string>
+  <string name="now">Азыр</string>
+  <string name="today">Бүгүн</string>
+  <string name="tomorrow">Эртең</string>
+</resources>

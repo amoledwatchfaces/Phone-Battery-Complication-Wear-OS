@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s-н дараа</string>
+  <string name="next_event_long_text_preview">Шүдний эмчийн уулзалтын цаг</string>
+  <string name="next_event_text_complication_selection_menu">Дараагийн үйл явдал</string>
+  <string name="no_upcoming_events_long_text">Өнөөдөр үйл явдал байхгүй</string>
+  <string name="no_upcoming_events_long_text_description">Дараагийн хорин дөрвөн цагийн дотор танд Google Календарьт ямар ч үйл явдал байхгүй байна.</string>
+  <string name="no_upcoming_events_short_text">Байхгүй</string>
+  <string name="no_upcoming_events_short_text_description">Дараагийн хорин дөрвөн цагийн дотор танд Google Календарьт ямар ч үйл явдал байхгүй байна.</string>
+  <string name="no_upcoming_events_text">Таны өдөр чөлөөтэй байна</string>
+  <string name="now">Одоо</string>
+  <string name="today">Өнөөдөр</string>
+  <string name="tomorrow">Маргааш</string>
+</resources>

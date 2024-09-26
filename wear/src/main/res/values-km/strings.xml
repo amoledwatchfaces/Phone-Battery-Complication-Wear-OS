@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">ក្នុងរយៈពេល %1$s</string>
+  <string name="next_event_long_text_preview">ការណាត់ជួបជាមួយពេទ្យធ្មេញ</string>
+  <string name="next_event_text_complication_selection_menu">ព្រឹត្តិការណ៍​បន្ទាប់</string>
+  <string name="no_upcoming_events_long_text">ថ្ងៃនេះគ្មានព្រឹត្តិការណ៍</string>
+  <string name="no_upcoming_events_long_text_description">អ្នក​មិនមាន​ព្រឹត្តិការណ៍​នៅក្នុង Google ប្រតិទិន​ក្នុងរយៈពេល​ម្ភៃបួនម៉ោង​បន្ទាប់​ទេ។</string>
+  <string name="no_upcoming_events_short_text">គ្មាន</string>
+  <string name="no_upcoming_events_short_text_description">អ្នក​មិនមាន​ព្រឹត្តិការណ៍​នៅក្នុង Google ប្រតិទិន​ក្នុងរយៈពេល​ម្ភៃបួនម៉ោង​បន្ទាប់​ទេ។</string>
+  <string name="no_upcoming_events_text">ថ្ងៃនេះ អ្នក​មិន​មានព្រឹត្តិការណ៍​ទេ</string>
+  <string name="now">ឥឡូវ</string>
+  <string name="today">ថ្ងៃនេះ</string>
+  <string name="tomorrow">ថ្ងៃស្អែក</string>
+</resources>

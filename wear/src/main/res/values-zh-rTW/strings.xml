@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s後</string>
+  <string name="next_event_long_text_preview">牙醫預約</string>
+  <string name="next_event_text_complication_selection_menu">下一個活動</string>
+  <string name="no_upcoming_events_long_text">今天沒有任何活動</string>
+  <string name="no_upcoming_events_long_text_description">你的 Google 日曆中在接下來 24 小時內沒有任何活動。</string>
+  <string name="no_upcoming_events_short_text">無</string>
+  <string name="no_upcoming_events_short_text_description">你的 Google 日曆中在接下來 24 小時內沒有任何活動。</string>
+  <string name="no_upcoming_events_text">沒有任何活動</string>
+  <string name="now">現在</string>
+  <string name="today">今天</string>
+  <string name="tomorrow">明天</string>
+</resources>

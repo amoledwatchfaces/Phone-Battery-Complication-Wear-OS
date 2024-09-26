@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">در %1$s</string>
+  <string name="next_event_long_text_preview">قرار با دندان‌پزشک</string>
+  <string name="next_event_text_complication_selection_menu">رویداد بعدی</string>
+  <string name="no_upcoming_events_long_text">رویدادی برای امروز موجود نیست</string>
+  <string name="no_upcoming_events_long_text_description">‏طی بیست‌وچهار ساعت آینده رویدادی در «تقویم Google» ندارید.</string>
+  <string name="no_upcoming_events_short_text">خالی</string>
+  <string name="no_upcoming_events_short_text_description">‏طی بیست‌وچهار ساعت آینده رویدادی در «تقویم Google» ندارید.</string>
+  <string name="no_upcoming_events_text">امروز رویدادی ندارید</string>
+  <string name="now">اکنون</string>
+  <string name="today">امروز</string>
+  <string name="tomorrow">فردا</string>
+</resources>

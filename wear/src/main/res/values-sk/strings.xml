@@ -57,7 +57,14 @@
 
     <!-- From Google Calendar -->
     <string name="countdown_text">o %1$s</string>
-    <string name="today">Dnes</string>
+    <string name="next_event_long_text_preview">Návšteva zubára</string>
+    <string name="next_event_text_complication_selection_menu">Ďalšia udalosť</string>
     <string name="no_upcoming_events_long_text">Dnes žiadne udalosti</string>
-    <string name="next_event_long_text_preview">Pracovná porada</string>
+    <string name="no_upcoming_events_long_text_description">V nasledujúcich dvadsiatich štyroch hodinách nemáte v Kalendári Google žiadne udalosti.</string>
+    <string name="no_upcoming_events_short_text">Žiadne</string>
+    <string name="no_upcoming_events_short_text_description">V nasledujúcich dvadsiatich štyroch hodinách nemáte v Kalendári Google žiadne udalosti.</string>
+    <string name="no_upcoming_events_text">Dnes nemáte nič</string>
+    <string name="now">Teraz</string>
+    <string name="today">Dnes</string>
+    <string name="tomorrow">Zajtra</string>
 </resources>

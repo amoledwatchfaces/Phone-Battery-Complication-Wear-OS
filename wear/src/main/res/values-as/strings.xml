@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$sত</string>
+  <string name="next_event_long_text_preview">দন্ত চিকিৎসকক সাক্ষাৎ কৰাৰ সময়</string>
+  <string name="next_event_text_complication_selection_menu">পৰৱৰ্তী অনুষ্ঠান</string>
+  <string name="no_upcoming_events_long_text">আজি কোনো অনুষ্ঠান নাই</string>
+  <string name="no_upcoming_events_long_text_description">অহা চৌবিছ ঘণ্টাৰ বাবে আপোনাৰ Google Calendarত কোনো অনুষ্ঠান নাই।</string>
+  <string name="no_upcoming_events_short_text">একো নাই</string>
+  <string name="no_upcoming_events_short_text_description">অহা চৌবিছ ঘণ্টাৰ বাবে আপোনাৰ Google Calendarত কোনো অনুষ্ঠান নাই।</string>
+  <string name="no_upcoming_events_text">দিনটোৰ বাবে আপোনাৰ কোনো অনুষ্ঠান নাই</string>
+  <string name="now">এতিয়া</string>
+  <string name="today">আজি</string>
+  <string name="tomorrow">কাইলৈ</string>
+</resources>

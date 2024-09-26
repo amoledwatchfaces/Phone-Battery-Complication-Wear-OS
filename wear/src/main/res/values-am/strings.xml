@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">በ%1$s ውስጥ</string>
+  <string name="next_event_long_text_preview">የጥርስ ሐኪም ቀጠሮ</string>
+  <string name="next_event_text_complication_selection_menu">ቀጣይ ክስተት</string>
+  <string name="no_upcoming_events_long_text">ዛሬ ምንም ክስተቶች የሉም</string>
+  <string name="no_upcoming_events_long_text_description">በሚቀጥሉት ሃያ አራት ሰዓታት ውስጥ በGoogle ቀን መቁጠሪያ ላይ ምንም ክስተቶች የሉዎትም።</string>
+  <string name="no_upcoming_events_short_text">ምንም</string>
+  <string name="no_upcoming_events_short_text_description">በሚቀጥሉት ሃያ አራት ሰዓታት ውስጥ በGoogle ቀን መቁጠሪያ ላይ ምንም ክስተቶች የሉዎትም።</string>
+  <string name="no_upcoming_events_text">ቀንዎ ነፃ ነው</string>
+  <string name="now">አሁን</string>
+  <string name="today">ዛሬ</string>
+  <string name="tomorrow">ነገ</string>
+</resources>

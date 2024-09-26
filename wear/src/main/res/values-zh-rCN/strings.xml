@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">%1$s后</string>
+  <string name="next_event_long_text_preview">预约了看牙医</string>
+  <string name="next_event_text_complication_selection_menu">下一项活动</string>
+  <string name="no_upcoming_events_long_text">今天没有活动</string>
+  <string name="no_upcoming_events_long_text_description">Google 日历中没有您在接下来 24 小时内的活动。</string>
+  <string name="no_upcoming_events_short_text">无</string>
+  <string name="no_upcoming_events_short_text_description">Google 日历中没有您在接下来 24 小时内的活动。</string>
+  <string name="no_upcoming_events_text">没有任何活动</string>
+  <string name="now">现在</string>
+  <string name="today">今天</string>
+  <string name="tomorrow">明天</string>
+</resources>

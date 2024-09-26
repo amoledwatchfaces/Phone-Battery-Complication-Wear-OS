@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+  <string name="countdown_text">en %1$s</string>
+  <string name="next_event_long_text_preview">Cita con el dentista</string>
+  <string name="next_event_text_complication_selection_menu">Siguiente evento</string>
+  <string name="no_upcoming_events_long_text">Hoy no hay eventos.</string>
+  <string name="no_upcoming_events_long_text_description">No tienes ningún evento en el Calendario de Google en las próximas veinticuatro horas.</string>
+  <string name="no_upcoming_events_short_text">Ninguno</string>
+  <string name="no_upcoming_events_short_text_description">No tienes ningún evento en el Calendario de Google en las próximas veinticuatro horas.</string>
+  <string name="no_upcoming_events_text">Hoy no tienes ningún evento</string>
+  <string name="now">Ahora</string>
+  <string name="today">Hoy</string>
+  <string name="tomorrow">Mañana</string>
+</resources>

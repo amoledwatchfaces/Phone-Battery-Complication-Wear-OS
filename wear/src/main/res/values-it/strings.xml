@@ -2,4 +2,14 @@
 <resources>
     <string name="app_name">Phone Battery Complication</string>
     <string name="countdown_text">tra %1$s</string>
+    <string name="next_event_long_text_preview">Appuntamento dal dentista</string>
+    <string name="next_event_text_complication_selection_menu">Prossimo evento</string>
+    <string name="no_upcoming_events_long_text">Nessun evento oggi</string>
+    <string name="no_upcoming_events_long_text_description">Non sono presenti eventi in Google Calendar nelle prossime ventiquattro ore.</string>
+    <string name="no_upcoming_events_short_text">Nessuno</string>
+    <string name="no_upcoming_events_short_text_description">Non sono presenti eventi in Google Calendar nelle prossime ventiquattro ore.</string>
+    <string name="no_upcoming_events_text">La giornata è libera</string>
+    <string name="now">Ora</string>
+    <string name="today">Oggi</string>
+    <string name="tomorrow">Domani</string>
 </resources>

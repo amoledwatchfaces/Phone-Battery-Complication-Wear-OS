@@ -56,7 +56,14 @@
 
     <!-- From Google Calendar -->
     <string name="countdown_text">in %1$s</string>
+    <string name="next_event_long_text_preview">Zahnarzttermin</string>
+    <string name="next_event_text_complication_selection_menu">Nächster Termin</string>
+    <string name="no_upcoming_events_long_text">Heute keine Termine</string>
+    <string name="no_upcoming_events_long_text_description">Sie haben in den nächsten 24 Stunden keine Termine in Google Kalender.</string>
+    <string name="no_upcoming_events_short_text">Keine</string>
+    <string name="no_upcoming_events_short_text_description">Sie haben in den nächsten 24 Stunden keine Termine in Google Kalender.</string>
+    <string name="no_upcoming_events_text">Heute keine Termine</string>
+    <string name="now">Jetzt</string>
     <string name="today">Heute</string>
-    <string name="next_event_long_text_preview">Kaffeepause</string>
-    <string name="no_upcoming_events_long_text">Keine Ereignisse heute</string>
+    <string name="tomorrow">Morgen</string>
 </resources>
