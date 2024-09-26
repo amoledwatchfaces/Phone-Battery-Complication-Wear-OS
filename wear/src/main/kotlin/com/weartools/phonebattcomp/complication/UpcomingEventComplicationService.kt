@@ -160,10 +160,8 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             if (currentTime in event.startTime..event.endTime) {
                 closestEvent = event
                 closestEventTime = event.endTime
-                eventIsOngoing = true
             }
             else {
-                eventIsOngoing = false
                 // Consider both start and end times for future or ongoing events
                 val relevantTimes = listOf(event.startTime, event.endTime).filter { it >= currentTime }
 
@@ -179,6 +177,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
         }
 
         closestEvent?.let { event ->
+            eventIsOngoing = currentTime in event.startTime..event.endTime
             eventIsAllDay = event.allDay == 1
             eventIsToday = DateUtils.isToday(event.startTime)
             eventIsTomorrow = if (eventIsToday){ false } else { getIsTomorrow(event.startTime) }
