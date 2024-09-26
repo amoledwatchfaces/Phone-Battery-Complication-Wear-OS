@@ -51,6 +51,7 @@ import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
 import java.time.LocalDate
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
@@ -66,6 +67,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
     var eventIsAllDay = false
     var eventIsOngoing = false
     var eventIsToday = true
+    var eventIsTomorrow = false
     var eventUpdateDelay = 0L
 
     private fun openScreen(): PendingIntent? {
@@ -137,6 +139,17 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             else -> drawable.ic_cal_31
         }
     }
+    fun getIsTomorrow(eventTime: Long): Boolean {
+        val calendar = Calendar.getInstance().apply {
+            get(Calendar.DAY_OF_YEAR)
+            add(Calendar.DAY_OF_YEAR, 1)
+        }
+        val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+        utcCalendar.timeInMillis = eventTime
+        val eventDayOfYear = utcCalendar.get(Calendar.DAY_OF_YEAR)
+
+        return eventDayOfYear == calendar.get(Calendar.DAY_OF_YEAR)
+    }
     fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
         var closestEvent: CalendarEvent? = null
         var closestEventTime: Long? = null
@@ -160,6 +173,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             eventIsOngoing = currentTime in event.startTime..event.endTime
             eventIsAllDay = event.allDay == 1
             eventIsToday = DateUtils.isToday(event.startTime)
+            if (eventIsToday.not()){ eventIsTomorrow = getIsTomorrow(event.startTime) }
 
             //Log.i("CalendarEventTimerComplication", "Event title: ${event.title}")
             //Log.i("CalendarEventTimerComplication", "Event isOngoing: $eventIsOngoing")
@@ -234,6 +248,8 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                                 .build()
                             /** Show normal event start time (HH:mm) when start time is above 2 hours but today  **/
                             eventIsToday -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
+                            /** If event is tomorrow show 'Tomorrow'  **/
+                            eventIsTomorrow && (eventUpdateDelay >= 43200000) -> PlainComplicationText.Builder(text = getString(R.string.tomorrow)).build()
                             /** Show Localized 'in x days' when event start time is not today  **/
                             else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
                                 .setText(String.format(getString(R.string.countdown_text), "^1"))
