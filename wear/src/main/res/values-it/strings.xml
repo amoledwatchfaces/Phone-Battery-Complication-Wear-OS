@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Phone Battery Complication</string>
+    <string name="event_no_upcoming_events">tra ^1</string>
+</resources>

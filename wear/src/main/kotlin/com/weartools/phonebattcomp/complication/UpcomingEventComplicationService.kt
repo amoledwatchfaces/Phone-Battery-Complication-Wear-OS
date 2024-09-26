@@ -217,6 +217,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
                     .setTitle(
+
                         when {
                             /** Do not show Title when event is all day and today **/
                             closestEvent == null -> null
@@ -230,13 +231,13 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                             /** Show Localized 'in x minutes' when event start time is under 2 hours but today **/
                             eventIsToday && (eventUpdateDelay <= 7200000) -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
                                 .setDisplayAsNow(false)
-                                .setText("${getString(R.string.event_in)} ^1")
+                                .setText(getString(R.string.event_in))
                                 .build()
                             /** Show normal event start time (HH:mm) when start time is above 2 hours but today  **/
                             eventIsToday -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
                             /** Show Localized 'in x days' when event start time is not today  **/
-                            else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
-                                .setText("${getString(R.string.event_in)} ^1")
+                            else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
+                                .setText(getString(R.string.event_in))
                                 .build()
                         }
                     )
