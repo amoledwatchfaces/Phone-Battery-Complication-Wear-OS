@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Phone Battery Complication</string>
-    <string name="event_no_events_today">za ^1</string>
+    <string name="countdown_text">za %1$s</string>
 </resources>

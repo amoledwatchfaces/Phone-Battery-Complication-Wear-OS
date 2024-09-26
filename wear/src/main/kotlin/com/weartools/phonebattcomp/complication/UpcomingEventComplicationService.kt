@@ -85,7 +85,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
 
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = getString(R.string.preview_coffee_chat)).build(),
+                    text = PlainComplicationText.Builder(text = getString(R.string.next_event_long_text_preview)).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
                     .setTitle(PlainComplicationText.Builder(text = "09:00").build())
@@ -185,7 +185,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
         val events = repository.getEvents().first()
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
-        val (closestEventName, closestEventTime) = closestEvent?.let { it.first to it.second } ?: (getString(R.string.event_no_upcoming_events) to 0L)
+        val (closestEventName, closestEventTime) = closestEvent?.let { it.first to it.second } ?: (getString(R.string.no_upcoming_events_long_text) to 0L)
         //Log.i("CalendarEventTimerComplication", "Nearest or current event: $closestEventName")
 
         /** Schedule event update when finished / started, only when delay is in future to avoid loop **/
@@ -211,33 +211,32 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(
-                        text = if (eventIsAllDay && eventIsToday.not()) getString(R.string.event_no_events_today)
+                        text = if (eventIsAllDay && eventIsToday.not()) getString(R.string.no_upcoming_events_long_text)
                         else closestEventName
                     ).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
                     .setTitle(
-
                         when {
                             /** Do not show Title when event is all day and today **/
                             closestEvent == null -> null
                             /** Do not show Title when closest event is all day but not today **/
                             eventIsAllDay && eventIsToday.not() -> null
                             /** Show 'Today' if event is all day and ongoing **/
-                            eventIsAllDay && eventIsOngoing -> PlainComplicationText.Builder(text = getString(R.string.event_today)).build()
+                            eventIsAllDay && eventIsOngoing -> PlainComplicationText.Builder(text = getString(R.string.today)).build()
                             /** Show Localized 'Now' when event is ongoing **/
                             eventIsOngoing -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_SINGLE_UNIT, CountDownTimeReference(Instant.now()))
                                 .build()
                             /** Show Localized 'in x minutes' when event start time is under 2 hours but today **/
                             eventIsToday && (eventUpdateDelay <= 7200000) -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
                                 .setDisplayAsNow(false)
-                                .setText(getString(R.string.event_in))
+                                .setText(String.format(getString(R.string.countdown_text), "^1"))
                                 .build()
                             /** Show normal event start time (HH:mm) when start time is above 2 hours but today  **/
                             eventIsToday -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
                             /** Show Localized 'in x days' when event start time is not today  **/
                             else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
-                                .setText(getString(R.string.event_in))
+                                .setText(String.format(getString(R.string.countdown_text), "^1"))
                                 .build()
                         }
                     )

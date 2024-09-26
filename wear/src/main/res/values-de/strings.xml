@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Translated by: Develeon64 -->
+<resources lang="de" country="DE">
+    <string name="app_name">Smartphone-Akku Komplikation</string> <!-- Does not need to be translated, but it's recommended -->
+    <string name="tile_name">Smartphone-Akku</string>
+
+    <string name="settings">Einstellungen</string>
+    <string name="install_companion">Bitte Smartphone-Begleitapp installieren!</string>
+    <string name="check_phone">Öffnen Sie den Play Store auf Ihrem Handy…</string>
+    <string name="install_chip">Handy-App</string>
+
+    <string name="faq">FAQ</string>
+    <string name="app_info">Über App</string>
+    <string name="version">Ausführung</string>
+
+    <!-- Percentage -->
+    <string name="percentage_section">Smartphone-/Smartwatch-Akku Komplikation</string>
+    <string name="percentage_toggle">Prozentanzeige (%)</string>
+    <string name="percentage_on">Anzeigen; z.B. 86 %</string>
+    <string name="percentage_off">Ausblenden; z.B. 86</string>
+
+    <!-- Notifications Complication -->
+    <string name="phone_notifications_complication">Telefonbenachrichtigungen</string>
+    <string name="notifications_section">Telefonbenachrichtigungen Komplikation</string>
+    <string name="notif_comp_force_icon_type">Symboltyp</string>
+    <string name="type_icon">SYMBOL (Erzwungen)</string>
+    <string name="type_photo">FOTO (Standard)</string>
+
+    <!-- Phone Battery Complication strings -->
+    <string name="phone_battery_preview_desc">Smartphone-Akkustand</string>
+    <string name="phone_battery_at">Smartphone-Akkustand bei</string>
+
+    <!-- Watch Battery Complication strings -->
+    <string name="watch_battery_at">Smartwatch-Akkustand bei</string>
+    <string name="watch_battery_text">Smartwatch-Akkustand</string>
+
+    <!-- Watch Battery Temperature Complication strings -->
+    <string name="temp_battery_at">Smartwatch-Akkutemperatur bei</string>
+    <string name="temp_battery_text">Smartwatch-Akkutemperatur</string>
+
+    <!-- Watch Battery Voltage Complication strings -->
+    <string name="voltage_battery_at">Smartwatch-Akkuspannung bei</string>
+    <string name="voltage_battery_text">Smartwatch-Akkuspannung</string>
+    <string name="voltage_volts">Volt</string>
+
+    <!-- Temperature Units Preferences -->
+    <string name="setting_preference_category_title">Smartwatch-Akku-Temperatur Komplikation</string>
+    <string name="temp_unit_pref_title">Temperatureinheit</string>
+    <string name="experimental">Experimentell</string>
+
+    <!-- Calendar Complications -->
+    <string name="events_timer_complication">Ereignistimer</string>
+    <string name="upcoming_events_complications">Bevorstehendes Ereignis</string>
+    <string name="preview_meeting">Meeting</string>
+
+    <!-- From Google Calendar -->
+    <string name="countdown_text">in %1$s</string>
+    <string name="today">Heute</string>
+    <string name="next_event_long_text_preview">Kaffeepause</string>
+    <string name="no_upcoming_events_long_text">Keine Ereignisse heute</string>
+</resources>
