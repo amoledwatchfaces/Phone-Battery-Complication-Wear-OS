@@ -173,7 +173,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             eventIsOngoing = currentTime in event.startTime..event.endTime
             eventIsAllDay = event.allDay == 1
             eventIsToday = DateUtils.isToday(event.startTime)
-            if (eventIsToday.not()){ eventIsTomorrow = getIsTomorrow(event.startTime) }
+            eventIsTomorrow = if (eventIsToday){ false } else { getIsTomorrow(event.startTime) }
 
             //Log.i("CalendarEventTimerComplication", "Event title: ${event.title}")
             //Log.i("CalendarEventTimerComplication", "Event isOngoing: $eventIsOngoing")
