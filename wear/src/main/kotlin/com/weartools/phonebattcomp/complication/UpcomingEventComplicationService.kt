@@ -185,7 +185,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
         val events = repository.getEvents().first()
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
-        val (closestEventName, closestEventTime) = closestEvent?.let { it.first to it.second } ?: (getString(R.string.no_upcoming_events_long_text) to 0L)
+        val (closestEventName, closestEventTime) = closestEvent?.let { it.first to it.second } ?: (getString(R.string.no_upcoming_events) to 0L)
         //Log.i("CalendarEventTimerComplication", "Nearest or current event: $closestEventName")
 
         /** Schedule event update when finished / started, only when delay is in future to avoid loop **/

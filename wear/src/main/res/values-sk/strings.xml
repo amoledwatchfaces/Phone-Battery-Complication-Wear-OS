@@ -54,6 +54,7 @@
     <string name="upcoming_events_complications">Nadchádzajúce udalosti</string>
     <string name="preview_meeting">Meeting</string>
     <string name="experimental">Experimentálne</string>
+    <string name="no_upcoming_events">Žiadne ďalšie udalosti</string>
 
     <!-- From Google Calendar -->
     <string name="countdown_text">o %1$s</string>

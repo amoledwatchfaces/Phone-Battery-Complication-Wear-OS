@@ -119,7 +119,7 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
          */
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
-        val closestEventName = closestEvent?.first ?: getString(R.string.no_upcoming_events_long_text)
+        val closestEventName = closestEvent?.first ?: getString(R.string.no_upcoming_events)
         val closestEventTime = closestEvent?.second ?: 0L
         //Log.i("CalendarEventTimerComplication", "Nearest or current event: $closestEventName")
 
