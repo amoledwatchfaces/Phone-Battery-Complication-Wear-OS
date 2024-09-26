@@ -29,8 +29,7 @@
         </activity>
 
         <!-- Wearable Listener -->
-        <service
-            android:name=".MobileListener"
+        <service android:name=".MobileListener"
             android:exported="true">
             <intent-filter>
                 <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
@@ -55,8 +54,7 @@
         </service>
 
         <!-- Complications -->
-        <service
-            android:name=".complication.NotificationsIconsComplicationService"
+        <service android:name=".complication.NotificationsIconsComplicationService"
             android:icon="@drawable/ic_notif"
             android:label="@string/phone_notifications_complication"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -71,8 +69,7 @@
                 android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="SMALL_IMAGE, LONG_TEXT"/>
         </service>
-        <service
-            android:name=".complication.MobileBatteryComplicationService"
+        <service android:name=".complication.MobileBatteryComplicationService"
             android:icon="@drawable/ic_phone_icon"
             android:label="@string/phone_battery_preview_desc"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -84,8 +81,7 @@
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="RANGED_VALUE,SHORT_TEXT,LONG_TEXT"/>
         </service>
-        <service
-            android:name=".complication.WatchBatteryComplicationService"
+        <service android:name=".complication.WatchBatteryComplicationService"
             android:icon="@drawable/ic_watch"
             android:label="@string/watch_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -96,8 +92,7 @@
             <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="300"/>
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES" android:value="RANGED_VALUE,SHORT_TEXT,LONG_TEXT,ICON,SMALL_IMAGE"/>
         </service>
-        <service
-            android:name=".complication.WatchTempComplicationService"
+        <service android:name=".complication.WatchTempComplicationService"
             android:icon="@drawable/ic_temp"
             android:label="@string/temp_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -109,8 +104,7 @@
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="SHORT_TEXT"/>
         </service>
-        <service
-            android:name=".complication.WatchVoltageComplicationService"
+        <service android:name=".complication.WatchVoltageComplicationService"
             android:icon="@drawable/ic_voltage"
             android:label="@string/voltage_battery_text"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -122,8 +116,7 @@
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="SHORT_TEXT"/>
         </service>
-        <service
-            android:name=".complication.EventTimerComplicationService"
+        <service android:name=".complication.EventTimerComplicationService"
             android:icon="@drawable/ic_calendar_clock"
             android:label="@string/events_timer_complication"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -135,8 +128,7 @@
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="LONG_TEXT"/>
         </service>
-        <service
-            android:name=".complication.UpcomingEventComplicationService"
+        <service android:name=".complication.UpcomingEventComplicationService"
             android:icon="@drawable/ic_event_upcoming_2"
             android:label="@string/upcoming_events_complications"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
@@ -150,8 +142,7 @@
         </service>
 
         <!-- Tile -->
-        <service
-            android:name=".tile.PhoneBatteryTileService"
+        <service android:name=".tile.PhoneBatteryTileService"
             android:exported="true"
             android:label="@string/tile_name"
             android:icon="@mipmap/ic_launcher"
@@ -166,21 +157,26 @@
         </service>
 
         <!-- Receivers -->
-        <receiver
-            android:name=".receiver.ComplicationTapBroadcastReceiver" />
-        <receiver
-            android:name=".receiver.PowerConnectionReceiver"
+        <receiver android:name=".receiver.ComplicationTapBroadcastReceiver" />
+        <receiver android:name=".receiver.PowerConnectionReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.ACTION_POWER_CONNECTED"/>
                 <action android:name="android.intent.action.ACTION_POWER_DISCONNECTED"/>
             </intent-filter>
         </receiver>
-        <receiver
-            android:name=".receiver.AppUpdateBroadcastReceiver"
+        <receiver android:name=".receiver.AppUpdateBroadcastReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name=".receiver.DateChangedBroadcastReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.TIME_SET" />
+                <action android:name="android.intent.action.TIMEZONE_CHANGED" />
+                <action android:name="android.intent.action.DATE_CHANGED" />
             </intent-filter>
         </receiver>
     </application>
