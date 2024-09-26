@@ -156,21 +156,29 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
         var closestEventTimeDiff = Long.MAX_VALUE
 
         events.forEach { event ->
-            // Consider both start and end times for future or ongoing events
-            val relevantTimes = listOf(event.startTime, event.endTime).filter { it >= currentTime }
 
-            relevantTimes.forEach { time ->
-                val timeDiff = time - currentTime
-                if (timeDiff < closestEventTimeDiff) {
-                    closestEventTimeDiff = timeDiff
-                    closestEvent = event
-                    closestEventTime = time
+            if (currentTime in event.startTime..event.endTime) {
+                closestEvent = event
+                closestEventTime = event.endTime
+                eventIsOngoing = true
+            }
+            else {
+                eventIsOngoing = false
+                // Consider both start and end times for future or ongoing events
+                val relevantTimes = listOf(event.startTime, event.endTime).filter { it >= currentTime }
+
+                relevantTimes.forEach { time ->
+                    val timeDiff = time - currentTime
+                    if (timeDiff < closestEventTimeDiff) {
+                        closestEventTimeDiff = timeDiff
+                        closestEvent = event
+                        closestEventTime = time
+                    }
                 }
             }
         }
 
         closestEvent?.let { event ->
-            eventIsOngoing = currentTime in event.startTime..event.endTime
             eventIsAllDay = event.allDay == 1
             eventIsToday = DateUtils.isToday(event.startTime)
             eventIsTomorrow = if (eventIsToday){ false } else { getIsTomorrow(event.startTime) }
