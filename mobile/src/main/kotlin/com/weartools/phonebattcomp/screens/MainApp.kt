@@ -149,7 +149,7 @@ fun MainApp(
                     action = Intent.ACTION_VIEW
                 }),
                 route = Screen.Experimental.route) {
-                ExperimentalScreen(context, viewModel,lifecycleOwner ,isWearableConnected,commonNodesList, connectedNodesList )
+                ExperimentalScreen(view, context, viewModel,lifecycleOwner ,isWearableConnected,commonNodesList, connectedNodesList )
             }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }

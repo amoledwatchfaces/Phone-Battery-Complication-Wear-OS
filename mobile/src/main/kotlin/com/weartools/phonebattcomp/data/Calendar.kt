@@ -1,6 +1,7 @@
 package com.weartools.phonebattcomp.data
 
 import com.google.android.gms.wearable.DataMap
+import kotlinx.serialization.Serializable
 
 data class CalendarEvent(
     val title: String = "",
@@ -17,3 +18,9 @@ data class CalendarEvent(
         return dataMap
     }
 }
+// Data class to store calendar information
+@Serializable
+data class CalendarInfo(
+    val calendarId: Long,
+    val displayName: String
+)

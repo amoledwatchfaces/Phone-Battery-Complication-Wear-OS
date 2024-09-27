@@ -88,7 +88,7 @@ class WearListener : WearableListenerService() {
                             ioScope.launch {
                                 if (dataRepository.calendarSync.first()){
                                     if (applicationContext.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
-                                        CalendarContentObserver.queryAllFutureCalendarEventAndSend(applicationContext)
+                                        CalendarContentObserver.queryAllFutureCalendarEventAndSend(applicationContext, dataRepository.syncedCalendarsIdsString.first())
                                     }
                                     else {
                                         dataRepository.setCalendarSyncState(false)

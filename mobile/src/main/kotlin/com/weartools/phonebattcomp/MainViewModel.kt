@@ -22,9 +22,11 @@ import com.google.android.gms.wearable.NodeClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
+import com.weartools.phonebattcomp.data.CalendarInfo
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
+import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.getAllCalendars
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
@@ -73,6 +76,10 @@ class MainViewModel @Inject constructor(
     private val connectedNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
     private val commonNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
 
+    // Backing property to hold the mutable state of the calendar list
+    private val _calendarsStateFlow = MutableStateFlow<List<CalendarInfo>>(emptyList())
+    val calendarsStateFlow: StateFlow<List<CalendarInfo>> = _calendarsStateFlow
+
     val isMessageShownFlow = _isMessageShown.asSharedFlow()
     val loaderStateStateFlow: StateFlow<Boolean> = loaderStateMutableStateFlow.asStateFlow()
     val watchAvailableStateStateFlow: StateFlow<Boolean> = watchAvailableStateMutableStateFlow.asStateFlow()
@@ -85,6 +92,7 @@ class MainViewModel @Inject constructor(
     val calendarSync = dataRepository.calendarSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
     val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
     val backgroundService = dataRepository.backgroundServiceState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
+    val syncedCalendars = dataRepository.getCalendars().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
 
     init {
         viewModelScope.launch {
@@ -93,6 +101,7 @@ class MainViewModel @Inject constructor(
             dataRepository.calendarSync.distinctUntilChanged().collect {}
             dataRepository.notificationsSync.distinctUntilChanged().collect {}
             dataRepository.backgroundServiceState.distinctUntilChanged().collect {}
+            dataRepository.getCalendars().distinctUntilChanged().collect {}
         }
     }
 
@@ -273,7 +282,7 @@ class MainViewModel @Inject constructor(
 
     fun changeCalendarContentObserver(register: Boolean, context: Context){
         val handler = Handler(context.mainLooper)
-        val observer = CalendarContentObserver(handler, context)
+        val observer = CalendarContentObserver(handler, context, dataRepository)
         /** Register Content observer **/
         if (register){
             context.contentResolver.registerContentObserver(
@@ -282,11 +291,43 @@ class MainViewModel @Inject constructor(
                 observer
             )
             // Send Events immediately
-            viewModelScope.launch { CalendarContentObserver.queryAllFutureCalendarEventAndSend(context)}
+            viewModelScope.launch { CalendarContentObserver.queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())}
         }
         else {
             context.contentResolver.unregisterContentObserver(observer)
         }
 
+    }
+    fun syncEventsOfSelectedCalendars(context: Context){
+        viewModelScope.launch { CalendarContentObserver.queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())}
+    }
+
+    fun fetchCalendars(context: Context) {
+        viewModelScope.launch {
+            // Fetch the calendars in a background thread
+            val calendars = withContext(Dispatchers.IO) {
+                getAllCalendars(context)
+            }
+            // Update the StateFlow with the new list of calendars
+            _calendarsStateFlow.value = calendars
+        }
+    }
+    fun saveAllCalendarsOnEnabled(context: Context){
+        fetchCalendars(context)
+        viewModelScope.launch {
+            dataRepository.saveCalendars(calendarsStateFlow.value)
+        }
+    }
+    fun addSyncedCalendar(calendarInfo: CalendarInfo){
+        val syncedCalendars = syncedCalendars.value
+        viewModelScope.launch {
+            dataRepository.saveCalendars(syncedCalendars.plus(calendarInfo))
+        }
+    }
+    fun removeSyncedCalendar(calendarInfo: CalendarInfo){
+        val syncedCalendars = syncedCalendars.value
+        viewModelScope.launch {
+            dataRepository.saveCalendars(syncedCalendars.minus(calendarInfo))
+        }
     }
 }

@@ -62,7 +62,7 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
                 if (dataRepository.calendarSync.first()){
                     if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
                         val handler = Handler(context.mainLooper)
-                        val observer = CalendarContentObserver(handler, context)
+                        val observer = CalendarContentObserver(handler, context, dataRepository)
                         // Call the suspend function after the delay
                         context.contentResolver.registerContentObserver(
                             CalendarContract.Events.CONTENT_URI,

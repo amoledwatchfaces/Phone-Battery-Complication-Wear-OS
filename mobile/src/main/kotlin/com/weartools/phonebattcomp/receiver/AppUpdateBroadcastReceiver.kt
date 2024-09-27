@@ -66,9 +66,12 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
 
             if (dataRepository.calendarSync.first()){
                 if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
+                    // TODO: I'm not sure if this is really needed because this is first time implementing calendars sync
+                    if (dataRepository.syncedCalendarsIdsString.first().isEmpty()){
+                        dataRepository.saveCalendars(CalendarContentObserver.getAllCalendars(context))
+                    }
                     val handler = Handler(context.mainLooper)
-                    val observer = CalendarContentObserver(handler, context)
-                    // Call the suspend function after the delay
+                    val observer = CalendarContentObserver(handler, context, dataRepository)
                     context.contentResolver.registerContentObserver(
                         CalendarContract.Events.CONTENT_URI,
                         true, // true for recursive monitoring of child URIs

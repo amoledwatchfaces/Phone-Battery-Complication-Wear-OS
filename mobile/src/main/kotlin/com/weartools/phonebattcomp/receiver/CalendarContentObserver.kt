@@ -5,23 +5,31 @@ import android.content.ContentUris
 import android.content.Context
 import android.content.pm.PackageManager
 import android.database.ContentObserver
+import android.database.Cursor
 import android.os.Handler
 import android.provider.CalendarContract
 import androidx.core.content.ContextCompat
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import com.weartools.phonebattcomp.data.CalendarEvent
+import com.weartools.phonebattcomp.data.CalendarInfo
+import com.weartools.phonebattcomp.data.DataStoreRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 
-class CalendarContentObserver(handler: Handler, private val context: Context) : ContentObserver(handler) {
+class CalendarContentObserver(
+    handler: Handler,
+    private val context: Context,
+    private val dataRepository: DataStoreRepository,
+) : ContentObserver(handler) {
 
     // Coroutine scope for managing coroutines (using Dispatchers.Main for debouncing)
     private val scope = CoroutineScope(Dispatchers.Main)
@@ -44,7 +52,7 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
             if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
                 // Call the suspend function after the delay
                 withContext(Dispatchers.IO){
-                    queryAllFutureCalendarEventAndSend(context)
+                    queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())
                 }
             } else {
                 context.contentResolver.unregisterContentObserver(this@CalendarContentObserver)
@@ -54,7 +62,14 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
     }
 
     companion object {
-        fun queryAllFutureCalendarEventAndSend(context: Context) {
+        fun queryAllFutureCalendarEventAndSend(context: Context, syncedCalendarIds: String) {
+
+            // Early return if the calendar list is empty, no need to query
+            if (syncedCalendarIds.isEmpty()) return
+
+            // Create a selection filter for the calendar IDs
+            val selection = "${CalendarContract.Instances.CALENDAR_ID} IN ($syncedCalendarIds)"  // SQL IN clause
+            //Log.i("CalendarContextObserver","Calendar Selection: $selection")
 
             //Log.d("CalendarContentObserver", "Getting Calendar Events!")
             val offsetMillis = TimeZone.getDefault().getOffset(System.currentTimeMillis())
@@ -73,7 +88,7 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
             val cursor = context.contentResolver.query(
                 builder.build(),
                 arrayOf(CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.ALL_DAY),
-                null,
+                selection,
                 null,
                 "${CalendarContract.Instances.BEGIN} ASC"
             )
@@ -109,6 +124,38 @@ class CalendarContentObserver(handler: Handler, private val context: Context) : 
             putDataMapReq.dataMap.putDataMapArrayList("events", ArrayList(dataMapList))
             putDataMapReq.setUrgent()
             dataClient.putDataItem(putDataMapReq.asPutDataRequest())
+        }
+        fun getAllCalendars(context: Context): List<CalendarInfo> {
+            val calendars = mutableListOf<CalendarInfo>()
+
+            // Define the projection (columns to retrieve)
+            val projection = arrayOf(
+                CalendarContract.Calendars._ID,        // Calendar ID
+                CalendarContract.Calendars.CALENDAR_DISPLAY_NAME  // Calendar display name
+            )
+
+            // Query the Calendars content provider
+            val cursor: Cursor? = context.contentResolver.query(
+                CalendarContract.Calendars.CONTENT_URI,
+                projection,
+                null,    // No selection filter (retrieves all calendars)
+                null,    // No selection arguments
+                null     // No sort order
+            )
+
+            // Iterate over the cursor and extract calendar information
+            cursor?.use {
+                val idIndex = it.getColumnIndex(CalendarContract.Calendars._ID)
+                val displayNameIndex = it.getColumnIndex(CalendarContract.Calendars.CALENDAR_DISPLAY_NAME)
+
+                while (it.moveToNext()) {
+                    val calendarId = it.getLong(idIndex)
+                    val displayName = it.getString(displayNameIndex)
+                    calendars.add(CalendarInfo(calendarId, displayName))
+                }
+            }
+
+            return calendars
         }
 
         fun Context.arePermissionsGranted(vararg permissions: String): Boolean {

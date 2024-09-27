@@ -5,6 +5,7 @@ plugins {
     id ("com.android.application")
     id ("org.jetbrains.kotlin.android")
     id ("org.jetbrains.kotlin.plugin.compose")
+    id ("kotlinx-serialization")
     id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
     id ("com.google.gms.google-services")
@@ -99,6 +100,9 @@ dependencies {
     implementation ("androidx.activity:activity-ktx:1.9.2")
     implementation ("androidx.core:core-ktx:1.13.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+
+    // Serialization
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
 
     // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
