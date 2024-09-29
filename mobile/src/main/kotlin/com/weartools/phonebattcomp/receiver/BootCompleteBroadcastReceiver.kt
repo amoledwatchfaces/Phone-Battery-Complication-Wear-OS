@@ -19,14 +19,13 @@ import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.os.Handler
-import android.provider.CalendarContract
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.ACTIVE_SYNC_KEY
 import com.weartools.phonebattcomp.ACTIVE_SYNC_PATH
 import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
+import com.weartools.phonebattcomp.utils.registerCalendarObserver
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +38,7 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
 
     @Inject lateinit var dataRepository: DataStoreRepository
     @Inject lateinit var dataClient: DataClient
+    @Inject lateinit var calendarContentObserver: CalendarContentObserver
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
     override fun onReceive(context: Context, intent: Intent) {
@@ -61,14 +61,7 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
 
                 if (dataRepository.calendarSync.first()){
                     if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
-                        val handler = Handler(context.mainLooper)
-                        val observer = CalendarContentObserver(handler, context, dataRepository)
-                        // Call the suspend function after the delay
-                        context.contentResolver.registerContentObserver(
-                            CalendarContract.Events.CONTENT_URI,
-                            true, // true for recursive monitoring of child URIs
-                            observer
-                        )
+                        context.registerCalendarObserver(calendarContentObserver)
                     }
                     else {
                         dataRepository.setCalendarSyncState(false)

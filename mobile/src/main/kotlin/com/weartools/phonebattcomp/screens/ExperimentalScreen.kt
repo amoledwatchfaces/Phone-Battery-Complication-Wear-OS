@@ -325,7 +325,7 @@ fun ExperimentalScreen(
         if (openCalendars){
             BasicAlertDialog(
                 onDismissRequest = {
-                    viewModel.syncEventsOfSelectedCalendars(context)
+                    viewModel.changeCalendarContentObserver(true, context)
                     openCalendars = false
                     return@BasicAlertDialog
                 }
@@ -377,7 +377,7 @@ fun ExperimentalScreen(
                             ) {
                                 TextButton(
                                     onClick = {
-                                        viewModel.syncEventsOfSelectedCalendars(context)
+                                        viewModel.changeCalendarContentObserver(true, context)
                                         openCalendars = false
                                     }
                                 ) {

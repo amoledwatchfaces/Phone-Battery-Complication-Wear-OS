@@ -8,8 +8,6 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.BatteryManager
-import android.os.Handler
-import android.provider.CalendarContract
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
@@ -27,6 +25,8 @@ import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.getAllCalendars
+import com.weartools.phonebattcomp.utils.registerCalendarObserver
+import com.weartools.phonebattcomp.utils.unregisterCalendarObserver
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -54,7 +54,8 @@ class MainViewModel @Inject constructor(
     private val remoteActivityHelper: RemoteActivityHelper,
     private val dataClient: DataClient,
     private val dataRepository: DataStoreRepository,
-    private val batteryManager: BatteryManager
+    private val batteryManager: BatteryManager,
+    private val calendarContentObserver: CalendarContentObserver,
 ) : ViewModel(){
 
     private lateinit var reviewManager: ReviewManager
@@ -281,25 +282,16 @@ class MainViewModel @Inject constructor(
     }
 
     fun changeCalendarContentObserver(register: Boolean, context: Context){
-        val handler = Handler(context.mainLooper)
-        val observer = CalendarContentObserver(handler, context, dataRepository)
         /** Register Content observer **/
         if (register){
-            context.contentResolver.registerContentObserver(
-                CalendarContract.Events.CONTENT_URI,
-                true, // true for recursive monitoring of child URIs
-                observer
-            )
+            context.registerCalendarObserver(calendarContentObserver)
             // Send Events immediately
             viewModelScope.launch { CalendarContentObserver.queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())}
         }
         else {
-            context.contentResolver.unregisterContentObserver(observer)
+            context.unregisterCalendarObserver(calendarContentObserver)
         }
 
-    }
-    fun syncEventsOfSelectedCalendars(context: Context){
-        viewModelScope.launch { CalendarContentObserver.queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())}
     }
 
     fun fetchCalendars(context: Context) {
@@ -313,9 +305,11 @@ class MainViewModel @Inject constructor(
         }
     }
     fun saveAllCalendarsOnEnabled(context: Context){
-        fetchCalendars(context)
         viewModelScope.launch {
-            dataRepository.saveCalendars(calendarsStateFlow.value)
+            val calendars = withContext(Dispatchers.IO) {
+                getAllCalendars(context)
+            }
+            dataRepository.saveCalendars(calendars)
         }
     }
     fun addSyncedCalendar(calendarInfo: CalendarInfo){

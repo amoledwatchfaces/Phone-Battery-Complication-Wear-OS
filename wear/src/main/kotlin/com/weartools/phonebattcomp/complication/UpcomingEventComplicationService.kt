@@ -157,7 +157,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
 
         for (event in events) {
             // Close loop sooner when some event is ongoing and set closestEventTime to event end time
-            if (currentTime in event.startTime..event.endTime) {
+            if (currentTime in event.startTime..event.endTime && event.allDay == 0) {
                 closestEvent = event
                 closestEventTime = event.endTime
                 break

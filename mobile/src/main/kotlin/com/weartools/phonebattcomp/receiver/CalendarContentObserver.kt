@@ -14,6 +14,8 @@ import com.google.android.gms.wearable.Wearable
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.CalendarInfo
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.utils.unregisterCalendarObserver
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -24,11 +26,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
-class CalendarContentObserver(
+class CalendarContentObserver @Inject constructor(
     handler: Handler,
-    private val context: Context,
-    private val dataRepository: DataStoreRepository,
+    @ApplicationContext private val context: Context,
+    private val dataRepository: DataStoreRepository
 ) : ContentObserver(handler) {
 
     // Coroutine scope for managing coroutines (using Dispatchers.Main for debouncing)
@@ -55,13 +58,15 @@ class CalendarContentObserver(
                     queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())
                 }
             } else {
-                context.contentResolver.unregisterContentObserver(this@CalendarContentObserver)
+                context.unregisterCalendarObserver(this@CalendarContentObserver)
                 scope.cancel()
             }
         }
     }
 
+
     companion object {
+
         fun queryAllFutureCalendarEventAndSend(context: Context, syncedCalendarIds: String) {
 
             // Early return if the calendar list is empty, no need to query
@@ -87,7 +92,22 @@ class CalendarContentObserver(
             // Query for all future events
             val cursor = context.contentResolver.query(
                 builder.build(),
-                arrayOf(CalendarContract.Instances.TITLE, CalendarContract.Instances.BEGIN, CalendarContract.Instances.END, CalendarContract.Instances.ALL_DAY),
+                arrayOf(
+                    CalendarContract.Instances.TITLE,
+                    CalendarContract.Instances.BEGIN,
+                    CalendarContract.Instances.END,
+                    CalendarContract.Instances.ALL_DAY,
+/*
+                    CalendarContract.Instances.DTEND,
+                    CalendarContract.Instances.DTSTART,
+                    CalendarContract.Instances.START_DAY,
+                    CalendarContract.Instances.START_MINUTE,
+                    CalendarContract.Instances.END_DAY,
+                    CalendarContract.Instances.END_MINUTE,
+                    CalendarContract.Instances.EVENT_TIMEZONE,
+
+ */
+                ),
                 selection,
                 null,
                 "${CalendarContract.Instances.BEGIN} ASC"
@@ -99,25 +119,97 @@ class CalendarContentObserver(
                     val eventStartTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.BEGIN))
                     val eventEndTime = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.END))
                     val isAllDay = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.ALL_DAY))
+/*
+                    val eventDTSTART = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.DTSTART))
+                    val eventDTEND = it.getLong(it.getColumnIndexOrThrow(CalendarContract.Instances.DTEND))
+                    val eventStartDay = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.START_DAY))
+                    val eventStartMinute = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.START_MINUTE))
+                    val eventEndDay = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.END_DAY))
+                    val eventEndMinute = it.getInt(it.getColumnIndexOrThrow(CalendarContract.Instances.END_MINUTE))
+                    val eventTimeZone = it.getString(it.getColumnIndexOrThrow(CalendarContract.Instances.EVENT_TIMEZONE))
 
+
+ */
                     if (isAllDay == 1){
                         // Calendar sets all-day events to start at 00:00 AM UTC+0 which is not corrected by offset
                         // We need to subtract offset so UTC+0 really defines local day midnight
-                        events.add(CalendarEvent(eventTitle, eventStartTime-offsetMillis, eventEndTime-offsetMillis, isAllDay))
+                        events.add(
+                            CalendarEvent(
+                                title = eventTitle,
+                                startTime = eventStartTime-offsetMillis,
+                                endTime = eventEndTime-offsetMillis,
+                                allDay = isAllDay,
+            /*
+                                dtStart = eventDTSTART,
+                                dtEnd = eventDTEND,
+                                startDay = eventStartDay,
+                                startMinute = eventStartMinute,
+                                endDay = eventEndDay,
+                                endMinute = eventEndMinute,
+                                timeZone = eventTimeZone
+
+             */
+                            )
+                        )
                     }
                     else {
-                        events.add(CalendarEvent(eventTitle, eventStartTime, eventEndTime, isAllDay))
+                        events.add(
+                            CalendarEvent(
+                                title = eventTitle,
+                                startTime = eventStartTime,
+                                endTime = eventEndTime,
+                                allDay = isAllDay,
+/*
+                                dtStart = eventDTSTART,
+                                dtEnd = eventDTEND,
+                                startDay = eventStartDay,
+                                startMinute = eventStartMinute,
+                                endDay = eventEndDay,
+                                endMinute = eventEndMinute,
+                                timeZone = eventTimeZone
+
+ */
+                            )
+                        )
                     }
                 }
             }
 
             // Log the number of events found and return the list of events
             /*
-            Log.i("queryAllFutureEvents", "Found ${events.size} future events.")
-            if (events.isNotEmpty()){
-                Log.i("queryAllFutureEvents", "First Event Title: ${events[0].title}")
+                        if (events.isNotEmpty()){
+                            for (event in events){
+                                Log.i("queryAllFutureEvents", "eventTitle: ${event.title}")
+                                Log.i("queryAllFutureEvents", "eventStart: ${event.startTime}")
+                                Log.i("queryAllFutureEvents", "eventEnd: ${event.endTime}")
+                                Log.i("queryAllFutureEvents", "-------------------------")
+                            }
+
+
+
+                            Log.i("queryAllFutureEvents", "startTime: ${events[0].startTime}")
+                            Log.i("queryAllFutureEvents", "endTime: ${events[0].endTime}")
+                            Log.i("queryAllFutureEvents", "allDay: ${events[0].allDay}")
+                            Log.i("queryAllFutureEvents", "dtStart: ${events[0].dtStart}")
+                            Log.i("queryAllFutureEvents", "dtEnd: ${events[0].dtEnd}")
+                            Log.i("queryAllFutureEvents", "startDay: ${events[0].startDay}")
+                            Log.i("queryAllFutureEvents", "startMinute: ${events[0].startMinute}")
+                            Log.i("queryAllFutureEvents", "endDay: ${events[0].endDay}")
+                            Log.i("queryAllFutureEvents", "endMinute: ${events[0].endMinute}")
+                            Log.i("queryAllFutureEvents", "timeZone: ${events[0].timeZone}")
+
+                            val julianStartToUTC = julianDayToUtcMillis(events[0].startDay,events[0].startMinute)
+                            val julianEndToUTC = julianDayToUtcMillis(events[0].endDay,events[0].endMinute)
+
+                            Log.i("queryAllFutureEvents", "julianDayToUtcStartTime: $julianStartToUTC")
+                            Log.i("queryAllFutureEvents", "julianDayToUtcEndTime: $julianEndToUTC")
+
+
             }
              */
+
+
+
 
             val dataMapList = events.map { it.toDataMap() }
             val putDataMapReq = PutDataMapRequest.create("/calendar-events")
@@ -125,6 +217,12 @@ class CalendarContentObserver(
             putDataMapReq.setUrgent()
             dataClient.putDataItem(putDataMapReq.asPutDataRequest())
         }
+        /*
+        fun julianDayToUtcMillis(julianDay: Int, minutesFromMidnight: Int): Long {
+            return (julianDay - 2440588L) * 86400000L + minutesFromMidnight * 60000L
+        }
+
+         */
         fun getAllCalendars(context: Context): List<CalendarInfo> {
             val calendars = mutableListOf<CalendarInfo>()
 

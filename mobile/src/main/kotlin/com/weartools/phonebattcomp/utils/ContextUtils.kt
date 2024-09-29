@@ -5,9 +5,11 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.provider.CalendarContract
 import android.provider.Settings
 import android.util.Log
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 
 fun Context.openPlayStore() {
         try {
@@ -90,4 +92,22 @@ fun Context.openTwitterSocialLink() {
     } catch (e: ActivityNotFoundException) {
         Log.d(TAG,"No Browser available")
     }
+}
+
+
+fun Context.unregisterCalendarObserver(observer: CalendarContentObserver){
+    try {
+        contentResolver.unregisterContentObserver(observer)
+    } catch (e: IllegalArgumentException) {
+        // Handle the case where the observer wasn't registered
+        Log.w("CalendarObserver", "Observer wasn't registered, ignoring.")
+    }
+}
+fun Context.registerCalendarObserver(observer: CalendarContentObserver){
+    unregisterCalendarObserver(observer)
+    contentResolver.registerContentObserver(
+        CalendarContract.Events.CONTENT_URI,
+        true, // true for recursive monitoring of child URIs
+        observer
+    )
 }
