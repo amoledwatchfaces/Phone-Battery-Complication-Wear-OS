@@ -27,6 +27,7 @@ import androidx.wear.watchface.complications.data.CountDownTimeReference
 import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
+import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.data.TimeDifferenceComplicationText
 import androidx.wear.watchface.complications.data.TimeDifferenceStyle
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
@@ -74,6 +75,14 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
 
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = getString(R.string.preview_meeting)).build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
+                    .setTitle(PlainComplicationText.Builder(text = "1h 30m").build())
+                    .build()
+            }
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = getString(R.string.preview_meeting)).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
@@ -145,6 +154,17 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
 
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = closestEventName).build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
+                    .setTitle(
+                        if (closestEvent == null) { null }
+                        else { TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime))).build() })
+                    .setTapAction(openScreen())
+                    .build()
+            }
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = closestEventName).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())

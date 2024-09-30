@@ -126,7 +126,7 @@
             </intent-filter>
             <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="2100"/>
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="LONG_TEXT"/>
+                android:value="LONG_TEXT SHORT_TEXT"/>
         </service>
         <service android:name=".complication.UpcomingEventComplicationService"
             android:icon="@drawable/ic_event_upcoming_2"
@@ -138,7 +138,7 @@
             </intent-filter>
             <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="2100"/>
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="LONG_TEXT"/>
+                android:value="LONG_TEXT SHORT_TEXT"/>
         </service>
 
         <!-- Tile -->

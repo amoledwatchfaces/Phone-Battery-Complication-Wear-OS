@@ -29,6 +29,7 @@ import androidx.wear.watchface.complications.data.CountDownTimeReference
 import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
+import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.data.TimeDifferenceComplicationText
 import androidx.wear.watchface.complications.data.TimeDifferenceStyle
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
@@ -91,6 +92,13 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
                     .setTitle(PlainComplicationText.Builder(text = "09:00").build())
+                    .build()
+            }
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = "09:00").build(),
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
                     .build()
             }
 
@@ -261,6 +269,19 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                                 .build()
                         }
                     )
+                    .setTapAction(openScreen())
+                    .build()
+            }
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = when {
+                        /** Show None when there are no events or when event is all day or when event is not today **/
+                        closestEvent == null || eventIsAllDay || eventIsToday.not() -> PlainComplicationText.Builder(text = getString(R.string.no_upcoming_events_short_text)).build()
+                        /** Else show normal event start time (HH:mm) but today  **/
+                        else -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
+                    },
+                    contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
                     .setTapAction(openScreen())
                     .build()
             }
