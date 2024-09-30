@@ -165,7 +165,7 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
             }
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = closestEventName).build(),
+                    text = PlainComplicationText.Builder(text = closestEvent?.first ?: getString(R.string.no_upcoming_events_short_text)).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
                     .setTitle(
