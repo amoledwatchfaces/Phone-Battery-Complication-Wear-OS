@@ -19,7 +19,9 @@ package com.weartools.phonebattcomp
 import android.Manifest
 import android.content.ContentValues.TAG
 import android.os.BatteryManager
+import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -47,6 +49,7 @@ const val ACTIVE_SYNC_PATH = "/active-sync"
 const val ACTIVE_SYNC_KEY = "active-sync-key"
 
 private const val CALENDAR_REQUEST_PATH = "/calendar-request"
+private const val NOTIFICATIONS_REQUEST_PATH = "/notifications-request"
 
 @AndroidEntryPoint
 class WearListener : WearableListenerService() {
@@ -93,6 +96,16 @@ class WearListener : WearableListenerService() {
                                     else {
                                         dataRepository.setCalendarSyncState(false)
                                     }
+                                }
+                            }
+                        }
+                        NOTIFICATIONS_REQUEST_PATH -> {
+                            Log.i(TAG, "Notifications Complication Activated, send notifications")
+                            ioScope.launch {
+                                val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(this@WearListener).contains(BuildConfig.APPLICATION_ID)
+                                if (isServiceRunning && dataRepository.notificationsSync.first()){
+                                    val notifications: Array<StatusBarNotification> = NotificationListener().activeNotifications
+                                    NotificationListener().sendToWatch(notifications, dataClient)
                                 }
                             }
                         }

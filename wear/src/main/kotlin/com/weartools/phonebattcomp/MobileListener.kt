@@ -18,6 +18,7 @@ package com.weartools.phonebattcomp
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.datastore.core.DataStore
 import androidx.wear.tiles.TileService
 import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
@@ -30,9 +31,8 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
-import com.weartools.phonebattcomp.complication.notificationsByteArrayList
 import com.weartools.phonebattcomp.data.CalendarEvent
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import com.weartools.phonebattcomp.utils.updateCalendarComplications
 import com.weartools.phonebattcomp.utils.updateComplication
@@ -56,19 +56,24 @@ private const val URI = "/foobar"
 private const val CALENDAR_EVENTS_PATH = "/calendar-events"
 private const val CALENDAR_EVENTS_KEY = "events"
 const val CALENDAR_REQUEST_PATH = "/calendar-request"
+
+const val NOTIFICATIONS_REQUEST_PATH = "/notifications-request"
+
 var lastCalendarRequestTime = 0L
 
 @AndroidEntryPoint
 class MobileListener : WearableListenerService() {
 
-    @Inject lateinit var dataRepository: DataStoreRepository
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+
     @Inject lateinit var dataClient: DataClient
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
-        val batteryState = application as MainApplication
+
 
         /** Freeze dataEvents before processing **/
         val frozenDataEvents = dataEvents.map {
@@ -84,13 +89,17 @@ class MobileListener : WearableListenerService() {
                         BATTERY_PATH -> {
                             val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
 
-                            batteryState.phoneBatteryLevel = dataMapItem.dataMap.getInt(BATTERY_KEY)
-                            batteryState.phoneIsCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY)
-                            batteryState.phoneIsConnected = true
-                            batteryState.afterMobileResult = true
-                            batteryState.lastUpdate.value = System.currentTimeMillis()
-
-
+                            ioScope.launch {
+                                dataStore.updateData {
+                                    it.copy(
+                                        phoneBatteryLevel = dataMapItem.dataMap.getInt(BATTERY_KEY),
+                                        phoneIsCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY),
+                                        phoneIsConnected = true,
+                                        afterMobileResult = true,
+                                        lastUpdate = System.currentTimeMillis()
+                                    )
+                                }
+                            }
                             //Log.d("MobileListener", "Received Phone Battery Level: ${batteryState.phoneBatteryLevel}")
                             //Log.d("MobileListener", "Update time: ${batteryState.lastUpdate.value}")
                             updateComplication(MobileBatteryComplicationService::class.java)
@@ -99,7 +108,7 @@ class MobileListener : WearableListenerService() {
                         ACTIVE_SYNC_PATH -> {
                             val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
                             ioScope.launch {
-                                dataRepository.setActiveSyncState(state)
+                                dataStore.updateData { it.copy(activeSync = state) }
                             }
                         }
                         URI -> {
@@ -111,19 +120,26 @@ class MobileListener : WearableListenerService() {
                             // Convert each DataMap back to CalendarEvent
                             val events = eventDataMaps.map { CalendarEvent.fromDataMap(it) }
                             // TODO: we're taking only first 200 items to reduce overhead (take(200))
-                            ioScope.launch { dataRepository.saveEvents(events.take(200)) }
+                            ioScope.launch {
+                                dataStore.updateData { it.copy(calendarEvents = events.take(200)) }
+                            }
                             updateCalendarComplications()
                         }
                     }
                 }
                 DataEvent.TYPE_DELETED -> {
                 //Log.v(TAG, "Data deleted : " + dataEvent.dataItem.toString())
-                    batteryState.phoneBatteryLevel = 0
-                    batteryState.phoneIsCharging = false
-                    batteryState.phoneIsConnected = false
-                    batteryState.afterMobileResult = false
-                    batteryState.lastUpdate.value = System.currentTimeMillis()
-
+                    ioScope.launch {
+                        dataStore.updateData {
+                            it.copy(
+                                phoneBatteryLevel = 0,
+                                phoneIsCharging = false,
+                                phoneIsConnected = false,
+                                afterMobileResult = false,
+                                lastUpdate = System.currentTimeMillis()
+                            )
+                        }
+                    }
                     //Log.d(TAG, "Phone Companion Uninstalled!")
                     updateComplication(MobileBatteryComplicationService::class.java)
             }
@@ -136,23 +152,30 @@ class MobileListener : WearableListenerService() {
 
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         super.onCapabilityChanged(capabilityInfo)
-        val batteryState = application as MainApplication
         if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP){
             //Log.d("MobileListener", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
             if (capabilityInfo.nodes.size > 0){
                 //Log.d("MobileListener", "capability ${capabilityInfo.name} connected!")
-                capabilityInfo.nodes.firstOrNull()?.let {
+                capabilityInfo.nodes.firstOrNull()?.let { node ->
                     ioScope.launch {
-                        dataRepository.storeNodeName(it.displayName)
+                        dataStore.updateData { it.copy(nodeName = node.displayName ) }
                     }
                 }
                 sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
             }
             else {
                 //Log.d("MobileListener", "capability ${capabilityInfo.name} disconnected!")
-                batteryState.phoneIsConnected = false
-                batteryState.afterMobileResult = true
+                ioScope.launch {
+                    dataStore.updateData {
+                        it.copy(
+                            phoneIsConnected = false,
+                            afterMobileResult = true,
+                            notificationsList = emptyList()
+                        )
+                    }
+                }
                 updateComplication(MobileBatteryComplicationService::class.java)
+                updateComplication(NotificationsIconsComplicationService::class.java)
             }
         }
     }
@@ -166,7 +189,9 @@ class MobileListener : WearableListenerService() {
             byteArrayList.add(byteArray)
             i++
         }
-        notificationsByteArrayList = byteArrayList
+        ioScope.launch {
+            dataStore.updateData { it.copy(notificationsList = byteArrayList) }
+        }
         updateComplication(NotificationsIconsComplicationService::class.java)
     }
 
@@ -197,6 +222,14 @@ class MobileListener : WearableListenerService() {
 
                 dataClient.putDataItem(request)
             }
+        }
+        fun sendNotificationsRequest(dataClient: DataClient){
+            val request = PutDataMapRequest.create(NOTIFICATIONS_REQUEST_PATH).apply {
+                dataMap.putLong("notificationsUpdate", System.currentTimeMillis()) }
+                .asPutDataRequest()
+                .setUrgent()
+
+            dataClient.putDataItem(request)
         }
     }
 }

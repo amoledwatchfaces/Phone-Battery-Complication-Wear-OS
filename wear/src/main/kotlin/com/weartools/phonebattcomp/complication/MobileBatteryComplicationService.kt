@@ -18,6 +18,7 @@ package com.weartools.phonebattcomp.complication
 
 import android.content.ComponentName
 import android.graphics.drawable.Icon
+import androidx.datastore.core.DataStore
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -31,10 +32,10 @@ import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.google.android.gms.wearable.DataClient
-import com.weartools.phonebattcomp.MainApplication
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
 import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
@@ -45,14 +46,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MobileBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
-    @Inject lateinit var repository: DataStoreRepository
-    @Inject lateinit var dataClient: DataClient
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
-    val phoneChargingIcon by lazy { Icon.createWithResource(this, R.drawable.ic_phone_charging_3) }
-    val phoneConnectedIcon by lazy { Icon.createWithResource(this, R.drawable.ic_phone_icon) }
-    val phoneDisconnectedIcon by lazy { Icon.createWithResource(this, R.drawable.ic_phone_disconnected) }
-    val watchChargingIcon by lazy { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
-    val watchNormalIcon by lazy { Icon.createWithResource(this, R.drawable.ic_watch) }
+    @Inject
+    lateinit var dataClient: DataClient
 
     override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType) {
         super.onComplicationActivated(complicationInstanceId, type)
@@ -106,42 +105,37 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(this,ComplicationToggleArgs(ComponentName(this, javaClass),request.complicationInstanceId))
 
-        val batteryState = application as MainApplication
+        val repository = preferences.first()
 
-        val activeSync = repository.activeSync.first()
-        val showPercentage = repository.percentage.first()
+        val activeSync = repository.activeSync
+        val showPercentage = repository.percentage
 
         /** When Active Sync is not enabled **/
         if (activeSync.not()) {
-            if (batteryState.afterMobileResult.not()) {
-                MobileListener.sendPhoneBatteryRequest(batteryState.lastUpdate.value?:0L, dataClient, false)
+            if (repository.afterMobileResult.not()) {
+                MobileListener.sendPhoneBatteryRequest(repository.lastUpdate, dataClient, false)
             }
             else {
-                batteryState.afterMobileResult = false
+                dataStore.updateData { it.copy(afterMobileResult = false) }
             }
         }
-        /** When Active Sync is enabled but last update time was reset **/
-        else {
-            if (batteryState.lastUpdate.value == null){
-                MobileListener.sendPhoneBatteryRequest(0L, dataClient, true)
-            }
-        }
+
         //Log.i("MobileBatteryComplicationService", "lastUpdate: ${batteryState.lastUpdate.value}")
         //Log.i("MobileBatteryComplicationService", "batteryLevel: ${batteryState.phoneBatteryLevel}")
 
-        val level = if (batteryState.phoneBatteryLevel == 0) "\uFEFF-" else "\uFEFF${batteryState.phoneBatteryLevel}${if (showPercentage) "%" else ""}"
+        val level = if (repository.phoneBatteryLevel == 0) "\uFEFF-" else "\uFEFF${repository.phoneBatteryLevel}${if (showPercentage) "%" else ""}"
         val phoneIcon = when {
-            batteryState.phoneIsConnected && batteryState.phoneIsCharging -> phoneChargingIcon
-            batteryState.phoneIsConnected -> phoneConnectedIcon
-            else -> phoneDisconnectedIcon
+            repository.phoneIsConnected && repository.phoneIsCharging -> Icon.createWithResource(this, R.drawable.ic_phone_charging_3)
+            repository.phoneIsConnected -> Icon.createWithResource(this, R.drawable.ic_phone_icon)
+            else -> Icon.createWithResource(this, R.drawable.ic_phone_disconnected)
         }
-        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) watchChargingIcon else watchNormalIcon
+        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) Icon.createWithResource(this, R.drawable.ic_watch_charging_3) else Icon.createWithResource(this, R.drawable.ic_watch)
 
         return when (request.complicationType) {
 
             ComplicationType.RANGED_VALUE -> {
                 RangedValueComplicationData.Builder(
-                    value = batteryState.phoneBatteryLevel.toFloat(),
+                    value = repository.phoneBatteryLevel.toFloat(),
                     min = 0f,
                     max = 100f,
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())
@@ -165,7 +159,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                      text = PlainComplicationText.Builder(text = level).build(),
                      contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())
                      .setMonochromaticImage(MonochromaticImage.Builder(image = phoneIcon).build())
-                     .setTitle(PlainComplicationText.Builder(text = repository.nodeName.first()).build())
+                     .setTitle(PlainComplicationText.Builder(text = repository.nodeName).build())
                      .setSmallImage(smallImage = SmallImage.Builder(image = phoneIcon, type = SmallImageType.ICON)
                          .setAmbientImage(watchIcon)
                          .build())

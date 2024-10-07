@@ -20,6 +20,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
@@ -28,10 +29,11 @@ import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchTempComplicationService
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
@@ -40,43 +42,37 @@ import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
-    private val dataRepository: DataStoreRepository
+    private val dataStore: DataStore<UserPreferences>,
+    repository: UserPreferencesRepository,
 ) : ViewModel(){
 
-    val nodeName = dataRepository.nodeName.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), "Not connected")
-    val tempUnit = dataRepository.tempUnit.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
-    val percentage = dataRepository.percentage.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), true)
-    val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-    val notificationIconType = dataRepository.notificationsIconType.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), 1)
+    val preferences: StateFlow<UserPreferences> = repository
+        .getPreferences()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = UserPreferences()
+        )
 
-    init {
-        viewModelScope.launch {
-            dataRepository.nodeName.distinctUntilChanged().collect {}
-            dataRepository.tempUnit.distinctUntilChanged().collect {}
-            dataRepository.percentage.distinctUntilChanged().collect {}
-            dataRepository.activeSync.distinctUntilChanged().collect {}
-            dataRepository.notificationsIconType.distinctUntilChanged().collect {}
-        }
-    }
 
     fun toggleEnabled(context: Context) {
         viewModelScope.launch {
-            val newEnabledStatus = !tempUnit.value
-            dataRepository.storeTempUnit(newEnabledStatus)
+            val newEnabledStatus = !preferences.value.tempUnit
+            dataStore.updateData { it.copy(tempUnit = newEnabledStatus) }
             updateComplication(context = context, WatchTempComplicationService::class.java)
         }
     }
     fun togglePercentage(context: Context) {
         viewModelScope.launch {
-            val newEnabledStatus = !percentage.value
-            dataRepository.storePercentage(newEnabledStatus)
+            val newEnabledStatus = !preferences.value.percentage
+            dataStore.updateData { it.copy(percentage = newEnabledStatus) }
             updateComplication(context = context, MobileBatteryComplicationService::class.java)
             updateComplication(context = context, WatchBatteryComplicationService::class.java)
         }
     }
     fun storeNotificationIconType(context: Context, type: Int) {
         viewModelScope.launch {
-            dataRepository.storeNotifIconType(type)
+            dataStore.updateData { it.copy(notificationsIconType = type) }
             updateComplication(context = context, NotificationsIconsComplicationService::class.java)
         }
     }

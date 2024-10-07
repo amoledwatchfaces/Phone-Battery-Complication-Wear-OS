@@ -18,6 +18,7 @@ package com.weartools.phonebattcomp.complication
 
 import android.graphics.Color
 import android.graphics.drawable.Icon
+import androidx.datastore.core.DataStore
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -28,21 +29,29 @@ import androidx.wear.watchface.complications.data.SmallImageComplicationData
 import androidx.wear.watchface.complications.data.SmallImageType
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
+import com.google.android.gms.wearable.DataClient
+import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.utils.BitmapCreator
 import com.weartools.phonebattcomp.utils.BitmapCreatorLine
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.launch
 import javax.inject.Inject
-
-/** Global variables **/
-var notificationsByteArrayList: List<ByteArray> = emptyList()
 
 @AndroidEntryPoint
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
 
-    @Inject lateinit var repository: DataStoreRepository
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
+    @Inject
+    lateinit var dataClient: DataClient
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         return when (type) {
@@ -70,9 +79,16 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
         }
     }
 
+    override fun onComplicationActivated(complicationInstanceId: Int, type: ComplicationType) {
+        super.onComplicationActivated(complicationInstanceId, type)
+        CoroutineScope(Dispatchers.IO).launch {
+            MobileListener.sendNotificationsRequest(dataClient)
+        }
+    }
+
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val noNotification = notificationsByteArrayList.isEmpty()
+        val notifications = preferences.first().notificationsList
 
         return when (request.complicationType) {
 
@@ -80,18 +96,20 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                 SmallImageComplicationData.Builder(
                     smallImage = SmallImage.Builder(
                         image =
-                        if (noNotification.not()) {
-                            if (notificationsByteArrayList.size == 1) {
-                                Icon.createWithBitmap(BitmapCreator.createSingleBitmap(notificationsByteArrayList[0]))
+                        if (notifications.isEmpty()){
+                            Icon.createWithResource(this, R.drawable.ic_notif_none)
+                        }
+                        else {
+                            if (notifications.size == 1) {
+                                Icon.createWithBitmap(BitmapCreator.createSingleBitmap(notifications[0]))
                                     .setTint(Color.WHITE)
                             }
                             else {
-                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(notificationsByteArrayList))
+                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(notifications))
                                     .setTint(Color.WHITE)
                             }
-                        }
-                        else Icon.createWithResource(this, R.drawable.ic_notif_none),
-                        type = if (repository.notificationsIconType.first() == 0) SmallImageType.ICON else SmallImageType.PHOTO)
+                        },
+                        type = if (preferences.first().notificationsIconType == 0) SmallImageType.ICON else SmallImageType.PHOTO)
                         .build(),
                     contentDescription = ComplicationText.EMPTY)
                     .build()
@@ -102,10 +120,12 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     contentDescription = ComplicationText.EMPTY)
                     .setSmallImage(SmallImage.Builder(
                         image =
-                        if (noNotification.not()) {
-                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(notificationsByteArrayList)).setTint(Color.WHITE)
+                        if (notifications.isEmpty()){
+                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty())
                         }
-                        else Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty()),
+                        else {
+                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(notifications)).setTint(Color.WHITE)
+                        },
                         type = SmallImageType.ICON)
                         .build())
                     .build()

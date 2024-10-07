@@ -22,6 +22,7 @@ import android.content.Intent
 import android.graphics.drawable.Icon
 import android.os.BatteryManager
 import android.provider.Settings
+import androidx.datastore.core.DataStore
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -42,7 +43,8 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
@@ -65,11 +67,11 @@ fun scheduleComplicationUpdate(context: Context){
 @AndroidEntryPoint
 class WatchBatteryComplicationService : SuspendingComplicationDataSourceService() {
 
-    @Inject lateinit var repository: DataStoreRepository
-    private val batteryManager by lazy { applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager }
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
-    val watchChargingIcon by lazy { Icon.createWithResource(this, R.drawable.ic_watch_charging_3) }
-    val watchNormalIcon by lazy { Icon.createWithResource(this, R.drawable.ic_watch) }
+    private val batteryManager by lazy { applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager }
 
     fun openScreen(): PendingIntent? {
         val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
@@ -117,7 +119,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val showPercentage = repository.percentage.first()
+        val showPercentage = preferences.first().percentage
         val newBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
         if (watchBatteryLevel != newBatteryLevel || watchBatteryLevel == 0) {
@@ -131,7 +133,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         }
 
         val level = "$watchBatteryLevel${if (showPercentage) "%" else ""}"
-        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) watchChargingIcon else watchNormalIcon
+        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) Icon.createWithResource(this, R.drawable.ic_watch_charging_3) else Icon.createWithResource(this, R.drawable.ic_watch)
 
         return when (request.complicationType) {
 

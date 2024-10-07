@@ -71,7 +71,7 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.7.2"
+    val composeUiVersion = "1.7.3"
     val composeWearVersion = "1.4.0"
 
     // Wearable
@@ -97,11 +97,12 @@ dependencies {
     debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // Datastore
+    // DataStore
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
+    implementation ("androidx.datastore:datastore:1.1.1")
 
     // Serialization
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
@@ -125,6 +126,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.51")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

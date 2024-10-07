@@ -4,6 +4,7 @@ import android.os.Handler
 import android.text.format.DateUtils
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.datastore.core.DataStore
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders
 import androidx.wear.protolayout.DeviceParametersBuilders
@@ -24,9 +25,9 @@ import androidx.wear.tiles.TileService
 import com.google.android.gms.wearable.DataClient
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
-import com.weartools.phonebattcomp.MainApplication
 import com.weartools.phonebattcomp.MobileListener
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -35,12 +36,15 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class PhoneBatteryTileService : TileService() {
 
-    @Inject lateinit var repository: DataStoreRepository
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
     @Inject lateinit var dataClient: DataClient
 
     override fun onTileRequest(requestParams: TileRequest): ListenableFuture<TileBuilders.Tile> {
 
-        val batteryState = application as MainApplication
+        val preferences = runBlocking { preferences.first() }
 
         val handler = Handler(mainLooper)
         handler.postDelayed({ getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java) }, 1000)
@@ -55,8 +59,8 @@ class PhoneBatteryTileService : TileService() {
                             TimelineBuilders.TimelineEntry.Builder()
                                 .setLayout(getPhoneBatteryTileLayout(
                                     requestParams.deviceConfiguration,
-                                    batteryState.phoneBatteryLevel,
-                                    runBlocking { repository.nodeName.first() }
+                                    preferences.phoneBatteryLevel,
+                                    preferences.nodeName
                                 )
                                 ).build()
                         ).build()

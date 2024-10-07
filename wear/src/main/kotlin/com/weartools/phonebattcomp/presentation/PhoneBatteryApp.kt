@@ -2,8 +2,6 @@ package com.weartools.phonebattcomp.presentation
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
@@ -30,20 +28,11 @@ fun PhoneBatteryApp(
             timeText = { TimeText(modifier = Modifier.scrollAway(listState)) },
             positionIndicator = { PositionIndicator(scalingLazyListState = listState) }
         ) {
-            val nodeName by viewModel.nodeName.collectAsState()
-            val tempUnit by viewModel.tempUnit.collectAsState()
-            val percentage by viewModel.percentage.collectAsState()
-            val notificationIconType by viewModel.notificationIconType.collectAsState()
-
             PhoneBatteryAppScreen(
                 listState = listState,
                 focusRequester = focusRequester,
-                nodeName = nodeName,
-                tempUnit = tempUnit,
-                percentage = percentage,
                 viewModel = viewModel,
                 dataClient = dataClient,
-                notificationIconType = notificationIconType
             )
         }
     }

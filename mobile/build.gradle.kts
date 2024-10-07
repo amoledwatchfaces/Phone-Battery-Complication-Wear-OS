@@ -70,8 +70,8 @@ android {
 dependencies {
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
 
     // Review
     implementation ("com.google.android.play:review-ktx:2.0.1")
@@ -85,7 +85,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // Compose
-    implementation (platform("androidx.compose:compose-bom:2024.09.02"))
+    implementation (platform("androidx.compose:compose-bom:2024.09.03"))
     implementation ("androidx.activity:activity-compose")
     implementation ("androidx.navigation:navigation-compose")
     implementation ("androidx.compose.material3:material3")
@@ -114,7 +114,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.09.02"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.09.03"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
@@ -125,6 +125,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.51")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.3.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.4.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

@@ -29,7 +29,6 @@ import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.watchBatteryLevel
-import com.weartools.phonebattcomp.data.DataStoreRepository
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -42,7 +41,6 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var repository: DataStoreRepository
     @Inject lateinit var dataClient: DataClient
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
 

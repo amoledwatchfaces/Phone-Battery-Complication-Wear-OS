@@ -22,6 +22,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.repeatOnLifecycle
@@ -31,7 +32,7 @@ import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.Wearable
 import com.weartools.phonebattcomp.MobileListener.Companion.sendPhoneBatteryRequest
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.presentation.PhoneBatteryApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
@@ -44,7 +45,9 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
 
-    @Inject lateinit var dataRepository: DataStoreRepository
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+
     @Inject lateinit var dataClient: DataClient
     private lateinit var capabilityClient: CapabilityClient
 
@@ -88,9 +91,9 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
             //Log.d("MainActivity", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
             if (capabilityInfo.nodes.size > 0){
                 //Log.d("MainActivity", "capability ${capabilityInfo.name} connected!")
-                capabilityInfo.nodes.firstOrNull()?.let {
+                capabilityInfo.nodes.firstOrNull()?.let { node ->
                     lifecycleScope.launch {
-                        dataRepository.storeNodeName(it.displayName)
+                        dataStore.updateData { it.copy(nodeName = node.displayName) }
                     }
                 }
                 //sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
@@ -116,8 +119,8 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
                 .await()
 
             withContext(Dispatchers.Main) {
-                capabilityInfo.nodes.firstOrNull()?.let {
-                    dataRepository.storeNodeName(it.displayName)
+                capabilityInfo.nodes.firstOrNull()?.let { node ->
+                    dataStore.updateData { it.copy(nodeName = node.displayName) }
                 }
             }
         } catch (cancellationException: CancellationException) {

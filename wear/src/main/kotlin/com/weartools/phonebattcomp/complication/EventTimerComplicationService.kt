@@ -20,6 +20,7 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
+import androidx.datastore.core.DataStore
 import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
@@ -42,7 +43,8 @@ import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.R.drawable
 import com.weartools.phonebattcomp.data.CalendarEvent
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -53,8 +55,12 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class EventTimerComplicationService : SuspendingComplicationDataSourceService() {
 
-    @Inject lateinit var repository: DataStoreRepository
-    @Inject lateinit var dataClient: DataClient
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
+    @Inject
+    lateinit var dataClient: DataClient
 
     var icon = drawable.ic_event_upcoming_2
 
@@ -120,7 +126,8 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
 
         val currentTime = System.currentTimeMillis()
-        val events = repository.getEvents().first()
+        val repository = preferences.first()
+        val events = repository.calendarEvents
 
         /** When currently some event is running, show countdown to event endTime
          *  else, show countdown to next event startTime

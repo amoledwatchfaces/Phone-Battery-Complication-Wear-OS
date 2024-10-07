@@ -60,11 +60,14 @@ class NotificationListener : NotificationListenerService() {
         serviceScope.cancel()
     }
 
-    private fun sendToWatch() {
+    fun sendToWatch(
+        notifications: Array<StatusBarNotification> = activeNotifications,
+        dataClient: DataClient = this@NotificationListener.dataClient
+    ) {
         //Log.i("NotificationListener", "Sending notifications icon to watch")
         val putDataMapReq = PutDataMapRequest.create(URI)
         val bitmaps = ArrayList<Bitmap>()
-        for (notification in activeNotifications) {
+        for (notification in notifications) {
 
             if (notification.isOngoing) {
                 continue

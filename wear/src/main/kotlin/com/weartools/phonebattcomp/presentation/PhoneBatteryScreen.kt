@@ -29,6 +29,7 @@ import androidx.compose.material.icons.filled.Science
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -55,7 +56,6 @@ import androidx.wear.compose.material.OutlinedCompactChip
 import androidx.wear.compose.material.Text
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
-import com.weartools.phonebattcomp.MainApplication
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
@@ -66,15 +66,11 @@ import com.weartools.phonebattcomp.utils.openAppStoreOnPhone
 fun PhoneBatteryAppScreen(
     listState: ScalingLazyListState = rememberScalingLazyListState(),
     focusRequester: FocusRequester,
-    nodeName: String,
-    tempUnit: Boolean,
-    percentage: Boolean,
-    notificationIconType: Int,
     viewModel: MainViewModel,
     dataClient: DataClient,
 ) {
     val context = LocalContext.current
-    val application = context.applicationContext as MainApplication
+    val preferences = viewModel.preferences.collectAsState()
     var openHowTo by remember{ mutableStateOf(false) }
 
     ScalingLazyColumn(
@@ -100,17 +96,17 @@ fun PhoneBatteryAppScreen(
         //item { PreferenceCategory(title = stringResource(id = R.string.app_info)) }
         item {
             DialogChip(
-                text = if (application.phoneBatteryLevel==0) "--" else "${application.phoneBatteryLevel} %",
+                text = if (preferences.value.phoneBatteryLevel==0) "--" else "${preferences.value.phoneBatteryLevel} %",
                 icon = {
                     Icon(
                         painter =
-                        if (application.phoneIsConnected.not()) painterResource(id = R.drawable.ic_phone_disconnected)
-                        else if (application.phoneIsCharging) painterResource(id = R.drawable.ic_phone_charging_3) else painterResource(id = R.drawable.ic_phone_icon),
+                        if (preferences.value.phoneIsConnected.not()) painterResource(id = R.drawable.ic_phone_disconnected)
+                        else if (preferences.value.phoneIsCharging) painterResource(id = R.drawable.ic_phone_charging_3) else painterResource(id = R.drawable.ic_phone_icon),
                         contentDescription = "Play Store Icon",
                         tint = wearColorPalette.secondaryVariant) },
-                title = nodeName,
+                title = preferences.value.nodeName,
                 onClick = {
-                    if (application.lastUpdate.value == null){ context.openAppStoreOnPhone() }
+                    if (preferences.value.lastUpdate == 0L){ context.openAppStoreOnPhone() }
                     MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
                 }
             )
@@ -150,7 +146,7 @@ fun PhoneBatteryAppScreen(
                 label = stringResource(id = R.string.percentage_toggle),
                 secondaryLabelOn = stringResource(id = R.string.percentage_on),
                 secondaryLabelOff = stringResource(id = R.string.percentage_off),
-                checked = percentage,
+                checked = preferences.value.percentage,
                 onCheckedChange = {viewModel.togglePercentage(context)}
             )
         }
@@ -162,7 +158,7 @@ fun PhoneBatteryAppScreen(
                 label = stringResource(id = R.string.temp_unit_pref_title),
                 secondaryLabelOn = stringResource(id = R.string.temp_unit_C),
                 secondaryLabelOff = stringResource(id = R.string.temp_unit_F),
-                checked = tempUnit,
+                checked = preferences.value.tempUnit,
                 onCheckedChange = {viewModel.toggleEnabled(context)}
             )
         }
@@ -173,7 +169,7 @@ fun PhoneBatteryAppScreen(
                 label = stringResource(id = R.string.notif_comp_force_icon_type),
                 secondaryLabelOn = stringResource(id = R.string.type_icon),
                 secondaryLabelOff = stringResource(id = R.string.type_photo),
-                checked = notificationIconType == 0,
+                checked = preferences.value.notificationsIconType == 0,
                 onCheckedChange = {
                     viewModel.storeNotificationIconType(
                         context, if (it) 0 else 1
