@@ -5,8 +5,10 @@ import android.content.Context
 import android.content.Intent
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
+import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+@AndroidEntryPoint
 class BootCompleteBroadcastReceiver : BroadcastReceiver() {
 
     @Inject
