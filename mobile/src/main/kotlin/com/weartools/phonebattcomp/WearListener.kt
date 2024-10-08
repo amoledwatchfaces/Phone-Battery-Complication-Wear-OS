@@ -19,9 +19,9 @@ package com.weartools.phonebattcomp
 import android.Manifest
 import android.content.ContentValues.TAG
 import android.os.BatteryManager
-import android.service.notification.StatusBarNotification
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
@@ -104,8 +104,7 @@ class WearListener : WearableListenerService() {
                             ioScope.launch {
                                 val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(this@WearListener).contains(BuildConfig.APPLICATION_ID)
                                 if (isServiceRunning && dataRepository.notificationsSync.first()){
-                                    val notifications: Array<StatusBarNotification> = NotificationListener().activeNotifications
-                                    NotificationListener().sendToWatch(notifications, dataClient)
+                                    NotificationListener().sendToWatch(dataClient)
                                 }
                             }
                         }
@@ -116,6 +115,35 @@ class WearListener : WearableListenerService() {
             }
             /** Release dataEvents after processing them */
             dataEvents.release()
+        }
+    }
+
+    override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
+        super.onCapabilityChanged(capabilityInfo)
+        if (capabilityInfo.name == BuildConfig.CAPABILITY_WEAR_APP){
+            //Log.d("MobileListener", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
+            if (capabilityInfo.nodes.size > 0){
+                //Log.d("MobileListener", "capability ${capabilityInfo.name} connected!")
+                val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
+                val isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING
+                val request = PutDataMapRequest.create(BATTERY_PATH).apply{
+                    dataMap.putInt(BATTERY_KEY, level)
+                    dataMap.putBoolean(IS_CHARGING_KEY, isCharging)
+                    dataMap.putLong("immediate-update", System.currentTimeMillis())
+                }
+                    .asPutDataRequest()
+                    .setUrgent()
+
+                dataClient.putDataItem(request)
+
+                // TODO: Test: maybe it's good to also send notifications to watch when watch is reconnected?
+                ioScope.launch {
+                    val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(this@WearListener).contains(BuildConfig.APPLICATION_ID)
+                    if (isServiceRunning && dataRepository.notificationsSync.first()){
+                        NotificationListener().sendToWatch(dataClient)
+                    }
+                }
+            }
         }
     }
 }

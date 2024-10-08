@@ -96,16 +96,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
                         dataStore.updateData { it.copy(nodeName = node.displayName) }
                     }
                 }
-                //sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
             }
-            /*
-            else {
-                //Log.d("MainActivity", "capability ${capabilityInfo.name} disconnected!")
-                phoneIsConnected = false
-                afterMobileResult = true
-                updateComplication(MobileBatteryComplicationService::class.java)
-            }
-            */
         }
     }
 

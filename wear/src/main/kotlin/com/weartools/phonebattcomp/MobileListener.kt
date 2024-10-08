@@ -161,7 +161,8 @@ class MobileListener : WearableListenerService() {
                         dataStore.updateData { it.copy(nodeName = node.displayName ) }
                     }
                 }
-                sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
+                // we are sending battery level now when change is detected on mobile app
+                //sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
             }
             else {
                 //Log.d("MobileListener", "capability ${capabilityInfo.name} disconnected!")
