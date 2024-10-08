@@ -29,6 +29,7 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.di.ServiceCommunication
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import dagger.hilt.android.AndroidEntryPoint
@@ -104,7 +105,7 @@ class WearListener : WearableListenerService() {
                             ioScope.launch {
                                 val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(this@WearListener).contains(BuildConfig.APPLICATION_ID)
                                 if (isServiceRunning && dataRepository.notificationsSync.first()){
-                                    NotificationListener().sendToWatch(dataClient)
+                                    ServiceCommunication.sendToWatchFlow.emit(Unit)
                                 }
                             }
                         }
@@ -140,7 +141,7 @@ class WearListener : WearableListenerService() {
                 ioScope.launch {
                     val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(this@WearListener).contains(BuildConfig.APPLICATION_ID)
                     if (isServiceRunning && dataRepository.notificationsSync.first()){
-                        NotificationListener().sendToWatch(dataClient)
+                        ServiceCommunication.sendToWatchFlow.emit(Unit)
                     }
                 }
             }

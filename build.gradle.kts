@@ -15,7 +15,7 @@ tasks.register("clean", Delete::class) {
 buildscript {
 
     /** Set version for wear & mobile modules **/
-    val versionCode by extra(10000491)
+    val versionCode by extra(10000492)
     val versionName by extra("4.9.0")
 
     dependencies {

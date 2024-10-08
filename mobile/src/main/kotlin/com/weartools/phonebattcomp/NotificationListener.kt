@@ -8,6 +8,7 @@ import android.service.notification.StatusBarNotification
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.di.ServiceCommunication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -39,6 +40,8 @@ class NotificationListener : NotificationListenerService() {
             dataRepository.setBackgroundServiceState(true)
             if (dataRepository.notificationsSync.first()) sendToWatch()
         }
+        // Collect the SharedFlow when notifications need to be sent
+        serviceScope.launch { ServiceCommunication.sendToWatchFlow.collect { sendToWatch() } }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
@@ -60,9 +63,7 @@ class NotificationListener : NotificationListenerService() {
         serviceScope.cancel()
     }
 
-    fun sendToWatch(
-        dataClient: DataClient = this@NotificationListener.dataClient
-    ) {
+    fun sendToWatch() {
         //Log.i("NotificationListener", "Sending notifications icon to watch")
         val putDataMapReq = PutDataMapRequest.create(URI)
         val bitmaps = ArrayList<Bitmap>()
