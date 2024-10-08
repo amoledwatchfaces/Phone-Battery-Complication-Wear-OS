@@ -19,6 +19,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
 // Proto DataStore --> New
@@ -65,6 +66,14 @@ object ProtoDataStoreModule {
                             nodeName = oldPreferencesDataStore[stringPreferencesKey("node_name")] as? String ?:"Disconnected",
                             tempUnit = oldPreferencesDataStore[booleanPreferencesKey("temp_unit")] as? Boolean ?: true,
                             notificationsIconType = oldPreferencesDataStore[intPreferencesKey("notifications_icon_type")] as? Int ?: 1,
+                            calendarEvents = oldPreferencesDataStore[stringPreferencesKey("calendar_events")]?.takeIf { it.toString().isNotEmpty() }?.let { jsonString ->
+                                try {
+                                    Json.decodeFromString<List<CalendarEvent>>(jsonString.toString())
+                                } catch (e: Exception) {
+                                    // Handle deserialization error (e.g., invalid data)
+                                    Log.e("ProtoDataStoreModule", "Failed to deserialize Calendar Events: ${e.message}")
+                                    emptyList()
+                                }} ?: emptyList(),
 
                             // Set version to prevent migration in the future
                             version = 1  // Update the version number to not migrate again
