@@ -18,6 +18,7 @@ package com.weartools.phonebattcomp
 
 import android.Manifest
 import android.content.ContentValues.TAG
+import android.content.Context
 import android.os.BatteryManager
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
@@ -73,22 +74,14 @@ class WearListener : WearableListenerService() {
                 DataEvent.TYPE_CHANGED -> {
                     when (dataEvent.dataItem.uri.path) {
                         REQUEST_PATH -> {
-                            val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-                            val forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY)
-                            val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                                dataMap.putInt(BATTERY_KEY, level)
-                                dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
-                                if (forceUpdate){
-                                    dataMap.putLong("immediate-update", System.currentTimeMillis())
-                                }
-                            }
-                                .asPutDataRequest()
-                                .setUrgent()
-
-                            dataClient.putDataItem(request)
+                            sendBatteryInfoToWatch(
+                                level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
+                                isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
+                                forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY),
+                                dataClient = dataClient
+                            )
                         }
                         CALENDAR_REQUEST_PATH -> {
-                            Log.i(TAG, "Calendar request path received")
                             ioScope.launch {
                                 if (dataRepository.calendarSync.first()){
                                     if (applicationContext.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
@@ -101,13 +94,7 @@ class WearListener : WearableListenerService() {
                             }
                         }
                         NOTIFICATIONS_REQUEST_PATH -> {
-                            Log.i(TAG, "Notifications Complication Activated, send notifications")
-                            ioScope.launch {
-                                val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(this@WearListener).contains(BuildConfig.APPLICATION_ID)
-                                if (isServiceRunning && dataRepository.notificationsSync.first()){
-                                    ServiceCommunication.sendToWatchFlow.emit(Unit)
-                                }
-                            }
+                            ioScope.launch { sendNotificationsToWatch(this@WearListener,dataRepository) }
                         }
                     }
                 }
@@ -125,25 +112,41 @@ class WearListener : WearableListenerService() {
             //Log.d("MobileListener", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
             if (capabilityInfo.nodes.size > 0){
                 //Log.d("MobileListener", "capability ${capabilityInfo.name} connected!")
-                val level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
-                val isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING
-                val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                    dataMap.putInt(BATTERY_KEY, level)
-                    dataMap.putBoolean(IS_CHARGING_KEY, isCharging)
+                sendBatteryInfoToWatch(
+                    level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
+                    isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
+                    dataClient = dataClient,
+                    forceUpdate = true
+                )
+                // TODO: Test: maybe it's good to also send notifications to watch when watch is reconnected?
+                ioScope.launch { sendNotificationsToWatch(this@WearListener,dataRepository) }
+            }
+        }
+    }
+    companion object{
+        fun sendBatteryInfoToWatch(
+            level: Int,
+            isCharging: Boolean,
+            forceUpdate: Boolean,
+            dataClient: DataClient,
+        ){
+            val request = PutDataMapRequest.create(BATTERY_PATH).apply{
+                dataMap.putInt(BATTERY_KEY, level)
+                dataMap.putBoolean(IS_CHARGING_KEY, isCharging)
+                if (forceUpdate){
                     dataMap.putLong("immediate-update", System.currentTimeMillis())
                 }
-                    .asPutDataRequest()
-                    .setUrgent()
+            }
+                .asPutDataRequest()
+                .setUrgent()
 
-                dataClient.putDataItem(request)
-
-                // TODO: Test: maybe it's good to also send notifications to watch when watch is reconnected?
-                ioScope.launch {
-                    val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(this@WearListener).contains(BuildConfig.APPLICATION_ID)
-                    if (isServiceRunning && dataRepository.notificationsSync.first()){
-                        ServiceCommunication.sendToWatchFlow.emit(Unit)
-                    }
-                }
+            dataClient.putDataItem(request)
+        }
+        suspend fun sendNotificationsToWatch(context: Context, dataRepository: DataStoreRepository){
+            val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(context).contains(BuildConfig.APPLICATION_ID)
+            if (isServiceRunning && dataRepository.notificationsSync.first()){
+                //Log.i(TAG, "Wear OS device connected, sending notifications")
+                ServiceCommunication.sendToWatchFlow.emit(Unit)
             }
         }
     }

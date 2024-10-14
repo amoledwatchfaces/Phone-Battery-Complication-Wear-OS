@@ -34,14 +34,20 @@ class NotificationListener : NotificationListenerService() {
         private const val URI = "/foobar"
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        serviceScope.launch {
+            // Collect the SharedFlow when notifications need to be sent
+            ServiceCommunication.sendToWatchFlow.collect { sendToWatch() }
+        }
+    }
+
     override fun onListenerConnected() {
         super.onListenerConnected()
         serviceScope.launch {
             dataRepository.setBackgroundServiceState(true)
-            if (dataRepository.notificationsSync.first()) sendToWatch()
+            if (dataRepository.notificationsSync.first()) { sendToWatch() }
         }
-        // Collect the SharedFlow when notifications need to be sent
-        serviceScope.launch { ServiceCommunication.sendToWatchFlow.collect { sendToWatch() } }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
@@ -50,7 +56,6 @@ class NotificationListener : NotificationListenerService() {
             if (dataRepository.notificationsSync.first()) sendToWatch()
         }
     }
-
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         //Log.w(ContentValues.TAG, "Notification Removed!")
@@ -65,6 +70,7 @@ class NotificationListener : NotificationListenerService() {
 
     fun sendToWatch() {
         //Log.i("NotificationListener", "Sending notifications icon to watch")
+        //Log.i("NotificationListener", "Notifications size: ${activeNotifications.size}")
         val putDataMapReq = PutDataMapRequest.create(URI)
         val bitmaps = ArrayList<Bitmap>()
         for (notification in activeNotifications) {
@@ -89,6 +95,8 @@ class NotificationListener : NotificationListenerService() {
             putDataMapReq.dataMap.putByteArray("icon$i", bitmapToByteArray(bitmap))
         }
         putDataMapReq.setUrgent()
+        // Ensure notifications are always delivered
+        putDataMapReq.dataMap.putLong("/immediate-update", System.currentTimeMillis())
         val putDataReq = putDataMapReq.asPutDataRequest()
         dataClient.putDataItem(putDataReq)
     }

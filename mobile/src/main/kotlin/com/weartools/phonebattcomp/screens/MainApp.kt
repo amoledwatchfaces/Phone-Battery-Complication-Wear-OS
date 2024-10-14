@@ -37,6 +37,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navDeepLink
+import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.isGranted
+import com.google.accompanist.permissions.rememberPermissionState
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.ui.components.BottomNavigationBar
@@ -45,6 +48,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 
+@OptIn(ExperimentalPermissionsApi::class)
 @SuppressLint("UnrememberedMutableState")
 @Composable
 fun MainApp(
@@ -57,6 +61,16 @@ fun MainApp(
     val scope = rememberCoroutineScope()
     val listState = rememberLazyListState()
 
+    val permissionStateCalendar = rememberPermissionState(
+        permission = "android.permission.READ_CALENDAR",
+        onPermissionResult = {
+            if (it){
+                viewModel.saveAllCalendarsOnEnabled(context)
+                viewModel.setCalendarSyncState(true)
+                viewModel.changeCalendarContentObserver(true, context)
+            }
+        }
+    )
 
     val snackbarHostState = remember { SnackbarHostState()}
 
@@ -76,24 +90,31 @@ fun MainApp(
             viewModel.findAllWearDevices()
         }
     }
-    LaunchedEffect(Unit){
-        viewModel.isMessageShownFlow.collectLatest { if (it){
-            snackbarHostState.showSnackbar(
-                message = viewModel.message
-            )
-        } }
+    LaunchedEffect(Unit) {
+        lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.RESUMED) {
+            viewModel.isMyNotificationsServiceRunning(context)
+        }
     }
-    LaunchedEffect(Unit){
-        viewModel.activeSync.collectLatest {
-            if (it){ viewModel.activateBatterySync(context)}}
+    LaunchedEffect(Unit) {
+        viewModel.activeSync.collectLatest { isActive ->
+            if (isActive) {
+                viewModel.activateBatterySync(context)
+            }
+        }
+        if (permissionStateCalendar.status.isGranted.not()) {
+            viewModel.setCalendarSyncState(false)
+        }
+    }
+    LaunchedEffect(viewModel.message) {
+        viewModel.isMessageShownFlow.collectLatest { isShown ->
+            if (isShown) {
+                snackbarHostState.showSnackbar(message = viewModel.message)
+            }
+        }
     }
 
     Scaffold(
-        snackbarHost = {
-                       SnackbarHost(
-                           hostState = snackbarHostState
-                       )
-        },
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
             if (isWearableConnected.value && (currentDestination?.route == Screen.Home.route)) {
                 ExtendedFloatingActionButton(
@@ -149,7 +170,7 @@ fun MainApp(
                     action = Intent.ACTION_VIEW
                 }),
                 route = Screen.Experimental.route) {
-                ExperimentalScreen(view, context, viewModel,lifecycleOwner ,isWearableConnected,commonNodesList, connectedNodesList )
+                ExperimentalScreen(view, context, viewModel,isWearableConnected,commonNodesList, connectedNodesList, permissionStateCalendar )
             }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }

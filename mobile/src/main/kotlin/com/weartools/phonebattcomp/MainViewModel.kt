@@ -14,6 +14,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
@@ -22,6 +23,7 @@ import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.weartools.phonebattcomp.data.CalendarInfo
 import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.di.ServiceCommunication
 import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.getAllCalendars
@@ -62,14 +64,14 @@ class MainViewModel @Inject constructor(
 
     private var wearNodesWithApp: Set<Node>? = null
 
-    private val listener = CapabilityClient.OnCapabilityChangedListener { capabilityInfo ->
-            // Handle capability changes here
-            Log.d("CAPABILITY","Capability changed: ${capabilityInfo.name}")
-            // You can use viewmodel events or other methods to notify the UI
-            viewModelScope.launch{
-                findAllWearDevices()
-            }
+    // Method to handle capability changes
+    fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
+        Log.d("CAPABILITY", "Capability changed: ${capabilityInfo.name}")
+        // Handle the logic in ViewModel (e.g., finding wear devices)
+        viewModelScope.launch {
+            findAllWearDevices()
         }
+    }
 
     private val _isMessageShown = MutableSharedFlow<Boolean>()
     private val loaderStateMutableStateFlow = MutableStateFlow(value = false)
@@ -97,19 +99,12 @@ class MainViewModel @Inject constructor(
 
     init {
         viewModelScope.launch {
-            capabilityClient.addListener(listener,BuildConfig.CAPABILITY_WEAR_APP)
             dataRepository.activeSync.distinctUntilChanged().collect {}
             dataRepository.calendarSync.distinctUntilChanged().collect {}
             dataRepository.notificationsSync.distinctUntilChanged().collect {}
             dataRepository.backgroundServiceState.distinctUntilChanged().collect {}
             dataRepository.getCalendars().distinctUntilChanged().collect {}
         }
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        // Unregister listener to avoid leaks
-        capabilityClient.removeListener(listener)
     }
 
     private fun setMessageShown(){
@@ -173,6 +168,15 @@ class MainViewModel @Inject constructor(
                 }
                 if (!commonNodes.isNullOrEmpty()) {
                     commonNodesMutableStateFlow.value = commonNodes
+                    WearListener.sendBatteryInfoToWatch(
+                        level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
+                        isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
+                        dataClient = dataClient,
+                        forceUpdate = true
+                    )
+                    if (notificationsSync.value){
+                        viewModelScope.launch { ServiceCommunication.sendToWatchFlow.emit(Unit) }
+                    }
                 }else {
                     commonNodesMutableStateFlow.value = emptyList()
                 }
@@ -324,4 +328,6 @@ class MainViewModel @Inject constructor(
             dataRepository.saveCalendars(syncedCalendars.minus(calendarInfo))
         }
     }
+
+
 }

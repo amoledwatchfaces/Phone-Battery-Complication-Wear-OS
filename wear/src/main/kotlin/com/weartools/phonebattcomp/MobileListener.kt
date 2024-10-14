@@ -99,11 +99,9 @@ class MobileListener : WearableListenerService() {
                                         lastUpdate = System.currentTimeMillis()
                                     )
                                 }
+                                updateComplication(MobileBatteryComplicationService::class.java)
+                                TileService.getUpdater(this@MobileListener).requestUpdate(PhoneBatteryTileService::class.java)
                             }
-                            //Log.d("MobileListener", "Received Phone Battery Level: ${batteryState.phoneBatteryLevel}")
-                            //Log.d("MobileListener", "Update time: ${batteryState.lastUpdate.value}")
-                            updateComplication(MobileBatteryComplicationService::class.java)
-                            TileService.getUpdater(this).requestUpdate(PhoneBatteryTileService::class.java)
                         }
                         ACTIVE_SYNC_PATH -> {
                             val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
@@ -122,8 +120,8 @@ class MobileListener : WearableListenerService() {
                             // TODO: we're taking only first 200 items to reduce overhead (take(200))
                             ioScope.launch {
                                 dataStore.updateData { it.copy(calendarEvents = events.take(200)) }
+                                updateCalendarComplications()
                             }
-                            updateCalendarComplications()
                         }
                     }
                 }
@@ -139,9 +137,9 @@ class MobileListener : WearableListenerService() {
                                 lastUpdate = System.currentTimeMillis()
                             )
                         }
+                        //Log.d(TAG, "Phone Companion Uninstalled!")
+                        updateComplication(MobileBatteryComplicationService::class.java)
                     }
-                    //Log.d(TAG, "Phone Companion Uninstalled!")
-                    updateComplication(MobileBatteryComplicationService::class.java)
             }
                 else -> { Log.e(TAG, "Unknown data event Type = " + dataEvent.type) }
             }
@@ -174,9 +172,9 @@ class MobileListener : WearableListenerService() {
                             notificationsList = emptyList()
                         )
                     }
+                    updateComplication(MobileBatteryComplicationService::class.java)
+                    updateComplication(NotificationsIconsComplicationService::class.java)
                 }
-                updateComplication(MobileBatteryComplicationService::class.java)
-                updateComplication(NotificationsIconsComplicationService::class.java)
             }
         }
     }
@@ -192,8 +190,8 @@ class MobileListener : WearableListenerService() {
         }
         ioScope.launch {
             dataStore.updateData { it.copy(notificationsList = byteArrayList) }
+            updateComplication(NotificationsIconsComplicationService::class.java)
         }
-        updateComplication(NotificationsIconsComplicationService::class.java)
     }
 
     companion object {

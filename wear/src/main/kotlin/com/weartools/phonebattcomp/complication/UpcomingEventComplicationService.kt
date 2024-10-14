@@ -152,15 +152,17 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
         }
     }
     fun getIsTomorrow(eventTime: Long): Boolean {
-        val calendar = Calendar.getInstance().apply {
-            get(Calendar.DAY_OF_YEAR)
+
+        // Local Calendar + 1 day
+        val localCalendar = Calendar.getInstance().apply {
             add(Calendar.DAY_OF_YEAR, 1)
         }
-        val utcCalendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-        utcCalendar.timeInMillis = eventTime
-        val eventDayOfYear = utcCalendar.get(Calendar.DAY_OF_YEAR)
+        // Event Calendar (UTC)
+        val eventLocalCalendar = Calendar.getInstance().apply {
+            timeInMillis = eventTime // This will automatically convert UTC millis to local time zone
+        }
 
-        return eventDayOfYear == calendar.get(Calendar.DAY_OF_YEAR)
+        return eventLocalCalendar.get(Calendar.DAY_OF_YEAR) == localCalendar.get(Calendar.DAY_OF_YEAR)
     }
     fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
         var closestEvent: CalendarEvent? = null
@@ -227,7 +229,12 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                     "upcoming_event_work",
                     ExistingWorkPolicy.REPLACE,
                     OneTimeWorkRequestBuilder<UpcomingEventComplicationUpdateWorker>()
-                        .setInitialDelay(Duration.ofMillis(eventUpdateDelay))
+                        .setInitialDelay(Duration.ofMillis(
+                            if (eventIsTomorrow) {
+                                86400000 - (currentTime % 86400000) + 1000  // Next update at 00:00:01 tomorrow
+                            }
+                            else eventUpdateDelay
+                        ))
                         .build()
                 )
             }

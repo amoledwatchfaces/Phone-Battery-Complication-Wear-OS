@@ -36,7 +36,6 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,12 +49,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.repeatOnLifecycle
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import com.google.accompanist.permissions.PermissionState
 import com.google.accompanist.permissions.isGranted
-import com.google.accompanist.permissions.rememberPermissionState
 import com.google.android.gms.wearable.Node
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
@@ -69,10 +65,10 @@ fun ExperimentalScreen(
     view: View,
     context: Context,
     viewModel: MainViewModel,
-    lifecycleOwner: LifecycleOwner,
     isWatchConnected: State<Boolean>,
     commonNodesList: State<List<Node>?>,
     connectedNodesList: State<List<Node>?>,
+    permissionStateCalendar: PermissionState
 ) {
 
     val listState = rememberLazyListState()
@@ -86,26 +82,6 @@ fun ExperimentalScreen(
     val syncedCalendars by viewModel.syncedCalendars.collectAsState()
     var openCalendars by remember { mutableStateOf(false) }
 
-    val permissionStateCalendar = rememberPermissionState(
-        permission = "android.permission.READ_CALENDAR",
-        onPermissionResult = {
-            if (it){
-                viewModel.saveAllCalendarsOnEnabled(context)
-                viewModel.setCalendarSyncState(true)
-                viewModel.changeCalendarContentObserver(true, context)
-            }
-        }
-    )
-
-
-    LaunchedEffect(Unit) {
-        lifecycleOwner.repeatOnLifecycle(state = Lifecycle.State.RESUMED) {
-            viewModel.isMyNotificationsServiceRunning(context)
-            if (permissionStateCalendar.status.isGranted.not()){
-                viewModel.setCalendarSyncState(false)
-            }
-        }
-    }
 
     Column(Modifier.fillMaxSize()) {
         // Show the top app bar on top level destinations.
