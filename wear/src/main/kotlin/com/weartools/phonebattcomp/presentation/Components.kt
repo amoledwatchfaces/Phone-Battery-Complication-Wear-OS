@@ -211,7 +211,7 @@ fun ListItemsWidget(
                                 "Complication simply mirrors phone notifications (not ongoing)") }
                     item { HowToCard(
                         title = "Active Sync",
-                        text = "This feature requires mobile companion app to have background service enabled in the experimental setting. " +
+                        text = "This feature requires mobile companion app to have background service enabled in the companion app setting. " +
                                 "Active Sync provides real-time phone battery updates & charging status") }
                 }
             )

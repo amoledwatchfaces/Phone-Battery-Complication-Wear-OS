@@ -25,7 +25,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ContactSupport
-import androidx.compose.material.icons.filled.Science
+import androidx.compose.material.icons.filled.SettingsSuggest
 import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.runtime.Composable
@@ -41,6 +41,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.ScalingLazyListState
@@ -184,10 +185,15 @@ fun PhoneBatteryAppScreen(
                     backgroundColor = Color(0xFF0E1011)
                 ),
                 border = ChipDefaults.outlinedChipBorder(),
-                label = { Text(color = wearColorPalette.secondary, text = stringResource(R.string.experimental))},
+                label = { Text(
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = wearColorPalette.secondary,
+                    text = stringResource(R.string.more_settings)
+                )},
                 modifier = Modifier.padding(top = 12.dp),
                 icon = {
-                    Icon(imageVector = Icons.Filled.Science, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                    Icon(imageVector = Icons.Filled.SettingsSuggest, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
                 },
                 onClick = {
                     viewModel.openExperimentalSettings(context)

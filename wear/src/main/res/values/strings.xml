@@ -52,7 +52,7 @@
     <!-- DO NOT TRANSLATE -->
     <string name="temp_unit_C" translatable="false">°C</string>
     <string name="temp_unit_F" translatable="false">°F</string>
-    <string name="experimental">Experimental</string>
+    <string name="more_settings">More settings</string>
 
     <!-- Calendar Complications -->
     <string name="events_timer_complication">Event timer</string>

@@ -22,7 +22,7 @@ fun BottomNavigationBar(
 ) {
     val items = listOf(
         Screen.Home,
-        Screen.Experimental,
+        Screen.Settings,
         Screen.About,
     )
     NavigationBar(

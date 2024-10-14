@@ -93,7 +93,7 @@ class MainViewModel @Inject constructor(
 
             try {
                 RemoteActivityHelper(context).startRemoteActivity(targetIntent = launchIntent,targetNodeId = null).await()
-                Toast.makeText(context,"Check Experimental settings on your phone",Toast.LENGTH_LONG).show()
+                Toast.makeText(context,"Check more settings on your phone",Toast.LENGTH_LONG).show()
             } catch (cancellationException: CancellationException) {
                 // Request was cancelled normally
             } catch (throwable: Throwable) {

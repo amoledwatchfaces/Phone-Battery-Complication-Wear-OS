@@ -61,7 +61,7 @@ import com.weartools.phonebattcomp.utils.openAmoledWebPage
 
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPermissionsApi::class)
 @Composable
-fun ExperimentalScreen(
+fun SettingsScreen(
     view: View,
     context: Context,
     viewModel: MainViewModel,
@@ -88,7 +88,7 @@ fun ExperimentalScreen(
         //val destination = appState.currentTopLevelDestination
         //if (destination != null) {
         CenterAlignedTopAppBar(
-            title = { Text(fontWeight = FontWeight.Medium, text = "Experimental Settings") },
+            title = { Text(fontWeight = FontWeight.Medium, text = "Settings") },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color.Transparent,
             )

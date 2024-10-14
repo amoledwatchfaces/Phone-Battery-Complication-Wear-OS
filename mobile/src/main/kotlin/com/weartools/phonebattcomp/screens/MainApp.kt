@@ -169,8 +169,8 @@ fun MainApp(
                     uriPattern = "https://amoledwatchfaces.com/phonebattcomp"
                     action = Intent.ACTION_VIEW
                 }),
-                route = Screen.Experimental.route) {
-                ExperimentalScreen(view, context, viewModel,isWearableConnected,commonNodesList, connectedNodesList, permissionStateCalendar )
+                route = Screen.Settings.route) {
+                SettingsScreen(view, context, viewModel,isWearableConnected,commonNodesList, connectedNodesList, permissionStateCalendar )
             }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }
