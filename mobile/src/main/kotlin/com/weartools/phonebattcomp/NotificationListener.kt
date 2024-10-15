@@ -38,7 +38,7 @@ class NotificationListener : NotificationListenerService() {
         super.onCreate()
         serviceScope.launch {
             // Collect the SharedFlow when notifications need to be sent
-            ServiceCommunication.sendToWatchFlow.collect { sendToWatch() }
+            ServiceCommunication.sendToWatchFlow.collect { sendToWatch(forceSend = true) }
         }
     }
 
@@ -68,7 +68,9 @@ class NotificationListener : NotificationListenerService() {
         serviceScope.cancel()
     }
 
-    fun sendToWatch() {
+    fun sendToWatch(
+        forceSend: Boolean = false
+    ) {
         //Log.i("NotificationListener", "Sending notifications icon to watch")
         //Log.i("NotificationListener", "Notifications size: ${activeNotifications.size}")
         val putDataMapReq = PutDataMapRequest.create(URI)
@@ -94,9 +96,9 @@ class NotificationListener : NotificationListenerService() {
         for ((i, bitmap) in bitmaps.withIndex()) {
             putDataMapReq.dataMap.putByteArray("icon$i", bitmapToByteArray(bitmap))
         }
+
         putDataMapReq.setUrgent()
-        // Ensure notifications are always delivered
-        putDataMapReq.dataMap.putLong("/immediate-update", System.currentTimeMillis())
+        if (forceSend){ putDataMapReq.dataMap.putLong("/immediate-update", System.currentTimeMillis()) }
         val putDataReq = putDataMapReq.asPutDataRequest()
         dataClient.putDataItem(putDataReq)
     }
