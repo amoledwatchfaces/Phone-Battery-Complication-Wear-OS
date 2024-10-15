@@ -21,14 +21,12 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.BatteryManager
 import android.os.Parcelable
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
-import com.weartools.phonebattcomp.complication.watchBatteryLevel
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -55,8 +53,6 @@ class ComplicationTapBroadcastReceiver : BroadcastReceiver() {
                         MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
                     }
                     ComponentName(context, WatchBatteryComplicationService::class.java) -> {
-                        val batteryManager = context.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
-                        watchBatteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
                         context.updateComplication(WatchBatteryComplicationService::class.java)
                     }
                     else -> {
