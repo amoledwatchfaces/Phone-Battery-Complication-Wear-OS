@@ -34,18 +34,17 @@ class NotificationListener : NotificationListenerService() {
         private const val URI = "/foobar"
     }
 
-    override fun onCreate() {
-        super.onCreate()
-        serviceScope.launch {
-            // Collect the SharedFlow when notifications need to be sent
-            ServiceCommunication.sendToWatchFlow.collect { sendToWatch(forceSend = true) }
-        }
-    }
     override fun onListenerConnected() {
         super.onListenerConnected()
         serviceScope.launch {
+            // Set background service state to true
             dataRepository.setBackgroundServiceState(true)
+
+            // Send notifications to watch when listener is connected
             if (dataRepository.notificationsSync.first()) { sendToWatch() }
+
+            // Send notifications to watch when WearListener requests it using flow collection
+            ServiceCommunication.sendToWatchFlow.collect { sendToWatch(forceSend = true) }
         }
     }
 
