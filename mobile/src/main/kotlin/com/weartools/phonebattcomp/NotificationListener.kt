@@ -41,7 +41,6 @@ class NotificationListener : NotificationListenerService() {
             ServiceCommunication.sendToWatchFlow.collect { sendToWatch(forceSend = true) }
         }
     }
-
     override fun onListenerConnected() {
         super.onListenerConnected()
         serviceScope.launch {
@@ -71,11 +70,13 @@ class NotificationListener : NotificationListenerService() {
     fun sendToWatch(
         forceSend: Boolean = false
     ) {
-        //Log.i("NotificationListener", "Sending notifications icon to watch")
-        //Log.i("NotificationListener", "Notifications size: ${activeNotifications.size}")
         val putDataMapReq = PutDataMapRequest.create(URI)
         val bitmaps = ArrayList<Bitmap>()
-        for (notification in activeNotifications) {
+
+        /** Catch exceptions when onListenerConnected is not called before accessing notifications **/
+        val notifications = try { activeNotifications } catch (e: Exception) { return }
+
+        for (notification in notifications) {
 
             if (notification.isOngoing) {
                 continue
