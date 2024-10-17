@@ -85,7 +85,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // Compose
-    implementation (platform("androidx.compose:compose-bom:2024.09.03"))
+    implementation (platform("androidx.compose:compose-bom:2024.10.00"))
     implementation ("androidx.activity:activity-compose")
     implementation ("androidx.navigation:navigation-compose")
     implementation ("androidx.compose.material3:material3")
@@ -97,7 +97,7 @@ dependencies {
     implementation ("androidx.compose.material:material-icons-extended")
 
 
-    implementation ("androidx.activity:activity-ktx:1.9.2")
+    implementation ("androidx.activity:activity-ktx:1.9.3")
     implementation ("androidx.core:core-ktx:1.13.1")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
 
@@ -114,15 +114,15 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.09.03"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.dagger:hilt-android:2.51")
-    ksp ("com.google.dagger:hilt-compiler:2.51")
+    implementation ("com.google.dagger:hilt-android:2.52")
+    ksp ("com.google.dagger:hilt-compiler:2.52")
 
     // Firebase
     implementation (platform("com.google.firebase:firebase-bom:33.4.0"))

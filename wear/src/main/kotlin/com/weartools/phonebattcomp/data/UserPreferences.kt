@@ -28,7 +28,7 @@ data class UserPreferences(
 
     // Phone Notifications
     val notificationsList: List<ByteArray> = emptyList(),
-    val notificationsIconType: Int = 1,
+    val notificationsIconType: Int = 2,
 
     // Calendar Events
     val calendarEvents: List<CalendarEvent> = emptyList(),

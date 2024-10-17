@@ -25,8 +25,8 @@
     <string name="phone_notifications_complication">Notificaciones del teléfono</string>
     <string name="notifications_section" translatable="false">Complicación de notificaciones del teléfono</string>
     <string name="notif_comp_force_icon_type" translatable="false">Tipo de icono</string>
-    <string name="type_icon">ICONO (Forzado)</string>
-    <string name="type_photo">FOTO (Por defecto)</string>
+    <string name="type_icon">ICONO</string>
+    <string name="type_photo">FOTO</string>
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Batería del teléfono</string>

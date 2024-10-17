@@ -170,10 +170,10 @@ fun PhoneBatteryAppScreen(
                 label = stringResource(id = R.string.notif_comp_force_icon_type),
                 secondaryLabelOn = stringResource(id = R.string.type_icon),
                 secondaryLabelOff = stringResource(id = R.string.type_photo),
-                checked = preferences.value.notificationsIconType == 0,
+                checked = preferences.value.notificationsIconType == 2,
                 onCheckedChange = {
                     viewModel.storeNotificationIconType(
-                        context, if (it) 0 else 1
+                        context, if (it) 2 else 1
                     )
                 }
             )

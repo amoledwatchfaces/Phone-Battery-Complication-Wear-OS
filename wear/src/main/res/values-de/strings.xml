@@ -24,8 +24,8 @@
     <string name="phone_notifications_complication">Telefonbenachrichtigungen</string>
     <string name="notifications_section">Telefonbenachrichtigungen Komplikation</string>
     <string name="notif_comp_force_icon_type">Symboltyp</string>
-    <string name="type_icon">SYMBOL (Erzwungen)</string>
-    <string name="type_photo">FOTO (Standard)</string>
+    <string name="type_icon">SYMBOL</string>
+    <string name="type_photo">FOTO</string>
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Smartphone-Akkustand</string>

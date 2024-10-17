@@ -60,7 +60,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                 SmallImageComplicationData.Builder(
                     smallImage = SmallImage.Builder(
                         image = Icon.createWithResource(this, R.drawable.ic_notif),
-                        type = SmallImageType.PHOTO).build(),
+                        type = SmallImageType.ICON).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .build()
             }
@@ -109,7 +109,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                                     .setTint(Color.WHITE)
                             }
                         },
-                        type = if (preferences.first().notificationsIconType == 0) SmallImageType.ICON else SmallImageType.PHOTO)
+                        type = if (preferences.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON)
                         .build(),
                     contentDescription = ComplicationText.EMPTY)
                     .build()

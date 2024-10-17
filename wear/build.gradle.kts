@@ -71,7 +71,7 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.7.3"
+    val composeUiVersion = "1.7.4"
     val composeWearVersion = "1.4.0"
 
     // Wearable
@@ -87,7 +87,7 @@ dependencies {
     implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
     implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
-    implementation ("androidx.activity:activity-compose:1.9.2")
+    implementation ("androidx.activity:activity-compose:1.9.3")
     implementation ("androidx.compose.material:material-icons-extended:$composeUiVersion")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.6")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
@@ -114,16 +114,16 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:2.9.1")
 
     // Tile
-    implementation("androidx.wear.protolayout:protolayout-expression:1.2.0")
-    implementation("androidx.wear.protolayout:protolayout:1.2.0")
-    implementation("androidx.wear.protolayout:protolayout-material:1.2.0")
-    implementation("androidx.wear.tiles:tiles:1.4.0")
+    implementation("androidx.wear.protolayout:protolayout-expression:1.2.1")
+    implementation("androidx.wear.protolayout:protolayout:1.2.1")
+    implementation("androidx.wear.protolayout:protolayout-material:1.2.1")
+    implementation("androidx.wear.tiles:tiles:1.4.1")
     implementation ("com.google.code.gson:gson:2.10.1")
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.dagger:hilt-android:2.51")
-    ksp ("com.google.dagger:hilt-compiler:2.51")
+    implementation ("com.google.dagger:hilt-android:2.52")
+    ksp ("com.google.dagger:hilt-compiler:2.52")
 
     // Firebase
     implementation (platform("com.google.firebase:firebase-bom:33.4.0"))
