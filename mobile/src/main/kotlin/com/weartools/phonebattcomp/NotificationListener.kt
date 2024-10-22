@@ -12,6 +12,7 @@ import com.weartools.phonebattcomp.di.ServiceCommunication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.first
@@ -27,7 +28,10 @@ class NotificationListener : NotificationListenerService() {
     @Inject
     lateinit var dataClient: DataClient
 
-    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
+
+    // Shared Job to cancel previous task before starting a new one
+    private var notificationJob: Job? = null
 
     companion object {
         private const val ICON_SIZE = 48
@@ -41,7 +45,7 @@ class NotificationListener : NotificationListenerService() {
             dataRepository.setBackgroundServiceState(true)
 
             // Send notifications to watch when listener is connected
-            if (dataRepository.notificationsSync.first()) { sendToWatch() }
+            sendToWatch()
 
             // Send notifications to watch when WearListener requests it using flow collection
             ServiceCommunication.sendToWatchFlow.collect { sendToWatch(forceSend = true) }
@@ -50,16 +54,12 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         //Log.w(ContentValues.TAG, "Notification Posted!")
-        serviceScope.launch {
-            if (dataRepository.notificationsSync.first()) sendToWatch()
-        }
+        sendToWatch()
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         //Log.w(ContentValues.TAG, "Notification Removed!")
-        serviceScope.launch {
-            if (dataRepository.notificationsSync.first()) sendToWatch()
-        }
+        sendToWatch()
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -69,38 +69,46 @@ class NotificationListener : NotificationListenerService() {
     fun sendToWatch(
         forceSend: Boolean = false
     ) {
-        val putDataMapReq = PutDataMapRequest.create(URI)
-        val bitmaps = ArrayList<Bitmap>()
+        // Cancel the previous job and start a new one
+        notificationJob?.cancel()
+        notificationJob = serviceScope.launch {
+            // Check if notifications should be synced
+            if (!dataRepository.notificationsSync.first()) return@launch
 
-        /** Catch exceptions when onListenerConnected is not called before accessing notifications **/
-        val notifications = try { activeNotifications } catch (e: Exception) { return }
+            /** Catch exceptions when onListenerConnected is not called before accessing notifications **/
+            val notifications = try { activeNotifications } catch (e: Exception) { return@launch }
 
-        for (notification in notifications) {
+            val bitmaps = ArrayList<Bitmap>()
 
-            if (notification.isOngoing) {
-                continue
-            }
+            for (notification in notifications) {
 
-            val bitmap = notification.notification.smallIcon?.let {
-                it.loadDrawable(this)?.let {
-                    drawable -> drawableToBitmap(drawable)
+                if (notification.isOngoing) {
+                    continue
+                }
+
+                val bitmap = notification.notification.smallIcon?.let {
+                    it.loadDrawable(this@NotificationListener)?.let {
+                            drawable -> drawableToBitmap(drawable)
+                    }
+                }
+
+                if (!bitmaps.any { it.sameAs(bitmap) }) {
+                    if (bitmap != null) {
+                        bitmaps.add(bitmap)
+                    }
                 }
             }
 
-            if (!bitmaps.any { it.sameAs(bitmap) }) {
-                if (bitmap != null) {
-                    bitmaps.add(bitmap)
-                }
+            // Create DataMap Request
+            val putDataMapReq = PutDataMapRequest.create(URI)
+            for ((i, bitmap) in bitmaps.withIndex()) {
+                putDataMapReq.dataMap.putByteArray("icon$i", bitmapToByteArray(bitmap))
             }
+            putDataMapReq.setUrgent()
+            if (forceSend){ putDataMapReq.dataMap.putLong("/immediate-update", System.currentTimeMillis()) }
+            val putDataReq = putDataMapReq.asPutDataRequest()
+            dataClient.putDataItem(putDataReq)
         }
-        for ((i, bitmap) in bitmaps.withIndex()) {
-            putDataMapReq.dataMap.putByteArray("icon$i", bitmapToByteArray(bitmap))
-        }
-
-        putDataMapReq.setUrgent()
-        if (forceSend){ putDataMapReq.dataMap.putLong("/immediate-update", System.currentTimeMillis()) }
-        val putDataReq = putDataMapReq.asPutDataRequest()
-        dataClient.putDataItem(putDataReq)
     }
 
     private fun drawableToBitmap(drawable: Drawable): Bitmap {

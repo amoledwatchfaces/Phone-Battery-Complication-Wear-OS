@@ -39,6 +39,7 @@ import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -70,6 +71,9 @@ class MobileListener : WearableListenerService() {
     @Inject lateinit var dataClient: DataClient
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
+
+    // Shared Job to cancel previous task before starting a new one
+    private var notificationJob: Job? = null
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
@@ -180,15 +184,16 @@ class MobileListener : WearableListenerService() {
     }
 
     private fun processDataItem(dataItem: DataItem) {
-        val dataMapItem = DataMapItem.fromDataItem(dataItem)
-        val byteArrayList = mutableListOf<ByteArray>()
-        var i = 0
-        while (true) {
-            val byteArray = dataMapItem.dataMap.getByteArray("icon$i") ?: break
-            byteArrayList.add(byteArray)
-            i++
-        }
-        ioScope.launch {
+        notificationJob?.cancel()
+        notificationJob = ioScope.launch {
+            val dataMapItem = DataMapItem.fromDataItem(dataItem)
+            val byteArrayList = mutableListOf<ByteArray>()
+            var i = 0
+            while (true) {
+                val byteArray = dataMapItem.dataMap.getByteArray("icon$i") ?: break
+                byteArrayList.add(byteArray)
+                i++
+            }
             dataStore.updateData { it.copy(notificationsList = byteArrayList) }
             updateComplication(NotificationsIconsComplicationService::class.java)
         }
