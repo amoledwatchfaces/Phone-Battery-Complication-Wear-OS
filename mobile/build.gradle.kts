@@ -74,8 +74,8 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
 
     // Review
-    implementation ("com.google.android.play:review-ktx:2.0.1")
-    implementation ("com.google.android.play:review:2.0.1")
+    implementation ("com.google.android.play:review-ktx:2.0.2")
+    implementation ("com.google.android.play:review:2.0.2")
 
     // Wearable
     implementation ("com.google.android.gms:play-services-wearable:18.2.0")
@@ -125,6 +125,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.52")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

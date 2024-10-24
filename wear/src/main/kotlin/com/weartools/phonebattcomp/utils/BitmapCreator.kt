@@ -26,7 +26,7 @@ object BitmapCreator {
     }
 
     fun createCompositeBitmap(byteArrays: List<ByteArray>): Bitmap {
-        val canvasSize = 96
+        val canvasSize = 100
 
         val arraySize = byteArrays.size
         val numByteArrays = arraySize.coerceAtMost(4)
@@ -43,20 +43,20 @@ object BitmapCreator {
 
             when (i) {
                 0 -> {
-                    x = 0F
-                    y = 0F
+                    x = 1F
+                    y = 1F
                 }
                 1 -> {
-                    x = 48F
-                    y = 0F
+                    x = 51F
+                    y = 1F
                 }
                 2 -> {
-                    x = if (numByteArrays == 3) 24F else 0F
-                    y = 48F
+                    x = if (numByteArrays == 3) 26F else 1F
+                    y = 51F
                 }
                 else -> {
-                    x = 48F
-                    y = 48F
+                    x = 51F
+                    y = 51F
                 }
             }
 
@@ -77,7 +77,9 @@ object BitmapCreator {
                 subBitmap,
                 48,
                 48,
-                false)}
+                false
+                )
+            }
 
             canvas.drawBitmap(scaledBitmap, x, y, paint)
         }

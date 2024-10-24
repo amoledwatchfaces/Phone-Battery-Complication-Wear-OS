@@ -24,7 +24,6 @@ import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
-import com.google.android.gms.wearable.DataItem
 import com.google.android.gms.wearable.DataMap
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -59,6 +58,7 @@ private const val CALENDAR_EVENTS_KEY = "events"
 const val CALENDAR_REQUEST_PATH = "/calendar-request"
 
 const val NOTIFICATIONS_REQUEST_PATH = "/notifications-request"
+const val NOTIFICATIONS_UPDATE_KEY = "update-time"
 
 var lastCalendarRequestTime = 0L
 
@@ -74,6 +74,8 @@ class MobileListener : WearableListenerService() {
 
     // Shared Job to cancel previous task before starting a new one
     private var notificationJob: Job? = null
+
+    private var lastNotificationsUpdateTime: Long = 0L
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
@@ -114,7 +116,12 @@ class MobileListener : WearableListenerService() {
                             }
                         }
                         URI -> {
-                            processDataItem(dataEvent.dataItem)
+                            val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
+                            val notificationUpdateTime = dataMapItem.dataMap.getLong(NOTIFICATIONS_UPDATE_KEY)
+                            if (notificationUpdateTime >= lastNotificationsUpdateTime){
+                                lastNotificationsUpdateTime = notificationUpdateTime
+                                processDataItem(dataMapItem)
+                            }
                         }
                         CALENDAR_EVENTS_PATH -> {
                             val dataMap = dataEvent.dataItem.data?.let { DataMap.fromByteArray(it) }
@@ -183,10 +190,9 @@ class MobileListener : WearableListenerService() {
         }
     }
 
-    private fun processDataItem(dataItem: DataItem) {
+    private fun processDataItem(dataMapItem: DataMapItem) {
         notificationJob?.cancel()
         notificationJob = ioScope.launch {
-            val dataMapItem = DataMapItem.fromDataItem(dataItem)
             val byteArrayList = mutableListOf<ByteArray>()
             var i = 0
             while (true) {

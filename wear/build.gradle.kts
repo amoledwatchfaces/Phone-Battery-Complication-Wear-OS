@@ -76,7 +76,6 @@ dependencies {
 
     // Wearable
     implementation ("com.google.android.gms:play-services-wearable:18.2.0")
-    implementation ("androidx.wear.watchface:watchface:1.2.1")
     implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha04")
     implementation ("androidx.wear:wear-remote-interactions:1.0.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
@@ -118,7 +117,6 @@ dependencies {
     implementation("androidx.wear.protolayout:protolayout:1.2.1")
     implementation("androidx.wear.protolayout:protolayout-material:1.2.1")
     implementation("androidx.wear.tiles:tiles:1.4.1")
-    implementation ("com.google.code.gson:gson:2.10.1")
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
@@ -126,6 +124,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.52")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.4.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.5.1"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }
