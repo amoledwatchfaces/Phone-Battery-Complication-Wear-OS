@@ -16,7 +16,6 @@
  */
 package com.weartools.phonebattcomp.complication
 
-import android.graphics.Color
 import android.graphics.drawable.Icon
 import androidx.datastore.core.DataStore
 import androidx.wear.watchface.complications.data.ComplicationData
@@ -42,6 +41,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+var notificationsList = mutableListOf<ByteArray>()
 
 @AndroidEntryPoint
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
@@ -88,25 +89,23 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val notifications = preferences.first().notificationsList
-
         return when (request.complicationType) {
 
             ComplicationType.SMALL_IMAGE -> {
                 SmallImageComplicationData.Builder(
                     smallImage = SmallImage.Builder(
                         image =
-                        if (notifications.isEmpty()){
+                        if (notificationsList.isEmpty()){
                             Icon.createWithResource(this, R.drawable.ic_notif_none)
                         }
                         else {
-                            if (notifications.size == 1) {
-                                Icon.createWithBitmap(BitmapCreator.createSingleBitmap(notifications[0]))
-                                    .setTint(Color.WHITE)
+                            if (notificationsList.size == 1) {
+                                Icon.createWithBitmap(BitmapCreator.createSingleBitmap(notificationsList[0]))
+                                    //.setTint(Color.WHITE)
                             }
                             else {
-                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(notifications))
-                                    .setTint(Color.WHITE)
+                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(notificationsList))
+                                    //.setTint(Color.WHITE)
                             }
                         },
                         type = if (preferences.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON)
@@ -120,11 +119,12 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     contentDescription = ComplicationText.EMPTY)
                     .setSmallImage(SmallImage.Builder(
                         image =
-                        if (notifications.isEmpty()){
+                        if (notificationsList.isEmpty()){
                             Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty())
                         }
                         else {
-                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(notifications)).setTint(Color.WHITE)
+                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(notificationsList))
+                                //.setTint(Color.WHITE)
                         },
                         type = SmallImageType.ICON)
                         .build())

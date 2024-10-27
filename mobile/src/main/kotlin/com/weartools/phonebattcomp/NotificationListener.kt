@@ -2,6 +2,7 @@ package com.weartools.phonebattcomp
 
 import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
@@ -21,7 +22,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
-import java.util.concurrent.ExecutionException
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -37,7 +37,7 @@ class NotificationListener : NotificationListenerService() {
     // Shared Job to cancel previous task before starting a new one
     private var notificationJob: Job? = null
 
-    // Store the previous bitmaps
+    // Store the previous icons
     private var lastBitmapsSent: List<Bitmap>? = null
 
     companion object {
@@ -53,21 +53,21 @@ class NotificationListener : NotificationListenerService() {
             dataRepository.setBackgroundServiceState(true)
 
             // Send notifications to watch when listener is connected
-            sendToWatch(updateTime = System.currentTimeMillis())
+            sendToWatch()
 
             // Send notifications to watch when WearListener requests it using flow collection
-            ServiceCommunication.sendToWatchFlow.collect { sendToWatch(updateTime = System.currentTimeMillis()) }
+            ServiceCommunication.sendToWatchFlow.collect { sendToWatch(forceSend = true) }
         }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         //Log.w(ContentValues.TAG, "Notification Posted!")
-        sendToWatch(updateTime = System.currentTimeMillis())
+        sendToWatch()
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         //Log.w(ContentValues.TAG, "Notification Removed!")
-        sendToWatch(updateTime = System.currentTimeMillis())
+        sendToWatch()
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -75,7 +75,7 @@ class NotificationListener : NotificationListenerService() {
     }
 
     fun sendToWatch(
-        updateTime: Long
+        forceSend: Boolean = false
     ) {
         // Cancel the previous job and start a new one
         notificationJob?.cancel()
@@ -89,69 +89,66 @@ class NotificationListener : NotificationListenerService() {
                 return@launch
             }
 
-            val currentBitmaps = ArrayList<Bitmap>()
+            val currentBitmaps = mutableListOf<Bitmap>()
 
             for (notification in notifications) {
 
-                if (notification.isOngoing) {
-                    continue
-                }
+                if (notification.isOngoing) { continue }
 
-                val bitmap = notification.notification.smallIcon?.let {
+                notification.notification.smallIcon?.let {
                     it.loadDrawable(this@NotificationListener)?.let {
                             drawable -> drawableToBitmap(drawable)
                     }
-                }
-
-                if (!currentBitmaps.any { it.sameAs(bitmap) }) {
-                    if (bitmap != null) {
+                }?.let { bitmap ->
+                    if (currentBitmaps.none { it.sameAs(bitmap) }) {
                         currentBitmaps.add(bitmap)
                     }
                 }
             }
-            // Take max 9 icons (Notifications Row allows 8 & (+) sign)
-            val bitmapsToSend = currentBitmaps.take(9)
 
-            // Compare currentBitmaps with lastBitmaps
-            if (bitmapsToSend == lastBitmapsSent) { return@launch }
+            // Compare current icons with last sent icons
+            if (currentBitmaps == lastBitmapsSent && !forceSend) { return@launch }
 
-            // Save current bitmaps as last sent bitmaps
-            lastBitmapsSent = bitmapsToSend
+            // Save current icons as last sent icons
+            lastBitmapsSent = currentBitmaps
+
+            Log.i("NotificationListener", "Notifications size: ${currentBitmaps.size}")
 
             // Create DataMap Request
             val putDataMapReq = PutDataMapRequest.create(URI)
             putDataMapReq.dataMap.apply {
-                for ((i, bitmap) in bitmapsToSend.withIndex()) {
-                    putByteArray("icon$i", bitmapToByteArray(bitmap))
+                currentBitmaps.forEachIndexed { i, bitmap ->
+                    if (i < 8) {
+                        // send only first 8 drawables
+                        putByteArray("icon$i", bitmapToByteArray(bitmap))
+                    } else {
+                        // Add an empty byte array for each drawable above the first 8
+                        putByteArray("icon$i", ByteArray(0))
+                    }
                 }
-                putLong(NOTIFICATIONS_UPDATE_KEY, updateTime)
+                putLong(NOTIFICATIONS_UPDATE_KEY, System.currentTimeMillis())
             }
 
             try {
                 dataClient.putDataItem(putDataMapReq.asPutDataRequest().setUrgent()).await()
-            }
-            catch (e: ExecutionException) {
-                FirebaseCrashlytics.getInstance().recordException(e)
-                Log.e("NotificationListener", "Notification sending failed: ${e.message}")
-            }
-            catch (e: InterruptedException) {
+            } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
                 Log.e("NotificationListener", "Notification sending failed: ${e.message}")
             }
         }
     }
 
-    private fun drawableToBitmap(drawable: Drawable): Bitmap {
-        val bitmap = Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(bitmap)
-        drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.draw(canvas)
-        return bitmap
-    }
-
     private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
         val stream = ByteArrayOutputStream()
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
         return stream.toByteArray()
+    }
+    private fun drawableToBitmap(drawable: Drawable): Bitmap {
+        val bitmap = Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(bitmap)
+        drawable.setBounds(0, 0, canvas.width, canvas.height)
+        drawable.setTint(Color.WHITE)
+        drawable.draw(canvas)
+        return bitmap
     }
 }

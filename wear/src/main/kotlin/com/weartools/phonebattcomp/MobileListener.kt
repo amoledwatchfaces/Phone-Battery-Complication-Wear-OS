@@ -30,6 +30,7 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
+import com.weartools.phonebattcomp.complication.notificationsList
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
@@ -58,7 +59,6 @@ private const val CALENDAR_EVENTS_KEY = "events"
 const val CALENDAR_REQUEST_PATH = "/calendar-request"
 
 const val NOTIFICATIONS_REQUEST_PATH = "/notifications-request"
-const val NOTIFICATIONS_UPDATE_KEY = "update-time"
 
 var lastCalendarRequestTime = 0L
 
@@ -74,8 +74,6 @@ class MobileListener : WearableListenerService() {
 
     // Shared Job to cancel previous task before starting a new one
     private var notificationJob: Job? = null
-
-    private var lastNotificationsUpdateTime: Long = 0L
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
@@ -116,12 +114,7 @@ class MobileListener : WearableListenerService() {
                             }
                         }
                         URI -> {
-                            val dataMapItem = DataMapItem.fromDataItem(dataEvent.dataItem)
-                            val notificationUpdateTime = dataMapItem.dataMap.getLong(NOTIFICATIONS_UPDATE_KEY)
-                            if (notificationUpdateTime >= lastNotificationsUpdateTime){
-                                lastNotificationsUpdateTime = notificationUpdateTime
-                                processDataItem(dataMapItem)
-                            }
+                            processDataItem(DataMapItem.fromDataItem(dataEvent.dataItem).dataMap)
                         }
                         CALENDAR_EVENTS_PATH -> {
                             val dataMap = dataEvent.dataItem.data?.let { DataMap.fromByteArray(it) }
@@ -180,9 +173,9 @@ class MobileListener : WearableListenerService() {
                         it.copy(
                             phoneIsConnected = false,
                             afterMobileResult = true,
-                            notificationsList = emptyList()
                         )
                     }
+                    notificationsList = mutableListOf()
                     updateComplication(MobileBatteryComplicationService::class.java)
                     updateComplication(NotificationsIconsComplicationService::class.java)
                 }
@@ -190,17 +183,17 @@ class MobileListener : WearableListenerService() {
         }
     }
 
-    private fun processDataItem(dataMapItem: DataMapItem) {
+    private fun processDataItem(dataMap: DataMap) {
         notificationJob?.cancel()
         notificationJob = ioScope.launch {
             val byteArrayList = mutableListOf<ByteArray>()
             var i = 0
             while (true) {
-                val byteArray = dataMapItem.dataMap.getByteArray("icon$i") ?: break
+                val byteArray = dataMap.getByteArray("icon$i") ?: break
                 byteArrayList.add(byteArray)
                 i++
             }
-            dataStore.updateData { it.copy(notificationsList = byteArrayList) }
+            notificationsList = byteArrayList
             updateComplication(NotificationsIconsComplicationService::class.java)
         }
     }

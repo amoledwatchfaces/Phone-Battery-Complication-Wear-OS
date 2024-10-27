@@ -15,12 +15,11 @@ object BitmapCreator {
         val resultBitmap = Bitmap.createBitmap(canvasSize,canvasSize, Bitmap.Config.ARGB_8888)
 
         val canvas = Canvas(resultBitmap)
-        val paint = Paint()
 
         val subBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
         val scaledBitmap = Bitmap.createScaledBitmap(subBitmap, 72, 72, false)
 
-        canvas.drawBitmap(scaledBitmap, 12F, 12F, paint)
+        canvas.drawBitmap(scaledBitmap, 12F, 12F, null)
 
         return resultBitmap
     }
@@ -34,7 +33,6 @@ object BitmapCreator {
         val resultBitmap = Bitmap.createBitmap(canvasSize,canvasSize, Bitmap.Config.ARGB_8888)
 
         val canvas = Canvas(resultBitmap)
-        val paint = Paint()
 
         for (i in 0 until numByteArrays) {
 
@@ -72,16 +70,16 @@ object BitmapCreator {
                 if (i == 3 && arraySize >= 5) {
                     generatePlusBitmap(arraySize-3)
                 }
-            else {
-                Bitmap.createScaledBitmap(
-                subBitmap,
-                48,
-                48,
-                false
-                )
-            }
+                else {
+                    Bitmap.createScaledBitmap(
+                    subBitmap,
+                    48,
+                    48,
+                    false
+                    )
+                }
 
-            canvas.drawBitmap(scaledBitmap, x, y, paint)
+            canvas.drawBitmap(scaledBitmap, x, y, null)
         }
 
         return resultBitmap

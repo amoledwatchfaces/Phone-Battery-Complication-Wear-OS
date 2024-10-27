@@ -27,7 +27,6 @@ data class UserPreferences(
     val nodeName: String = "Disconnected",
 
     // Phone Notifications
-    val notificationsList: List<ByteArray> = emptyList(),
     val notificationsIconType: Int = 2,
 
     // Calendar Events

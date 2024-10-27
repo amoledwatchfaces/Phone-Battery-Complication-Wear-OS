@@ -65,7 +65,7 @@ object ProtoDataStoreModule {
                             activeSync = oldPreferencesDataStore[booleanPreferencesKey("active_sync")] as? Boolean ?: false,
                             nodeName = oldPreferencesDataStore[stringPreferencesKey("node_name")] as? String ?:"Disconnected",
                             tempUnit = oldPreferencesDataStore[booleanPreferencesKey("temp_unit")] as? Boolean ?: true,
-                            notificationsIconType = oldPreferencesDataStore[intPreferencesKey("notifications_icon_type")] as? Int ?: 1,
+                            notificationsIconType = oldPreferencesDataStore[intPreferencesKey("notifications_icon_type")] as? Int ?: 2,
                             calendarEvents = oldPreferencesDataStore[stringPreferencesKey("calendar_events")]?.takeIf { it.toString().isNotEmpty() }?.let { jsonString ->
                                 try {
                                     Json.decodeFromString<List<CalendarEvent>>(jsonString.toString())

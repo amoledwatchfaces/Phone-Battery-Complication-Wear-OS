@@ -16,7 +16,6 @@ object BitmapCreatorLine {
         val numByteArrays = arraySize.coerceAtMost(8)
 
         val canvas = Canvas(resultBitmap)
-        val paint = Paint()
 
         for (i in 0 until numByteArrays) {
             val totalIconsWidth = numByteArrays * 50
@@ -38,7 +37,7 @@ object BitmapCreatorLine {
                 48,
                 false)
             }
-            canvas.drawBitmap(scaledBitmap, x+1F, 0+1F, paint)
+            canvas.drawBitmap(scaledBitmap, x+1F, 0+1F, null)
         }
         return resultBitmap
     }
@@ -71,9 +70,6 @@ object BitmapCreatorLine {
         val resultBitmap = Bitmap.createBitmap(400,50, Bitmap.Config.ARGB_8888)
 
         val canvas = Canvas(resultBitmap)
-        val paint = Paint()
-
-
         val emptyBitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888)
         val emptyCanvas = Canvas(emptyBitmap)
 
@@ -89,7 +85,7 @@ object BitmapCreatorLine {
         val textY = centerY + 1 - (paintText.descent() + paintText.ascent()) / 2
         emptyCanvas.drawText("--", centerX, textY, paintText)
 
-        canvas.drawBitmap(emptyBitmap, 175 + 1F, 0F, paint)
+        canvas.drawBitmap(emptyBitmap, 175 + 1F, 0F, null)
         return resultBitmap
     }
 }
