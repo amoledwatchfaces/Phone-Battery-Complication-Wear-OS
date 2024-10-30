@@ -64,11 +64,15 @@ class NotificationListener : NotificationListenerService() {
             debounceSendToWatch(updateTime = System.currentTimeMillis())
 
             // Send notifications to watch when WearListener requests it using flow collection
-            ServiceCommunication.sendToWatchFlow.collect {
+            ServiceCommunication.sendToWatchFlow.collect { params ->
+
+                syncEnabled = params.syncEnabled
+
                 debounceSendToWatch(
                 updateTime = System.currentTimeMillis(),
                 forceSend = true
                 )
+
             }
         }
     }
