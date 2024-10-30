@@ -38,6 +38,8 @@ class NotificationListener : NotificationListenerService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+    var syncEnabled = true
+
     private val mutex = Mutex()
 
     // Shared Job to cancel previous task before starting a new one
@@ -131,16 +133,21 @@ class NotificationListener : NotificationListenerService() {
                 }
             }
 
-            // Compare first 8 current bitmaps with first 8 previously sent bitmaps.
-            // Return early when list sizes are same or bitmaps are identical.
-            if (!forceSend && currentBitmaps.size == lastBitmapsSent.size) { // Early exit if no changes
+            /** If update is not forced and list sizes are same, check bitmaps pairs
+             * to see if the bitmaps on their positions matches. If bitmaps match, return early
+             * so there is no need to send new complication update, else, continue with sending
+            **/
+            if (!forceSend && currentBitmaps.size == lastBitmapsSent.size) {
+                var allIdentical = true
                 for (i in 0 until minOf(8, currentBitmaps.size)) {
                     if (!currentBitmaps[i].sameAs(lastBitmapsSent[i])) {
-                        break // If any compared bitmaps are different, break the loop
+                        // If any compared bitmaps are different, break the loop
+                        allIdentical = false
+                        break
                     }
-                    // If loop completes without breaking, all bitmaps are identical
-                    return@withLock
                 }
+                // If loop completes without breaking, all bitmaps are identical
+                if (allIdentical) { return@withLock }
             }
 
             // Set currentBitmaps as lastBitmapsSent for next comparison
