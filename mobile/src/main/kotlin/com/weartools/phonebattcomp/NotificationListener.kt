@@ -38,7 +38,7 @@ class NotificationListener : NotificationListenerService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    var syncEnabled = true
+    private var syncEnabled = true
 
     private val mutex = Mutex()
 
@@ -61,28 +61,30 @@ class NotificationListener : NotificationListenerService() {
             dataRepository.setBackgroundServiceState(true)
 
             // Send notifications to watch when listener is connected
-            debounceSendToWatch(updateTime = System.currentTimeMillis())
+            syncEnabled = dataRepository.notificationsSync.first()
+            if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
 
             // Send notifications to watch when WearListener requests it using flow collection
-            ServiceCommunication.sendToWatchFlow.collect { params ->
+            ServiceCommunication.sendToWatchFlow.collect {
 
-                syncEnabled = params.syncEnabled
+                syncEnabled = dataRepository.notificationsSync.first()
 
-                debounceSendToWatch(
-                updateTime = System.currentTimeMillis(),
-                forceSend = true
-                )
-
+                if (syncEnabled){
+                    debounceSendToWatch(
+                        updateTime = System.currentTimeMillis(),
+                        forceSend = true
+                    )
+                }
             }
         }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        debounceSendToWatch(updateTime = System.currentTimeMillis())
+        if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        debounceSendToWatch(updateTime = System.currentTimeMillis())
+        if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -95,8 +97,6 @@ class NotificationListener : NotificationListenerService() {
     ) {
         notificationJob?.cancel()
         notificationJob = serviceScope.launch {
-
-            if (!dataRepository.notificationsSync.first()) return@launch // Early exit if syncing is disabled
 
             delay(300)  // Debounce delay
 
