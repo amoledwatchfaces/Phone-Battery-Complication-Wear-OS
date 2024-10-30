@@ -18,8 +18,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
@@ -34,16 +38,18 @@ class NotificationListener : NotificationListenerService() {
 
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
+    private val mutex = Mutex()
+
     // Shared Job to cancel previous task before starting a new one
     private var notificationJob: Job? = null
 
-    // Store the previous icons
-    private var lastBitmapsSent: List<Bitmap>? = null
+    // Store the previous bitmaps
+    private var lastBitmapsSent = mutableListOf<Bitmap>()
 
     companion object {
         private const val ICON_SIZE = 48
         private const val URI = "/foobar"
-        private const val NOTIFICATIONS_UPDATE_KEY = "update-time"
+        private const val NOTIFICATIONS_UPDATE_KEY = "ts"
     }
 
     override fun onListenerConnected() {
@@ -53,51 +59,70 @@ class NotificationListener : NotificationListenerService() {
             dataRepository.setBackgroundServiceState(true)
 
             // Send notifications to watch when listener is connected
-            sendToWatch()
+            debounceSendToWatch(updateTime = System.currentTimeMillis())
 
             // Send notifications to watch when WearListener requests it using flow collection
-            ServiceCommunication.sendToWatchFlow.collect { sendToWatch(forceSend = true) }
+            ServiceCommunication.sendToWatchFlow.collect {
+                debounceSendToWatch(
+                updateTime = System.currentTimeMillis(),
+                forceSend = true
+                )
+            }
         }
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
-        //Log.w(ContentValues.TAG, "Notification Posted!")
-        sendToWatch()
+        debounceSendToWatch(updateTime = System.currentTimeMillis())
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
-        //Log.w(ContentValues.TAG, "Notification Removed!")
-        sendToWatch()
+        debounceSendToWatch(updateTime = System.currentTimeMillis())
     }
     override fun onDestroy() {
         super.onDestroy()
         serviceScope.cancel()
     }
 
-    fun sendToWatch(
+    private fun debounceSendToWatch(
+        updateTime: Long,
         forceSend: Boolean = false
     ) {
-        // Cancel the previous job and start a new one
         notificationJob?.cancel()
         notificationJob = serviceScope.launch {
-            // Check if notifications should be synced
-            if (!dataRepository.notificationsSync.first()) return@launch
+
+            if (!dataRepository.notificationsSync.first()) return@launch // Early exit if syncing is disabled
+
+            delay(300)  // Debounce delay
+
+            if (isActive) {
+                sendToWatch(updateTime, forceSend)
+            }
+        }
+    }
+
+    suspend fun sendToWatch(
+        updateTime: Long,
+        forceSend: Boolean
+    ) {
+        mutex.withLock {
 
             /** Catch exceptions when onListenerConnected is not called before accessing notifications **/
             val notifications = try { activeNotifications } catch (e: Exception) {
                 FirebaseCrashlytics.getInstance().recordException(e)
-                return@launch
+                return@withLock
             }
 
+            // Initialize current bitmaps list.
             val currentBitmaps = mutableListOf<Bitmap>()
 
+            // Get activeNotifications bitmaps and add unique ones to currentBitmaps.
             for (notification in notifications) {
 
                 if (notification.isOngoing) { continue }
 
                 notification.notification.smallIcon?.let {
-                    it.loadDrawable(this@NotificationListener)?.let {
-                            drawable -> drawableToBitmap(drawable)
+                    it.loadDrawable(this@NotificationListener)?.let { drawable ->
+                        drawableToBitmap(drawable)
                     }
                 }?.let { bitmap ->
                     if (currentBitmaps.none { it.sameAs(bitmap) }) {
@@ -106,13 +131,20 @@ class NotificationListener : NotificationListenerService() {
                 }
             }
 
-            // Compare current icons with last sent icons
-            if (currentBitmaps == lastBitmapsSent && !forceSend) { return@launch }
+            // Compare first 8 current bitmaps with first 8 previously sent bitmaps.
+            // Return early when list sizes are same or bitmaps are identical.
+            if (!forceSend && currentBitmaps.size == lastBitmapsSent.size) { // Early exit if no changes
+                for (i in 0 until minOf(8, currentBitmaps.size)) {
+                    if (!currentBitmaps[i].sameAs(lastBitmapsSent[i])) {
+                        break // If any compared bitmaps are different, break the loop
+                    }
+                    // If loop completes without breaking, all bitmaps are identical
+                    return@withLock
+                }
+            }
 
-            // Save current icons as last sent icons
+            // Set currentBitmaps as lastBitmapsSent for next comparison
             lastBitmapsSent = currentBitmaps
-
-            Log.i("NotificationListener", "Notifications size: ${currentBitmaps.size}")
 
             // Create DataMap Request
             val putDataMapReq = PutDataMapRequest.create(URI)
@@ -126,9 +158,10 @@ class NotificationListener : NotificationListenerService() {
                         putByteArray("icon$i", ByteArray(0))
                     }
                 }
-                putLong(NOTIFICATIONS_UPDATE_KEY, System.currentTimeMillis())
+                putLong(NOTIFICATIONS_UPDATE_KEY, updateTime)
             }
 
+            // Send DataMap to watch using DataClient
             try {
                 dataClient.putDataItem(putDataMapReq.asPutDataRequest().setUrgent()).await()
             } catch (e: Exception) {

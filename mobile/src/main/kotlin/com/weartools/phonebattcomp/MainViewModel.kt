@@ -269,6 +269,9 @@ class MainViewModel @Inject constructor(
     fun setNotificationsSyncState(state: Boolean) {
         viewModelScope.launch {
             dataRepository.setNotificationsSyncState(state)
+            if (state){
+                viewModelScope.launch { ServiceCommunication.sendToWatchFlow.emit(Unit) }
+            }
         }
     }
     fun setBackgroundServiceState(state: Boolean) {

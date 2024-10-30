@@ -33,14 +33,17 @@ import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationSe
 import com.weartools.phonebattcomp.complication.notificationsList
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import com.weartools.phonebattcomp.utils.updateCalendarComplications
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import javax.inject.Inject
 
 private const val BATTERY_PATH = "/battery-level"
@@ -59,6 +62,7 @@ private const val CALENDAR_EVENTS_KEY = "events"
 const val CALENDAR_REQUEST_PATH = "/calendar-request"
 
 const val NOTIFICATIONS_REQUEST_PATH = "/notifications-request"
+const val NOTIFICATIONS_UPDATE_KEY = "ts"
 
 var lastCalendarRequestTime = 0L
 
@@ -67,13 +71,13 @@ class MobileListener : WearableListenerService() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject lateinit var dataClient: DataClient
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
-    // Shared Job to cancel previous task before starting a new one
-    private var notificationJob: Job? = null
+    private val mutex = Mutex()
 
     override fun onDataChanged(dataEvents: DataEventBuffer) {
         super.onDataChanged(dataEvents)
@@ -184,22 +188,34 @@ class MobileListener : WearableListenerService() {
     }
 
     private fun processDataItem(dataMap: DataMap) {
-        notificationJob?.cancel()
-        notificationJob = ioScope.launch {
-            val byteArrayList = mutableListOf<ByteArray>()
-            var i = 0
-            while (true) {
-                val byteArray = dataMap.getByteArray("icon$i") ?: break
-                byteArrayList.add(byteArray)
-                i++
+        ioScope.launch {
+            mutex.withLock {
+                val lastUpdateTime = preferences.first().lastNotificationsUpdateTime
+                //Log.i("MobileListener", "processDataItem, lastNotificationsUpdateTime: $lastUpdateTime")
+                val updateTime = dataMap.getLong(NOTIFICATIONS_UPDATE_KEY)
+                if (updateTime < lastUpdateTime){
+                    //Log.i("MobileListener", "Notifications Update Time is lower than Last Update Time, discard & return!")
+                    return@launch
+                }
+
+                //Log.i("MobileListener", "processDataItem, setting new last update time $updateTime")
+                dataStore.updateData { it.copy(lastNotificationsUpdateTime = updateTime) }
+
+                val byteArrayList = mutableListOf<ByteArray>()
+                var i = 0
+                while (true) {
+                    val byteArray = dataMap.getByteArray("icon$i") ?: break
+                    byteArrayList.add(byteArray)
+                    i++
+                }
+                notificationsList = byteArrayList
+                //Log.i("MobileListener", "Icons count: ${byteArrayList.size}")
+                updateComplication(NotificationsIconsComplicationService::class.java)
             }
-            notificationsList = byteArrayList
-            updateComplication(NotificationsIconsComplicationService::class.java)
         }
     }
 
     companion object {
-
         fun sendPhoneBatteryRequest (lastUpdateTime: Long, dataClient: DataClient, forceUpdate: Boolean) {
             val currentTime = System.currentTimeMillis()
             if (currentTime - lastUpdateTime >= 5000) {
