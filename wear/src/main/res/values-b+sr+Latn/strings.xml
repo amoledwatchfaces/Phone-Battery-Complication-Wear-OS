@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Tajmer događaja</string>
+  <string name="upcoming_events_complications">Sledeći događaj</string>
+  <string name="preview_meeting">Sastanak</string>
+  <string name="no_upcoming_events">Nema predstojećih događaja</string>
+
+
   <string name="countdown_text">za %1$s</string>
   <string name="next_event_long_text_preview">Pregled kod zubara</string>
   <string name="next_event_text_complication_selection_menu">Sledeći događaj</string>

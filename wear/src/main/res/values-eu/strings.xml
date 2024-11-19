@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Gertaera tenporizadorea</string>
+  <string name="upcoming_events_complications">Hurrengo gertaera</string>
+  <string name="preview_meeting">Bilera</string>
+  <string name="no_upcoming_events">Ez dago hurrengo gertaerarik</string>
+
+
   <string name="countdown_text">%1$s barru</string>
   <string name="next_event_long_text_preview">Dentistarako hitzordua</string>
   <string name="next_event_text_complication_selection_menu">Hurrengo gertaera</string>

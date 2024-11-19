@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Etkinlik zamanlayıcı</string>
+  <string name="upcoming_events_complications">Yaklaşan etkinlik</string>
+  <string name="preview_meeting">Toplantı</string>
+  <string name="no_upcoming_events">Yaklaşan etkinlik yok</string>
+
   <string name="countdown_text">%1$s sonra</string>
   <string name="next_event_long_text_preview">Dişçi randevusu</string>
   <string name="next_event_text_complication_selection_menu">Sonraki etkinlik</string>

@@ -1,14 +1,18 @@
 package com.weartools.phonebattcomp.utils
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.Paint
 import android.graphics.Typeface
+import androidx.core.content.ContextCompat
+import com.weartools.phonebattcomp.R
 
 object BitmapCreator {
 
+    // SMALL_IMAGE
     fun createSingleBitmap(byteArray: ByteArray): Bitmap {
         val canvasSize = 96
 
@@ -23,8 +27,7 @@ object BitmapCreator {
 
         return resultBitmap
     }
-
-    fun createCompositeBitmap(byteArrays: List<ByteArray>): Bitmap {
+    fun createCompositeBitmap(byteArrays: List<ByteArray>, context: Context): Bitmap {
         val canvasSize = 100
 
         val arraySize = byteArrays.size
@@ -68,7 +71,7 @@ object BitmapCreator {
             //Log.w(TAG, "i: $i , arraySize: $arraySize")
             val scaledBitmap =
                 if (i == 3 && arraySize >= 5) {
-                    generatePlusBitmap(arraySize-3)
+                    generateMoreBitmap(context)
                 }
                 else {
                     Bitmap.createScaledBitmap(
@@ -85,25 +88,80 @@ object BitmapCreator {
         return resultBitmap
     }
 
+    // LONG_TEXT
+    fun createLineCompositeBitmap(byteArrays: List<ByteArray>, context: Context): Bitmap {
+        val resultBitmap = Bitmap.createBitmap(400,50, Bitmap.Config.ARGB_8888)
 
-    fun generatePlusBitmap(plus: Int): Bitmap {
-        val plusSize = 48
-        val plusBitmap = Bitmap.createBitmap(plusSize, plusSize, Bitmap.Config.ARGB_8888)
-        val canvas = Canvas(plusBitmap)
+        val arraySize = byteArrays.size
+        val numByteArrays = arraySize.coerceAtMost(8)
+
+        val canvas = Canvas(resultBitmap)
+
+        for (i in 0 until numByteArrays) {
+            val totalIconsWidth = numByteArrays * 50
+            val startX = (400 - totalIconsWidth) / 2
+            val x: Float = startX + i * 50F
+
+            val byteArray = byteArrays[i] // list size item starts from 1 so we need to subtract 1 to get the correct index
+            val subBitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.size)
+
+            //Log.w(TAG, "i: $i , arraySize: $arraySize")
+            val scaledBitmap =
+                if (i == 7 && arraySize >= 9) {
+                    generateMoreBitmap(context)
+                }
+                else {
+                    Bitmap.createScaledBitmap(
+                        subBitmap,
+                        48,
+                        48,
+                        false)
+                }
+            canvas.drawBitmap(scaledBitmap, x+1F, 0+1F, null)
+        }
+        return resultBitmap
+    }
+    fun createLineBitmapEmpty(): Bitmap {
+        val resultBitmap = Bitmap.createBitmap(400,50, Bitmap.Config.ARGB_8888)
+
+        val canvas = Canvas(resultBitmap)
+        val emptyBitmap = Bitmap.createBitmap(48, 48, Bitmap.Config.ARGB_8888)
+        val emptyCanvas = Canvas(emptyBitmap)
 
         val centerX = 24F
         val centerY = 24F
 
-        // Draw the number in the center
         val paintText = Paint().apply {
-            color = Color.WHITE
+            color = Color.GRAY
             textAlign = Paint.Align.CENTER
-            textSize = if (plus < 10) 38f else 28f
+            textSize = 40f
             typeface = Typeface.DEFAULT_BOLD
         }
-
         val textY = centerY + 1 - (paintText.descent() + paintText.ascent()) / 2
-        canvas.drawText("+$plus", centerX, textY, paintText)
+        emptyCanvas.drawText("--", centerX, textY, paintText)
+
+        canvas.drawBitmap(emptyBitmap, 175 + 1F, 0F, null)
+        return resultBitmap
+    }
+
+    fun generateMoreBitmap(context: Context): Bitmap {
+        // Load the drawable resource
+        val drawable = ContextCompat.getDrawable(context, R.drawable.ic_more) ?: throw IllegalArgumentException("Drawable not found")
+
+        // Define the size for the bitmap
+        val size = 48
+
+        // Create a bitmap with the specified size
+        val plusBitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+
+        // Create a canvas to draw the drawable onto the bitmap
+        val canvas = Canvas(plusBitmap)
+
+        // Set the bounds for the drawable to match the bitmap dimensions
+        drawable.setBounds(0, 0, size, size)
+
+        // Draw the drawable onto the canvas
+        drawable.draw(canvas)
 
         return plusBitmap
     }

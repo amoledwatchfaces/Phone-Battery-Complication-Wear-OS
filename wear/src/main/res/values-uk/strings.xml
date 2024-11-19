@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Таймер події</string>
+  <string name="upcoming_events_complications">Майбутня подія</string>
+  <string name="preview_meeting">Зустріч</string>
+  <string name="no_upcoming_events">Немає майбутніх подій</string>
+
   <string name="countdown_text">через %1$s</string>
   <string name="next_event_long_text_preview">Візит до стоматолога</string>
   <string name="next_event_text_complication_selection_menu">Наступна подія</string>

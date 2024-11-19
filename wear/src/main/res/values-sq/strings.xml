@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Kohëmatës i ngjarjes</string>
+  <string name="upcoming_events_complications">Ngjarja e ardhshme</string>
+  <string name="preview_meeting">Takim</string>
+  <string name="no_upcoming_events">Asnjë ngjarje e ardhshme</string>
+
   <string name="countdown_text">për %1$s</string>
   <string name="next_event_long_text_preview">Vizitë te dentisti</string>
   <string name="next_event_text_complication_selection_menu">Ngjarja tjetër</string>

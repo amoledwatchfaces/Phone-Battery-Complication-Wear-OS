@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Иш-чаранын таймери</string>
+  <string name="upcoming_events_complications">Жакынкы иш-чара</string>
+  <string name="preview_meeting">Жолугушуу</string>
+  <string name="no_upcoming_events">Жакынкы иш-чаралар жок</string>
+
   <string name="countdown_text">%1$s кийин</string>
   <string name="next_event_long_text_preview">Тиш доктурга баруу</string>
   <string name="next_event_text_complication_selection_menu">Кийинки иш-чара</string>

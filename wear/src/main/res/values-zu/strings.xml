@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Isibali sikhathi somcimbi</string>
+  <string name="upcoming_events_complications">Umcimbi ozayo</string>
+  <string name="preview_meeting">Umhlangano</string>
+  <string name="no_upcoming_events">Azikho izenzakalo ezizayo</string>
+
   <string name="countdown_text">kokuthi %1$s</string>
   <string name="next_event_long_text_preview">I-aphoyintimenti yakadokotela wamazinyo</string>
   <string name="next_event_text_complication_selection_menu">Umcimbi olandelayo</string>

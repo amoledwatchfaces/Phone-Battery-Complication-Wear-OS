@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Event timer</string>
+  <string name="upcoming_events_complications">Upcoming event</string>
+  <string name="preview_meeting">Meeting</string>
+  <string name="no_upcoming_events">No upcoming events</string>
+
+
   <string name="countdown_text">in %1$s</string>
   <string name="next_event_long_text_preview">Dentist appointment</string>
   <string name="next_event_text_complication_selection_menu">Next event</string>

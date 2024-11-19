@@ -53,6 +53,7 @@
     <string name="events_timer_complication">Temporizador de evento</string>
     <string name="upcoming_events_complications">Próximo evento</string>
     <string name="preview_meeting">Reunión</string>
+    <string name="no_upcoming_events">Sin próximos eventos</string>
 
     <!-- From Google Calendar -->
     <string name="countdown_text">en %1$s</string>

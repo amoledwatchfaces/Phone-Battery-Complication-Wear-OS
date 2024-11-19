@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">事件计时器</string>
+  <string name="upcoming_events_complications">即将举行的事件</string>
+  <string name="preview_meeting">会议</string>
+  <string name="no_upcoming_events">没有即将发生的事件</string>
+
   <string name="countdown_text">%1$s后</string>
   <string name="next_event_long_text_preview">预约了看牙医</string>
   <string name="next_event_text_complication_selection_menu">下一项活动</string>

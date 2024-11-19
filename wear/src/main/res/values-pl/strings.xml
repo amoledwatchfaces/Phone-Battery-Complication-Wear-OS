@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Phone Battery Complication</string>
+    <!-- Calendar Complications -->
+    <string name="events_timer_complication">Licznik czasu wydarzenia</string>
+    <string name="upcoming_events_complications">Nadchodzące wydarzenie</string>
+    <string name="preview_meeting">Spotkanie</string>
+    <string name="no_upcoming_events">Brak nadchodzących wydarzeń</string>
+
     <string name="countdown_text">za: %1$s</string>
     <string name="next_event_long_text_preview">Wizyta u dentysty</string>
     <string name="next_event_text_complication_selection_menu">Następne wydarzenie</string>

@@ -34,7 +34,6 @@ import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.utils.BitmapCreator
-import com.weartools.phonebattcomp.utils.BitmapCreatorLine
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -104,7 +103,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                                     //.setTint(Color.WHITE)
                             }
                             else {
-                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(notificationsList))
+                                Icon.createWithBitmap(BitmapCreator.createCompositeBitmap(notificationsList,this))
                                     //.setTint(Color.WHITE)
                             }
                         },
@@ -120,10 +119,10 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                     .setSmallImage(SmallImage.Builder(
                         image =
                         if (notificationsList.isEmpty()){
-                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmapEmpty())
+                            Icon.createWithBitmap(BitmapCreator.createLineBitmapEmpty())
                         }
                         else {
-                            Icon.createWithBitmap(BitmapCreatorLine.createLineCompositeBitmap(notificationsList))
+                            Icon.createWithBitmap(BitmapCreator.createLineCompositeBitmap(notificationsList, this))
                                 //.setTint(Color.WHITE)
                         },
                         type = SmallImageType.ICON)

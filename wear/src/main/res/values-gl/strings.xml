@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Temporizador de evento</string>
+  <string name="upcoming_events_complications">Próximo evento</string>
+  <string name="preview_meeting">Reunión</string>
+  <string name="no_upcoming_events">Sen eventos próximos</string>
+
   <string name="countdown_text">en %1$s</string>
   <string name="next_event_long_text_preview">Cita co dentista</string>
   <string name="next_event_text_complication_selection_menu">Próximo evento</string>

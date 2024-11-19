@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Pemasa acara</string>
+  <string name="upcoming_events_complications">Acara akan datang</string>
+  <string name="preview_meeting">Mesyuarat</string>
+  <string name="no_upcoming_events">Tiada acara akan datang</string>
+
   <string name="countdown_text">dalam masa %1$s</string>
   <string name="next_event_long_text_preview">Janji temu doktor gigi</string>
   <string name="next_event_text_complication_selection_menu">Acara seterusnya</string>

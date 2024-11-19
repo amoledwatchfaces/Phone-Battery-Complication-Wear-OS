@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Įvykio laikmatis</string>
+  <string name="upcoming_events_complications">Artėjantis įvykis</string>
+  <string name="preview_meeting">Susitikimas</string>
+  <string name="no_upcoming_events">Nėra artėjančių įvykių</string>
+
   <string name="countdown_text">po %1$s</string>
   <string name="next_event_long_text_preview">Odontologo susitikimas</string>
   <string name="next_event_text_complication_selection_menu">Kitas įvykis</string>

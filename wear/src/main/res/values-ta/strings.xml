@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">நிகழ்வு நேரக் கணிப்பான்</string>
+  <string name="upcoming_events_complications">உடனடியாக வரவிருக்கும் நிகழ்வு</string>
+  <string name="preview_meeting">கூட்டம்</string>
+  <string name="no_upcoming_events">எதிர்கால நிகழ்வுகள் இல்லை</string>
+
   <string name="countdown_text">மீதமுள்ள நேரம்: %1$s</string>
   <string name="next_event_long_text_preview">டென்டிஸ்ட் அப்பாயிண்ட்மெண்ட்</string>
   <string name="next_event_text_complication_selection_menu">அடுத்த நிகழ்வு</string>

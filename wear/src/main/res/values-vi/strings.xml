@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Bộ đếm giờ sự kiện</string>
+  <string name="upcoming_events_complications">Sự kiện sắp tới</string>
+  <string name="preview_meeting">Cuộc họp</string>
+  <string name="no_upcoming_events">Không có sự kiện sắp tới</string>
+
   <string name="countdown_text">trong %1$s</string>
   <string name="next_event_long_text_preview">Lịch hẹn với nha sĩ</string>
   <string name="next_event_text_complication_selection_menu">Sự kiện tiếp theo</string>

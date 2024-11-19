@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">କାର୍ଯ୍ୟକ୍ରମ ଟାଇମର</string>
+  <string name="upcoming_events_complications">ଆସନ୍ତା କାର୍ଯ୍ୟକ୍ରମ</string>
+  <string name="preview_meeting">ସଭା</string>
+  <string name="no_upcoming_events">କୌଣସି ଆସନ୍ତା କାର୍ଯ୍ୟକ୍ରମ ନାହିଁ</string>
+
   <string name="countdown_text">%1$sରେ</string>
   <string name="next_event_long_text_preview">ଡେଣ୍ଟିଷ୍ଟଙ୍କ ସହ ଆପଏଣ୍ଟମେଣ୍ଟ</string>
   <string name="next_event_text_complication_selection_menu">ପରବର୍ତ୍ତୀ ଇଭେଣ୍ଟ</string>

@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Oras ng kaganapan</string>
+  <string name="upcoming_events_complications">Paparating na kaganapan</string>
+  <string name="preview_meeting">Pulong</string>
+  <string name="no_upcoming_events">Walang paparating na mga kaganapan</string>
+
   <string name="countdown_text">sa %1$s</string>
   <string name="next_event_long_text_preview">Appointment sa dentista</string>
   <string name="next_event_text_complication_selection_menu">Susunod na event</string>

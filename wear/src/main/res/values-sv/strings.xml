@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Händelsetimer</string>
+  <string name="upcoming_events_complications">Kommande händelse</string>
+  <string name="preview_meeting">Möte</string>
+  <string name="no_upcoming_events">Inga kommande händelser</string>
+
   <string name="countdown_text">om %1$s</string>
   <string name="next_event_long_text_preview">Tandläkartid</string>
   <string name="next_event_text_complication_selection_menu">Nästa händelse</string>

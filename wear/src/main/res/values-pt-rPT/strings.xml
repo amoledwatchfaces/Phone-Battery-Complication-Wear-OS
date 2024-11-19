@@ -1,6 +1,10 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-  <string name="no_upcoming_events">Sem eventos hoje</string>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Temporizador de evento</string>
+  <string name="upcoming_events_complications">Evento seguinte</string>
+  <string name="preview_meeting">Reunião</string>
+  <string name="no_upcoming_events">Sem eventos próximos</string>
 
   <string name="countdown_text">dentro de %1$s</string>
   <string name="next_event_long_text_preview">Consulta no dentista</string>

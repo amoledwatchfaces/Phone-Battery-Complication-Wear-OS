@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">ಈವೆಂಟ್ ಟೈಮರ್</string>
+  <string name="upcoming_events_complications">ಮುಂಬರುವ ಈವೆಂಟ್</string>
+  <string name="preview_meeting">ಮೀಟಿಂಗ್</string>
+  <string name="no_upcoming_events">ಮುಂಬರುವ ಈವೆಂಟ್‌ಗಳು ಇಲ್ಲ</string>
+
   <string name="countdown_text">%1$s ರಲ್ಲಿ</string>
   <string name="next_event_long_text_preview">ದಂತ ವೈದ್ಯರ ಅಪಾಯಿಂಟ್‌ಮೆಂಟ್</string>
   <string name="next_event_text_complication_selection_menu">ಮುಂದಿನ ಈವೆಂಟ್</string>

@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Оқиға таймері</string>
+  <string name="upcoming_events_complications">Алдағы оқиға</string>
+  <string name="preview_meeting">Кездесу</string>
+  <string name="no_upcoming_events">Алдағы оқиғалар жоқ</string>
+
   <string name="countdown_text">%1$s ішінде</string>
   <string name="next_event_long_text_preview">Тіс дәрігерінің қабылдауы</string>
   <string name="next_event_text_complication_selection_menu">Келесі іс-шара</string>

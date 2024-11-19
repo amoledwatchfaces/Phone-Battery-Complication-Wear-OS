@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">සිද්ධි කාලය</string>
+  <string name="upcoming_events_complications">ඉදිරි සිද්ධිය</string>
+  <string name="preview_meeting">සමීපනය</string>
+  <string name="no_upcoming_events">ඉදිරි සිද්ධීන් නැත</string>
+
   <string name="countdown_text">%1$sකින්</string>
   <string name="next_event_long_text_preview">දන්ත වෛද්‍යවරයෙකු හමුව</string>
   <string name="next_event_text_complication_selection_menu">මීළඟ සිදුවීම</string>

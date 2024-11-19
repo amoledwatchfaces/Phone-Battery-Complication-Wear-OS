@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">تایمر رویداد</string>
+  <string name="upcoming_events_complications">رویداد بعدی</string>
+  <string name="preview_meeting">جلسه</string>
+  <string name="no_upcoming_events">هیچ رویداد آینده‌ای وجود ندارد</string>
+
+
   <string name="countdown_text">در %1$s</string>
   <string name="next_event_long_text_preview">قرار با دندان‌پزشک</string>
   <string name="next_event_text_complication_selection_menu">رویداد بعدی</string>

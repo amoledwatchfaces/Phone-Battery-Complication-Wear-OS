@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Kipima muda wa tukio</string>
+  <string name="upcoming_events_complications">Tukio lijalo</string>
+  <string name="preview_meeting">Mkutano</string>
+  <string name="no_upcoming_events">Hakuna matukio yajayo</string>
+
   <string name="countdown_text">baada ya %1$s</string>
   <string name="next_event_long_text_preview">Miadi na daktari wa meno</string>
   <string name="next_event_text_complication_selection_menu">Tukio linalofuata</string>

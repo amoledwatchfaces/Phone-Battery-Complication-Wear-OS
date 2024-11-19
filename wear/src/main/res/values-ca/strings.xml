@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Temporitzador d\'esdeveniments</string>
+  <string name="upcoming_events_complications">Esdeveniment proper</string>
+  <string name="preview_meeting">Reunió</string>
+  <string name="no_upcoming_events">Sense esdeveniments propers</string>
+
+
   <string name="countdown_text">"d'aquí a %1$s"</string>
   <string name="next_event_long_text_preview">Cita amb el dentista</string>
   <string name="next_event_text_complication_selection_menu">Proper esdeveniment</string>

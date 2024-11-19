@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">ইভেন্ট টাইমার</string>
+  <string name="upcoming_events_complications">আগামী ইভেন্ট</string>
+  <string name="preview_meeting">মিটিং</string>
+  <string name="no_upcoming_events">কোনও আসন্ন ইভেন্ট নেই</string>
+
+
   <string name="countdown_text">%1$s-এর মধ্যে</string>
   <string name="next_event_long_text_preview">ডেন্টিস্টের অ্যাপয়েন্টমেন্ট</string>
   <string name="next_event_text_complication_selection_menu">পরবর্তী ইভেন্ট</string>

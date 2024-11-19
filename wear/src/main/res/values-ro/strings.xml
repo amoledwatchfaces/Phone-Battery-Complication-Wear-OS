@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Temporizator eveniment</string>
+  <string name="upcoming_events_complications">Eveniment viitor</string>
+  <string name="preview_meeting">Întâlnire</string>
+  <string name="no_upcoming_events">Niciun eveniment viitor</string>
+
   <string name="countdown_text">în %1$s</string>
   <string name="next_event_long_text_preview">Programare la dentist</string>
   <string name="next_event_text_complication_selection_menu">Evenimentul următor</string>

@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Միջոցառման ժմչփ</string>
+  <string name="upcoming_events_complications">Առաջիկա միջոցառում</string>
+  <string name="preview_meeting">Հանդիպում</string>
+  <string name="no_upcoming_events">Առաջիկա միջոցառումներ չկան</string>
+
   <string name="countdown_text">%1$sից</string>
   <string name="next_event_long_text_preview">Հանդիպում ատամնաբույժի մոտ</string>
   <string name="next_event_text_complication_selection_menu">Հաջորդ միջոցառումը</string>

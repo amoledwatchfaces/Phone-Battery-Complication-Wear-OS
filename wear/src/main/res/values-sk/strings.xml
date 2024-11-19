@@ -51,7 +51,7 @@
 
     <!-- Calendar Complications -->
     <string name="events_timer_complication">Časovač udalostí</string>
-    <string name="upcoming_events_complications">Nadchádzajúce udalosti</string>
+    <string name="upcoming_events_complications">Nadchádzajúca udalosť</string>
     <string name="preview_meeting">Meeting</string>
     <string name="more_settings">Viac nastavení</string>
     <string name="no_upcoming_events">Žiadne ďalšie udalosti</string>

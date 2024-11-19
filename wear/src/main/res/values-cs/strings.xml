@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Phone Battery Complication</string>
+    <!-- Calendar Complications -->
+    <string name="events_timer_complication">Časovač události</string>
+    <string name="upcoming_events_complications">Nadcházející událost</string>
+    <string name="preview_meeting">Schůzka</string>
+    <string name="no_upcoming_events">Žádné nadcházející události</string>
 
     <string name="countdown_text">za %1$s</string>
     <string name="next_event_long_text_preview">Zubař</string>

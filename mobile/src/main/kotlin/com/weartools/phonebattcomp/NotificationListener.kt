@@ -125,6 +125,7 @@ class NotificationListener : NotificationListenerService() {
             for (notification in notifications) {
 
                 if (notification.isOngoing) { continue }
+                if (currentBitmaps.size >= 9) { break } // Break the loop when we have 9 distinct icons (...)
 
                 notification.notification.smallIcon?.let {
                     it.loadDrawable(this@NotificationListener)?.let { drawable ->

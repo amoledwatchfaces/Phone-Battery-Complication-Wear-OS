@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">इवेंट टाइमर</string>
+  <string name="upcoming_events_complications">आगामी इवेंट</string>
+  <string name="preview_meeting">बैठक</string>
+  <string name="no_upcoming_events">कोई आगामी इवेंट नहीं है</string>
+
   <string name="countdown_text">%1$s में</string>
   <string name="next_event_long_text_preview">दांत के डॉक्टर का अपॉइंटमेंट</string>
   <string name="next_event_text_complication_selection_menu">अगला इवेंट</string>

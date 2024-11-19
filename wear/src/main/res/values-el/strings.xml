@@ -1,5 +1,12 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">Χρονόμετρο εκδήλωσης</string>
+  <string name="upcoming_events_complications">Επερχόμενη εκδήλωση</string>
+  <string name="preview_meeting">Συνάντηση</string>
+  <string name="no_upcoming_events">Χωρίς επερχόμενες εκδηλώσεις</string>
+
+
   <string name="countdown_text">σε %1$s</string>
   <string name="next_event_long_text_preview">Ραντεβού με οδοντίατρο</string>
   <string name="next_event_text_complication_selection_menu">Επόμενο συμβάν</string>

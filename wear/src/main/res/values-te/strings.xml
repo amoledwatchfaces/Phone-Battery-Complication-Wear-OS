@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">ఈవెంట్ టైమర్</string>
+  <string name="upcoming_events_complications">రాబోయే ఈవెంట్</string>
+  <string name="preview_meeting">సమావేశం</string>
+  <string name="no_upcoming_events">రాబోయే ఈవెంట్లు లేవు</string>
+
   <string name="countdown_text">%1$s‌లో</string>
   <string name="next_event_long_text_preview">దంత వైద్యుని అపాయింట్‌మెంట్</string>
   <string name="next_event_text_complication_selection_menu">తర్వాతి ఈవెంట్</string>

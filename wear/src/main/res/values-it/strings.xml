@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <!-- Calendar Complications -->
+    <string name="events_timer_complication">Timer evento</string>
+    <string name="upcoming_events_complications">Evento imminente</string>
+    <string name="preview_meeting">Riunione</string>
+    <string name="no_upcoming_events">Nessun evento imminente</string>
+
     <string name="app_name">Phone Battery Complication</string>
     <string name="countdown_text">tra %1$s</string>
     <string name="next_event_long_text_preview">Appuntamento dal dentista</string>

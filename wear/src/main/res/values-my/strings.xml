@@ -1,5 +1,11 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
+  <!-- Calendar Complications -->
+  <string name="events_timer_complication">ပွဲစဉ်အချိန်တိုင်</string>
+  <string name="upcoming_events_complications">လာမည့်ပွဲစဉ်</string>
+  <string name="preview_meeting">အစည်းအဝေး</string>
+  <string name="no_upcoming_events">လာမည့်ပွဲစဉ်မရှိပါ</string>
+
   <string name="countdown_text">%1$s အတွင်း</string>
   <string name="next_event_long_text_preview">သွားဆရာဝန် ရက်ချိန်း</string>
   <string name="next_event_text_complication_selection_menu">နောက်အစီအစဉ်</string>
