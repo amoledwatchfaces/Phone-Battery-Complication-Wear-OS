@@ -30,7 +30,6 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
-import com.weartools.phonebattcomp.complication.notificationsList
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.data.UserPreferencesRepository
@@ -177,9 +176,9 @@ class MobileListener : WearableListenerService() {
                         it.copy(
                             phoneIsConnected = false,
                             afterMobileResult = true,
+                            notificationsList = mutableListOf()
                         )
                     }
-                    notificationsList = mutableListOf()
                     updateComplication(MobileBatteryComplicationService::class.java)
                     updateComplication(NotificationsIconsComplicationService::class.java)
                 }
@@ -208,7 +207,7 @@ class MobileListener : WearableListenerService() {
                     byteArrayList.add(byteArray)
                     i++
                 }
-                notificationsList = byteArrayList
+                dataStore.updateData { it.copy(notificationsList = byteArrayList) }
                 //Log.i("MobileListener", "Icons count: ${byteArrayList.size}")
                 updateComplication(NotificationsIconsComplicationService::class.java)
             }

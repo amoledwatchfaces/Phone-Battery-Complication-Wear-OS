@@ -29,6 +29,7 @@ data class UserPreferences(
     // Phone Notifications
     val notificationsIconType: Int = 2,
     val lastNotificationsUpdateTime: Long = 0L,
+    val notificationsList: List<ByteArray> = mutableListOf(),
 
     // Calendar Events
     val calendarEvents: List<CalendarEvent> = emptyList(),

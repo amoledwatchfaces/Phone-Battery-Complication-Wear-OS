@@ -41,8 +41,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-var notificationsList = mutableListOf<ByteArray>()
-
 @AndroidEntryPoint
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
 
@@ -87,6 +85,8 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
     }
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
+
+        val notificationsList = preferences.first().notificationsList
 
         return when (request.complicationType) {
 
