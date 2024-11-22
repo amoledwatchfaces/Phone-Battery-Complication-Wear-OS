@@ -85,13 +85,27 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val showPercentage = preferences.first().percentage
+        val repository = preferences.first()
+        val showPercentage = repository.percentage
+        val materialSymbols = repository.materialSymbols
+        val chargingSymbolInside = repository.chargingSymbolInsideIcon
+        val watchCharging = watchIsCharging?: getCurrentBatteryChargingStatus(this)
+
         val batteryManager = applicationContext.getSystemService(Context.BATTERY_SERVICE) as BatteryManager
         val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
         val level = "$batteryLevel${if (showPercentage) "%" else ""}"
-        val watchIcon = if (getCurrentBatteryChargingStatus(this)) Icon.createWithResource(this, R.drawable.ic_watch_charging) else Icon.createWithResource(this, R.drawable.ic_watch)
 
+        val watchIcon = Icon.createWithResource(this,
+            when {
+                watchCharging && materialSymbols && chargingSymbolInside -> R.drawable.ic_watch_charging_inside_material_symbols
+                watchCharging && materialSymbols -> R.drawable.ic_watch_charging_material_symbols
+                watchCharging && chargingSymbolInside -> R.drawable.ic_watch_charging_inside
+                watchCharging -> R.drawable.ic_watch_charging
+                materialSymbols -> R.drawable.ic_watch_material_symbols
+                else -> R.drawable.ic_watch
+            }
+        )
         return when (request.complicationType) {
 
             ComplicationType.RANGED_VALUE -> {
