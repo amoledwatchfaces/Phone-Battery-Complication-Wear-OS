@@ -55,6 +55,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.OutlinedButton
 import androidx.wear.compose.material.OutlinedCompactChip
 import androidx.wear.compose.material.Text
+import androidx.wear.compose.material.ToggleChipDefaults
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
@@ -93,16 +94,23 @@ fun PhoneBatteryAppScreen(
             )
         } }
 
-        // APP INFO SECTION
-        //item { PreferenceCategory(title = stringResource(id = R.string.app_info)) }
+        // Main
         item {
             DialogChip(
                 text = if (preferences.value.phoneBatteryLevel==0) "--" else "${preferences.value.phoneBatteryLevel} %",
                 icon = {
-                    Icon(
-                        painter =
-                        if (preferences.value.phoneIsConnected.not()) painterResource(id = R.drawable.ic_phone_disconnected)
-                        else if (preferences.value.phoneIsCharging) painterResource(id = R.drawable.ic_phone_charging_3) else painterResource(id = R.drawable.ic_phone_icon),
+                    Icon(painter = painterResource(
+                        when {
+                            preferences.value.phoneIsConnected && preferences.value.phoneIsCharging && preferences.value.materialSymbols && preferences.value.chargingSymbolInsideIcon -> R.drawable.ic_phone_charging_inside_material_symbols
+                            preferences.value.phoneIsConnected && preferences.value.phoneIsCharging && preferences.value.materialSymbols -> R.drawable.ic_phone_charging_material_symbols
+                            preferences.value.phoneIsConnected && preferences.value.phoneIsCharging && preferences.value.chargingSymbolInsideIcon -> R.drawable.ic_phone_charging_inside
+                            preferences.value.phoneIsConnected && preferences.value.phoneIsCharging -> R.drawable.ic_phone_charging
+                            preferences.value.phoneIsConnected && preferences.value.materialSymbols -> R.drawable.ic_phone_material_symbols
+                            preferences.value.phoneIsConnected -> R.drawable.ic_phone
+                            preferences.value.materialSymbols -> R.drawable.ic_phone_disconnected_material_symbols
+                            else -> R.drawable.ic_phone_disconnected
+                        }
+                        ),
                         contentDescription = "Play Store Icon",
                         tint = wearColorPalette.secondaryVariant) },
                 title = preferences.value.nodeName,
@@ -124,7 +132,7 @@ fun PhoneBatteryAppScreen(
                 onClick = {context.openPlayStore()}
             )
         }
-        item{
+        item {
             Row(modifier = Modifier.padding(top = 12.dp)) {
                 OutlinedButton(
                     modifier = Modifier.padding(end = 12.dp),
@@ -140,7 +148,7 @@ fun PhoneBatteryAppScreen(
             }
         }
 
-        // PERCENTAGE COMPLICATION
+        // Phone / Watch Battery Complications
         item { PreferenceCategory(title = stringResource(id = R.string.percentage_section)) }
         item {
             ToggleChip(
@@ -151,8 +159,60 @@ fun PhoneBatteryAppScreen(
                 onCheckedChange = {viewModel.togglePercentage(context)}
             )
         }
+        item {
+            androidx.wear.compose.material.ToggleChip(
+                modifier = Modifier.fillMaxWidth(),
+                checked = preferences.value.materialSymbols,
+                colors = ToggleChipDefaults.toggleChipColors(
+                    checkedEndBackgroundColor = wearColorPalette.primaryVariant,
+                    checkedToggleControlColor = Color(0xFFb9f7ff)
+                ),
+                onCheckedChange = { enabled -> viewModel.toggleMaterialSymbols(enabled,context) },
+                label = { Text(stringResource(R.string.pbc_material_symbols)) },
+                appIcon = {
+                    Icon(
+                        painter = if (preferences.value.materialSymbols){ painterResource(R.drawable.ic_phone_material_symbols) }
+                        else {painterResource(R.drawable.ic_phone)},
+                        contentDescription = "Phone Icon", tint = wearColorPalette.primary) },
+                toggleControl = {
+                    Icon(
+                        imageVector = ToggleChipDefaults.switchIcon(preferences.value.materialSymbols),
+                        contentDescription = "compose_toggle"
+                    )
+                }
+            )
+        }
+        item {
+            androidx.wear.compose.material.ToggleChip(
+                modifier = Modifier.fillMaxWidth(),
+                checked = preferences.value.chargingSymbolInsideIcon,
+                colors = ToggleChipDefaults.toggleChipColors(
+                    checkedEndBackgroundColor = wearColorPalette.primaryVariant,
+                    checkedToggleControlColor = Color(0xFFb9f7ff)
+                ),
+                onCheckedChange = { enabled -> viewModel.toggleChargingSymbol(enabled,context) },
+                label = { Text(stringResource(R.string.charging_symbol_inside_icon)) },
+                appIcon = {
+                    Icon(
+                        painter = painterResource(
+                            when {
+                                preferences.value.materialSymbols && preferences.value.chargingSymbolInsideIcon -> R.drawable.ic_phone_charging_inside_material_symbols
+                                preferences.value.materialSymbols -> R.drawable.ic_phone_charging_material_symbols
+                                preferences.value.chargingSymbolInsideIcon-> R.drawable.ic_phone_charging_inside
+                                else -> R.drawable.ic_phone_charging
+                            }
+                        ),
+                        contentDescription = "Phone Icon", tint = wearColorPalette.primary) },
+                toggleControl = {
+                    Icon(
+                        imageVector = ToggleChipDefaults.switchIcon(preferences.value.chargingSymbolInsideIcon),
+                        contentDescription = "compose_toggle"
+                    )
+                }
+            )
+        }
 
-        // TEMPERATURE UNIT COMPLICATION
+        // Watch Battery Temperature Complication
         item { PreferenceCategory(title = stringResource(id = R.string.setting_preference_category_title)) }
         item {
             ToggleChip(
@@ -164,6 +224,7 @@ fun PhoneBatteryAppScreen(
             )
         }
 
+        // Phone Notifications Complication
         item { PreferenceCategory(title = stringResource(id = R.string.notifications_section)) }
         item {
             ToggleChip(
@@ -179,7 +240,7 @@ fun PhoneBatteryAppScreen(
             )
         }
 
-        item{
+        item {
             OutlinedCompactChip(
                 colors = ChipDefaults.chipColors(
                     backgroundColor = Color(0xFF0E1011)

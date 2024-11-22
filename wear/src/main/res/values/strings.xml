@@ -72,4 +72,8 @@
     <string name="now">Now</string>
     <string name="today">Today</string>
     <string name="tomorrow">Tomorrow</string>
+
+    <!-- Material Symbols & Charging Symbol -->
+    <string name="pbc_material_symbols">Material Symbols</string>
+    <string name="charging_symbol_inside_icon">Charging symbol inside icon</string>
 </resources>

@@ -70,6 +70,20 @@ class MainViewModel @Inject constructor(
             updateComplication(context = context, WatchBatteryComplicationService::class.java)
         }
     }
+    fun toggleMaterialSymbols(value: Boolean, context: Context) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(materialSymbols = value) }
+            updateComplication(context = context, MobileBatteryComplicationService::class.java)
+            updateComplication(context = context, WatchBatteryComplicationService::class.java)
+        }
+    }
+    fun toggleChargingSymbol(value: Boolean, context: Context) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(chargingSymbolInsideIcon = value) }
+            updateComplication(context = context, MobileBatteryComplicationService::class.java)
+            updateComplication(context = context, WatchBatteryComplicationService::class.java)
+        }
+    }
     fun storeNotificationIconType(context: Context, type: Int) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(notificationsIconType = type) }

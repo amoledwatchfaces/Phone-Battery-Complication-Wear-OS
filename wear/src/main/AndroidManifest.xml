@@ -68,7 +68,7 @@
                 android:value="SMALL_IMAGE, LONG_TEXT"/>
         </service>
         <service android:name=".complication.MobileBatteryComplicationService"
-            android:icon="@drawable/ic_phone_icon"
+            android:icon="@drawable/ic_phone"
             android:label="@string/phone_battery_preview_desc"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
             android:exported="true">

@@ -68,4 +68,8 @@
     <string name="now">Teraz</string>
     <string name="today">Dnes</string>
     <string name="tomorrow">Zajtra</string>
+
+    <!-- Material Symbols & Charging Symbol -->
+    <string name="pbc_material_symbols">Material Symboly</string>
+    <string name="charging_symbol_inside_icon">Stav nabíjania vnútri ikony</string>
 </resources>

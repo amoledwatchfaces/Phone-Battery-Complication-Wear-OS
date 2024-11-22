@@ -25,6 +25,8 @@ data class UserPreferences(
     val lastUpdate: Long = 0L,
     val activeSync: Boolean = false,
     val nodeName: String = "Disconnected",
+    val materialSymbols: Boolean = false,
+    val chargingSymbolInsideIcon: Boolean = false,
 
     // Phone Notifications
     val notificationsIconType: Int = 2,

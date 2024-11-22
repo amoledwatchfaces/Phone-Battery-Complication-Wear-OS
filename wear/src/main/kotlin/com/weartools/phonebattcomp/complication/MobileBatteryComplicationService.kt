@@ -74,14 +74,14 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     max = 100f,
                     contentDescription = ComplicationText.EMPTY)
                     .setText(PlainComplicationText.Builder(text = "86%").build())
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone)).build())
                     .build()
             }
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                     contentDescription = ComplicationText.EMPTY)
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon))
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone))
                         .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch))
                         .build())
                     .build()
@@ -90,9 +90,9 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                     contentDescription = ComplicationText.EMPTY)
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon)).build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone)).build())
                     .setTitle(PlainComplicationText.Builder(text = "Pixel 9 Pro").build())
-                    .setSmallImage(smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone_icon), type = SmallImageType.ICON)
+                    .setSmallImage(smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone), type = SmallImageType.ICON)
                         .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
                         .build())
                     .build()
@@ -109,6 +109,9 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
         val activeSync = repository.activeSync
         val showPercentage = repository.percentage
+        val materialSymbols = repository.materialSymbols
+        val chargingSymbolInside = repository.chargingSymbolInsideIcon
+        val watchCharging = watchIsCharging?: getCurrentBatteryChargingStatus(this)
 
         /** When Active Sync is not enabled **/
         if (activeSync.not()) {
@@ -124,12 +127,29 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
         //Log.i("MobileBatteryComplicationService", "batteryLevel: ${batteryState.phoneBatteryLevel}")
 
         val level = if (repository.phoneBatteryLevel == 0) "\uFEFF-" else "\uFEFF${repository.phoneBatteryLevel}${if (showPercentage) "%" else ""}"
-        val phoneIcon = when {
-            repository.phoneIsConnected && repository.phoneIsCharging -> Icon.createWithResource(this, R.drawable.ic_phone_charging_3)
-            repository.phoneIsConnected -> Icon.createWithResource(this, R.drawable.ic_phone_icon)
-            else -> Icon.createWithResource(this, R.drawable.ic_phone_disconnected)
-        }
-        val watchIcon = if (watchIsCharging?: getCurrentBatteryChargingStatus(this)) Icon.createWithResource(this, R.drawable.ic_watch_charging_3) else Icon.createWithResource(this, R.drawable.ic_watch)
+        val phoneIcon = Icon.createWithResource(this,
+                when {
+                    repository.phoneIsConnected && repository.phoneIsCharging && materialSymbols && chargingSymbolInside -> R.drawable.ic_phone_charging_inside_material_symbols
+                    repository.phoneIsConnected && repository.phoneIsCharging && materialSymbols -> R.drawable.ic_phone_charging_material_symbols
+                    repository.phoneIsConnected && repository.phoneIsCharging && chargingSymbolInside -> R.drawable.ic_phone_charging_inside
+                    repository.phoneIsConnected && repository.phoneIsCharging -> R.drawable.ic_phone_charging
+                    repository.phoneIsConnected && materialSymbols -> R.drawable.ic_phone_material_symbols
+                    repository.phoneIsConnected -> R.drawable.ic_phone
+                    materialSymbols -> R.drawable.ic_phone_disconnected_material_symbols
+                    else -> R.drawable.ic_phone_disconnected
+                }
+            )
+
+        val watchIcon = Icon.createWithResource(this,
+                when {
+                    watchCharging && materialSymbols && chargingSymbolInside -> R.drawable.ic_watch_charging_inside_material_symbols
+                    watchCharging && materialSymbols -> R.drawable.ic_watch_charging_material_symbols
+                    watchCharging && chargingSymbolInside -> R.drawable.ic_watch_charging_inside
+                    watchCharging -> R.drawable.ic_watch_charging
+                    materialSymbols -> R.drawable.ic_watch_material_symbols
+                    else -> R.drawable.ic_watch
+                }
+            )
 
         return when (request.complicationType) {
 

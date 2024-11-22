@@ -90,7 +90,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
         val batteryLevel = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY)
 
         val level = "$batteryLevel${if (showPercentage) "%" else ""}"
-        val watchIcon = if (getCurrentBatteryChargingStatus(this)) Icon.createWithResource(this, R.drawable.ic_watch_charging_3) else Icon.createWithResource(this, R.drawable.ic_watch)
+        val watchIcon = if (getCurrentBatteryChargingStatus(this)) Icon.createWithResource(this, R.drawable.ic_watch_charging) else Icon.createWithResource(this, R.drawable.ic_watch)
 
         return when (request.complicationType) {
 
