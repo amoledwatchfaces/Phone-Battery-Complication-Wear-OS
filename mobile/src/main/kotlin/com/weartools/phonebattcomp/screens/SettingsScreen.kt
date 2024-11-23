@@ -140,7 +140,9 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(0.8f)
+                        ) {
                             Text(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
@@ -152,6 +154,7 @@ fun SettingsScreen(
                                 text = "Important - Notifications Access required")
                         }
                         Switch(
+                            modifier = Modifier.weight(0.2f),
                             checked = backgroundSyncState,
                             onCheckedChange = {
                                 viewModel.isMyNotificationsServiceRunning(context)
@@ -167,7 +170,9 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(0.8f)
+                        ) {
                             Text(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
@@ -180,6 +185,7 @@ fun SettingsScreen(
                         }
 
                         Switch(
+                            modifier = Modifier.weight(0.2f),
                             enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
                             checked = activeSyncState,
                             onCheckedChange = {
@@ -201,7 +207,9 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(0.8f)
+                        ) {
                             Text(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
@@ -213,6 +221,7 @@ fun SettingsScreen(
                                 text = "Only for Phone Notifications Complication")
                         }
                         Switch(
+                            modifier = Modifier.weight(0.2f),
                             enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
                             checked = notificationsSyncState,
                             onCheckedChange = {
@@ -232,7 +241,9 @@ fun SettingsScreen(
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(0.8f)
+                        ) {
                             Text(
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Medium,
@@ -245,6 +256,7 @@ fun SettingsScreen(
                         }
 
                         Switch(
+                            modifier = Modifier.weight(0.2f),
                             enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
                             checked = calendarSyncState,
                             onCheckedChange = {

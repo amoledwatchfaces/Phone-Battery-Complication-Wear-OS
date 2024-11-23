@@ -55,6 +55,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.wearable.Node
 import com.weartools.phonebattcomp.MainViewModel
@@ -109,6 +110,8 @@ fun HomeScreen(
             },
             title = {
                 Text(
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
                     fontWeight = FontWeight.Medium,
                     text = stringResource(id = R.string.app_name)
                 )
@@ -215,15 +218,21 @@ fun HomeScreen(
                                 context.openGuideLink()})
                         {
                             if (nodesListEmpty) {
-                                Icon(
-                                    modifier = Modifier.padding(end = 10.dp),
-                                    imageVector = Icons.Filled.SmartDisplay,
-                                    contentDescription = null,
-                                )
-                                Text(
-                                    textDecoration = TextDecoration.Underline,
-                                    text = stringResource(id = R.string.installation_guides),
-                                    color = colorScheme.onPrimaryContainer)
+                                Row(
+                                    horizontalArrangement = Arrangement.Center,
+                                    verticalAlignment = Alignment.CenterVertically
+                                ){
+                                    Icon(
+                                        modifier = Modifier.padding(end = 10.dp),
+                                        imageVector = Icons.Filled.SmartDisplay,
+                                        contentDescription = null,
+                                    )
+                                    Text(
+                                        textAlign = TextAlign.Center,
+                                        textDecoration = TextDecoration.Underline,
+                                        text = stringResource(id = R.string.installation_guides),
+                                        color = colorScheme.onPrimaryContainer)
+                                }
                             }
                         }
                     }

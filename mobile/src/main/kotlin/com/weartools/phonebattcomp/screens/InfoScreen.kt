@@ -46,6 +46,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
@@ -87,7 +88,13 @@ fun InfoScreen(
                     )
                 }
             },
-            title = { Text(fontWeight = FontWeight.Medium, text = stringResource(id = R.string.app_name)) },
+            title = {
+                Text(
+                    overflow = TextOverflow.Ellipsis,
+                    maxLines = 1,
+                    fontWeight = FontWeight.Medium,
+                    text = stringResource(id = R.string.app_name)
+                ) },
             colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
                 containerColor = Color.Transparent,
             )
