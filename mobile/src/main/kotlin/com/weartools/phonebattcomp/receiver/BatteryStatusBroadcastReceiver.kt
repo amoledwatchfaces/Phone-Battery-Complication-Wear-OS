@@ -5,11 +5,13 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.os.BatteryManager
+import android.os.Build
 import android.util.Log
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.BATTERY_KEY
 import com.weartools.phonebattcomp.BATTERY_PATH
+import com.weartools.phonebattcomp.CHARGE_TIME_REMAINING_KEY
 import com.weartools.phonebattcomp.IS_CHARGING_KEY
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -30,6 +32,7 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
 
     var batteryLevel: Int? = null
     var isCharging: Boolean? = null
+    var remainingTime: Long = -1
 
     @OptIn(DelicateCoroutinesApi::class)
     override fun onReceive(context: Context, intent: Intent) {
@@ -59,12 +62,20 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                         val isChargingSafe = isCharging ?: lastChargingStatus ?: false
 
                         //Log.i("BSBR","Active Sync: Sending Battery Level: $batteryLevel")
-                        //Log.i("BSBR","Active Sync: Is Charging?: $isCharging")
+                        Log.i("BSBR","ChargingTimeRemaining: ${
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                batteryManager.computeChargeTimeRemaining()
+                            }
+                            else {""}
+                        }")
 
                         val request = PutDataMapRequest.create(BATTERY_PATH).apply{
                             dataMap.putInt(BATTERY_KEY, batteryLevelSafe)
                             dataMap.putBoolean(IS_CHARGING_KEY, isChargingSafe)
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                dataMap.putLong(CHARGE_TIME_REMAINING_KEY, batteryManager.computeChargeTimeRemaining())
                             }
+                        }
                             .asPutDataRequest()
                             .setUrgent()
 

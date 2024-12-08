@@ -4,10 +4,10 @@
     <selectionStates>
       <SelectionState runConfigName="wear">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-11-19T07:05:44.959065100Z">
+        <DropdownSelection timestamp="2024-11-23T09:43:46.228051300Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=19071FDEE00490" />
+              <DeviceId pluginId="LocalEmulator" identifier="path=C:\Users\amoledwatchfaces\.android\avd\Pixel_8_API_35.avd" />
             </handle>
           </Target>
         </DropdownSelection>
@@ -15,10 +15,10 @@
       </SelectionState>
       <SelectionState runConfigName="mobile">
         <option name="selectionMode" value="DROPDOWN" />
-        <DropdownSelection timestamp="2024-10-30T13:19:57.623920400Z">
+        <DropdownSelection timestamp="2024-12-01T21:12:21.967294700Z">
           <Target type="DEFAULT_BOOT">
             <handle>
-              <DeviceId pluginId="PhysicalDevice" identifier="serial=19071FDEE00490" />
+              <DeviceId pluginId="PhysicalDevice" identifier="serial=46061FDAS007U6" />
             </handle>
           </Target>
         </DropdownSelection>

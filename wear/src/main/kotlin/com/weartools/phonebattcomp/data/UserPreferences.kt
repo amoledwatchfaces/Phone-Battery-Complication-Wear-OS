@@ -27,11 +27,14 @@ data class UserPreferences(
     val nodeName: String = "Disconnected",
     val materialSymbols: Boolean = false,
     val chargingSymbolInsideIcon: Boolean = false,
+    val chargeRemainingTime: Long = -1,
 
     // Phone Notifications
     val notificationsIconType: Int = 2,
     val lastNotificationsUpdateTime: Long = 0L,
     val notificationsList: List<ByteArray> = mutableListOf(),
+    val notificationText: String = "",
+    val notificationTitle: String = "",
 
     // Calendar Events
     val calendarEvents: List<CalendarEvent> = emptyList(),

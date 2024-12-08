@@ -8,6 +8,11 @@ import androidx.datastore.core.DataStore
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders
 import androidx.wear.protolayout.DeviceParametersBuilders
+import androidx.wear.protolayout.DimensionBuilders
+import androidx.wear.protolayout.LayoutElementBuilders
+import androidx.wear.protolayout.LayoutElementBuilders.ColorFilter
+import androidx.wear.protolayout.LayoutElementBuilders.HORIZONTAL_ALIGN_CENTER
+import androidx.wear.protolayout.LayoutElementBuilders.Image
 import androidx.wear.protolayout.LayoutElementBuilders.Layout
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.ResourceBuilders
@@ -26,12 +31,24 @@ import com.google.android.gms.wearable.DataClient
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
 import com.weartools.phonebattcomp.MobileListener
+import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
+import java.util.Locale
 import javax.inject.Inject
+
+internal const val ID_PHONE = "ic_phone"
+internal const val ID_PHONE_CHARGING = "ic_phone_charging"
+internal const val ID_PHONE_CHARGING_INSIDE = "ic_phone_charging_inside"
+internal const val ID_PHONE_CHARGING_INSIDE_MATERIAL_SYMBOLS = "ic_phone_charging_inside_material_symbols"
+internal const val ID_PHONE_CHARGING_MATERIAL_SYMBOLS = "ic_phone_charging_material_symbols"
+internal const val ID_PHONE_DISCONNECTED = "ic_phone_disconnected"
+internal const val ID_PHONE_DISCONNECTED_MATERIAL_SYMBOLS = "ic_phone_disconnected_material_symbols"
+internal const val ID_PHONE_MATERIAL_SYMBOLS = "ic_phone_material_symbols"
+internal const val RESOURCES_VERSION = "1"
 
 @AndroidEntryPoint
 class PhoneBatteryTileService : TileService() {
@@ -41,6 +58,26 @@ class PhoneBatteryTileService : TileService() {
     private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject lateinit var dataClient: DataClient
+
+    fun formatChargeTimeRemaining(
+        timeRemaining: Long,
+        isConnected: Boolean,
+        isCharging: Boolean,
+        level: Int
+    ): String {
+        val seconds = timeRemaining / 1000
+        val minutes = seconds / 60
+        val hours = minutes / 60
+
+        return when {
+            isConnected.not() -> "Disconnected"
+            isCharging.not() -> "Discharging"
+            isCharging && level == 100 -> "Fully charged"
+            isCharging && timeRemaining <= 0 -> "Charging..."
+            hours > 0 -> String.format(Locale.getDefault(),"Full in %dh %dm", hours, minutes % 60)
+            else -> String.format(Locale.getDefault(),"Full in %d min", minutes)
+        }
+    }
 
     override fun onTileRequest(requestParams: TileRequest): ListenableFuture<TileBuilders.Tile> {
 
@@ -60,7 +97,13 @@ class PhoneBatteryTileService : TileService() {
                                 .setLayout(getPhoneBatteryTileLayout(
                                     requestParams.deviceConfiguration,
                                     preferences.phoneBatteryLevel,
-                                    preferences.nodeName
+                                    preferences.nodeName,
+                                    preferences.chargeRemainingTime,
+                                    preferences.phoneIsConnected,
+                                    preferences.phoneIsCharging,
+                                    preferences.materialSymbols,
+                                    preferences.chargingSymbolInsideIcon
+
                                 )
                                 ).build()
                         ).build()
@@ -72,8 +115,25 @@ class PhoneBatteryTileService : TileService() {
     private fun getPhoneBatteryTileLayout(
         deviceParameters: DeviceParametersBuilders.DeviceParameters,
         batteryLevel: Int,
-        nodeName: String
+        nodeName: String,
+        chargeRemainingTime: Long,
+        phoneIsConnected: Boolean,
+        phoneIsCharging: Boolean,
+        materialSymbols: Boolean,
+        chargingSymbolInside: Boolean
     ): Layout {
+
+        val phoneIcon =
+            when {
+                phoneIsConnected && phoneIsCharging && materialSymbols && chargingSymbolInside -> ID_PHONE_CHARGING_INSIDE_MATERIAL_SYMBOLS
+                phoneIsConnected && phoneIsCharging && materialSymbols -> ID_PHONE_CHARGING_MATERIAL_SYMBOLS
+                phoneIsConnected && phoneIsCharging && chargingSymbolInside -> ID_PHONE_CHARGING_INSIDE
+                phoneIsConnected && phoneIsCharging -> ID_PHONE_CHARGING
+                phoneIsConnected && materialSymbols -> ID_PHONE_MATERIAL_SYMBOLS
+                phoneIsConnected -> ID_PHONE
+                materialSymbols -> ID_PHONE_DISCONNECTED_MATERIAL_SYMBOLS
+                else -> ID_PHONE_DISCONNECTED
+            }
 
         return Layout.Builder()
             .setRoot(
@@ -82,6 +142,7 @@ class PhoneBatteryTileService : TileService() {
                     .setEdgeContent(
                         CircularProgressIndicator.Builder()
                             .setProgress(batteryLevel.toFloat() / 100f)
+                            .setStrokeWidth(DimensionBuilders.dp(10f))
                             .setCircularProgressIndicatorColors(
                                 ProgressIndicatorColors(
                                     ColorBuilders.argb(TileColors.Blue),
@@ -90,47 +151,140 @@ class PhoneBatteryTileService : TileService() {
                             )
                             .build()
                     )
-
+                    // Device Name
                     .setPrimaryLabelTextContent(
                         Text.Builder(this, nodeName)
-                            .setTypography(Typography.TYPOGRAPHY_CAPTION1)
-                            .setColor(ColorBuilders.argb(TileColors.Blue))
-                            .build()
-                    )
-                    .setSecondaryLabelTextContent(
-                        Text.Builder(this, "Power")
+                            /*
+                            .setModifiers(ModifiersBuilders.Modifiers.Builder()
+                                .setPadding(ModifiersBuilders.Padding.Builder()
+                                    .setBottom(DimensionBuilders.dp(16f))
+                                    .build())
+                                .build())
+
+                             */
                             .setTypography(Typography.TYPOGRAPHY_CAPTION1)
                             .setColor(ColorBuilders.argb(TileColors.Gray))
                             .build()
+
                     )
+                    // Battery Level + Status
                     .setContent(
-                        Text.Builder(this, "${batteryLevel}%")
-                            .setTypography(Typography.TYPOGRAPHY_DISPLAY1)
-                            .setColor(ColorBuilders.argb(TileColors.White))
-                            .setModifiers(
-                                ModifiersBuilders.Modifiers.Builder()
-                                .setClickable(launchAppClickable(openApp())).build())
+                        LayoutElementBuilders.Column.Builder()
+                            .setHorizontalAlignment(HORIZONTAL_ALIGN_CENTER)
+                            .addContent(
+                                Text.Builder(this, "${batteryLevel}%")
+                                    .setTypography(Typography.TYPOGRAPHY_DISPLAY1)
+                                    .setColor(ColorBuilders.argb(TileColors.White))
+                                    .setModifiers(
+                                        ModifiersBuilders.Modifiers.Builder()
+                                            .setClickable(launchAppClickable(openApp())).build())
+                                    .build()
+                            )
+                            .addContent(
+                                Text.Builder(this, formatChargeTimeRemaining(
+                                    chargeRemainingTime,
+                                    phoneIsConnected,
+                                    phoneIsCharging,
+                                    batteryLevel
+                                ))
+                                    .setTypography(Typography.TYPOGRAPHY_CAPTION1)
+                                    .setColor(ColorBuilders.argb(TileColors.Gray))
+                                    .build()
+                            )
                             .build()
                     )
+                    .setSecondaryLabelTextContent(
+                        Image.Builder()
+                            .setWidth(DimensionBuilders.dp(36f))
+                            .setHeight(DimensionBuilders.dp(36f))
+                            .setColorFilter(
+                                ColorFilter.Builder().setTint(ColorBuilders.argb(TileColors.Blue))
+                                .build())
+                            .setResourceId(phoneIcon)
+                            .build()
+                    )
+
                     .build()
             )
             .build()
     }
-    /*
-        override fun onTileResourcesRequest(requestParams: RequestBuilders.ResourcesRequest): ListenableFuture<ResourceBuilders.Resources> =
-            Futures.immediateFuture(
-                ResourceBuilders.Resources.Builder()
-                    .setVersion(RESOURCES_VERSION)
-                    .build()
-            )
 
-     */
     override fun onTileResourcesRequest(requestParams: RequestBuilders.ResourcesRequest): ListenableFuture<ResourceBuilders.Resources> {
-        return Futures.immediateFuture(
-            ResourceBuilders.Resources.Builder()
-                .setVersion(RESOURCES_VERSION)
-                .build()
-        )
+
+        val currentResources = requestParams.resourceIds
+
+        val resources: ResourceBuilders.Resources = ResourceBuilders.Resources.Builder()
+            .apply {
+                if (currentResources.isEmpty()){
+                    addIdToImageMapping(
+                        ID_PHONE,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone)
+                                .build())
+                            .build()
+                    )
+                    addIdToImageMapping(
+                        ID_PHONE_CHARGING,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone_charging)
+                                .build())
+                            .build()
+                    )
+                    addIdToImageMapping(
+                        ID_PHONE_CHARGING_INSIDE,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone_charging_inside)
+                                .build())
+                            .build()
+                    )
+                    addIdToImageMapping(
+                        ID_PHONE_CHARGING_INSIDE_MATERIAL_SYMBOLS,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone_charging_inside_material_symbols)
+                                .build())
+                            .build()
+                    )
+                    addIdToImageMapping(
+                        ID_PHONE_CHARGING_MATERIAL_SYMBOLS,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone_charging_material_symbols)
+                                .build())
+                            .build()
+                    )
+                    addIdToImageMapping(
+                        ID_PHONE_DISCONNECTED,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone_disconnected)
+                                .build())
+                            .build()
+                    )
+                    addIdToImageMapping(
+                        ID_PHONE_DISCONNECTED_MATERIAL_SYMBOLS,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone_disconnected_material_symbols)
+                                .build())
+                            .build()
+                    )
+                    addIdToImageMapping(
+                        ID_PHONE_MATERIAL_SYMBOLS,
+                        ResourceBuilders.ImageResource.Builder().setAndroidResourceByResId(
+                            ResourceBuilders.AndroidImageResourceByResId.Builder()
+                                .setResourceId(R.drawable.ic_phone_material_symbols)
+                                .build())
+                            .build()
+                    )
+                }
+            }
+            .setVersion(RESOURCES_VERSION)
+            .build()
+        return Futures.immediateFuture(resources)
     }
 
     override fun onTileAddEvent(requestParams: EventBuilders.TileAddEvent) {
@@ -144,8 +298,7 @@ class PhoneBatteryTileService : TileService() {
     }
 
     companion object {
-        private const val RESOURCES_VERSION = "1"
-        private const val FRESHNESS_INTERVAL = 15 * DateUtils.MINUTE_IN_MILLIS
+        private const val FRESHNESS_INTERVAL = 5 * DateUtils.MINUTE_IN_MILLIS
         //private const val animationDurationInMillis = 1000L // 2 seconds
     }
     }
@@ -170,5 +323,5 @@ object TileColors {
     val Blue = android.graphics.Color.parseColor("#b9f7ff")
     val Gray = android.graphics.Color.parseColor("#BDC1C6")
     val White = Color.White.toArgb()
-    val White10Pc = Color(1f, 1f, 1f, 0.1f).toArgb()
+    val White10Pc = Color(1f, 1f, 1f, 0.15f).toArgb()
 }

@@ -8,6 +8,7 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.BatteryManager
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import androidx.lifecycle.ViewModel
@@ -171,8 +172,9 @@ class MainViewModel @Inject constructor(
                     WearListener.sendBatteryInfoToWatch(
                         level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
                         isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
+                        forceUpdate = true,
                         dataClient = dataClient,
-                        forceUpdate = true
+                        batteryManager = batteryManager,
                     )
                     if (notificationsSync.value){
                         viewModelScope.launch { ServiceCommunication.sendToWatchFlow.emit(Unit) }
@@ -236,6 +238,9 @@ class MainViewModel @Inject constructor(
                 val request = PutDataMapRequest.create(BATTERY_PATH).apply{
                     dataMap.putInt(BATTERY_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
                     dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        dataMap.putLong(CHARGE_TIME_REMAINING_KEY, batteryManager.computeChargeTimeRemaining())
+                    }
                 }
                     .asPutDataRequest()
                     .setUrgent()

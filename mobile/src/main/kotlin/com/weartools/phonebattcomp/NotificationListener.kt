@@ -52,6 +52,8 @@ class NotificationListener : NotificationListenerService() {
         private const val ICON_SIZE = 48
         private const val URI = "/foobar"
         private const val NOTIFICATIONS_UPDATE_KEY = "ts"
+        private const val NOTIFICATION_TEXT = "ntext"
+        private const val NOTIFICATION_TITLE = "ntitle"
     }
 
     override fun onListenerConnected() {
@@ -171,6 +173,8 @@ class NotificationListener : NotificationListenerService() {
                     }
                 }
                 putLong(NOTIFICATIONS_UPDATE_KEY, updateTime)
+                putString(NOTIFICATION_TEXT, notifications.firstOrNull()?.notification?.extras?.getString("android.text")?:"")
+                putString(NOTIFICATION_TITLE, notifications.firstOrNull()?.notification?.extras?.getString("android.title")?:"")
             }
 
             // Send DataMap to watch using DataClient

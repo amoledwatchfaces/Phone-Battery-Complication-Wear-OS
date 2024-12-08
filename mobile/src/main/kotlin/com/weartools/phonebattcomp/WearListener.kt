@@ -20,6 +20,7 @@ import android.Manifest
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.os.BatteryManager
+import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
 import com.google.android.gms.wearable.CapabilityInfo
@@ -43,6 +44,7 @@ import javax.inject.Inject
 const val BATTERY_PATH = "/battery-level"
 const val BATTERY_KEY= "battery-key"
 const val IS_CHARGING_KEY = "is-charging-key"
+const val CHARGE_TIME_REMAINING_KEY = "charge-time-remaining-key"
 
 private const val REQUEST_PATH = "/request"
 private const val FORCE_UPDATE_KEY = "force-update-key"
@@ -78,7 +80,8 @@ class WearListener : WearableListenerService() {
                                 level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
                                 isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
                                 forceUpdate = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(FORCE_UPDATE_KEY),
-                                dataClient = dataClient
+                                dataClient = dataClient,
+                                batteryManager = batteryManager
                             )
                         }
                         CALENDAR_REQUEST_PATH -> {
@@ -115,8 +118,9 @@ class WearListener : WearableListenerService() {
                 sendBatteryInfoToWatch(
                     level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
                     isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
+                    forceUpdate = true,
                     dataClient = dataClient,
-                    forceUpdate = true
+                    batteryManager = batteryManager,
                 )
                 // TODO: Test: maybe it's good to also send notifications to watch when watch is reconnected?
                 ioScope.launch { sendNotificationsToWatch(this@WearListener,dataRepository) }
@@ -129,10 +133,14 @@ class WearListener : WearableListenerService() {
             isCharging: Boolean,
             forceUpdate: Boolean,
             dataClient: DataClient,
+            batteryManager: BatteryManager
         ){
             val request = PutDataMapRequest.create(BATTERY_PATH).apply{
                 dataMap.putInt(BATTERY_KEY, level)
                 dataMap.putBoolean(IS_CHARGING_KEY, isCharging)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    dataMap.putLong(CHARGE_TIME_REMAINING_KEY, batteryManager.computeChargeTimeRemaining())
+                }
                 if (forceUpdate){
                     dataMap.putLong("immediate-update", System.currentTimeMillis())
                 }

@@ -13,6 +13,8 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.complication.EventTimerComplicationService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
+import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
+import com.weartools.phonebattcomp.complication.NotificationsPreviewComplicationService
 import com.weartools.phonebattcomp.complication.UpcomingEventComplicationService
 import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 
@@ -37,6 +39,10 @@ fun Context.updateBatteriesComplications() {
 fun Context.updateCalendarComplications() {
     this.updateComplication(EventTimerComplicationService::class.java)
     this.updateComplication(UpcomingEventComplicationService::class.java)
+}
+fun Context.updateNotificationComplications() {
+    this.updateComplication(NotificationsIconsComplicationService::class.java)
+    this.updateComplication(NotificationsPreviewComplicationService::class.java)
 }
 
 fun Context.openAppStoreOnPhone() {

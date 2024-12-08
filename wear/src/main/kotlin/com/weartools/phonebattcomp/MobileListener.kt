@@ -29,13 +29,13 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
-import com.weartools.phonebattcomp.complication.NotificationsIconsComplicationService
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import com.weartools.phonebattcomp.utils.updateCalendarComplications
 import com.weartools.phonebattcomp.utils.updateComplication
+import com.weartools.phonebattcomp.utils.updateNotificationComplications
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -54,6 +54,7 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 private const val ACTIVE_SYNC_PATH = "/active-sync"
 private const val ACTIVE_SYNC_KEY = "active-sync-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
+private const val CHARGE_TIME_REMAINING_KEY = "charge-time-remaining-key"
 private const val URI = "/foobar"
 
 private const val CALENDAR_EVENTS_PATH = "/calendar-events"
@@ -62,6 +63,8 @@ const val CALENDAR_REQUEST_PATH = "/calendar-request"
 
 const val NOTIFICATIONS_REQUEST_PATH = "/notifications-request"
 const val NOTIFICATIONS_UPDATE_KEY = "ts"
+private const val NOTIFICATION_TEXT = "ntext"
+private const val NOTIFICATION_TITLE = "ntitle"
 
 var lastCalendarRequestTime = 0L
 
@@ -101,6 +104,7 @@ class MobileListener : WearableListenerService() {
                                     it.copy(
                                         phoneBatteryLevel = dataMapItem.dataMap.getInt(BATTERY_KEY),
                                         phoneIsCharging = dataMapItem.dataMap.getBoolean(IS_CHARGING_KEY),
+                                        chargeRemainingTime = dataMapItem.dataMap.getLong(CHARGE_TIME_REMAINING_KEY, -1),
                                         phoneIsConnected = true,
                                         afterMobileResult = true,
                                         lastUpdate = System.currentTimeMillis()
@@ -180,7 +184,7 @@ class MobileListener : WearableListenerService() {
                         )
                     }
                     updateComplication(MobileBatteryComplicationService::class.java)
-                    updateComplication(NotificationsIconsComplicationService::class.java)
+                    updateNotificationComplications()
                 }
             }
         }
@@ -207,9 +211,13 @@ class MobileListener : WearableListenerService() {
                     byteArrayList.add(byteArray)
                     i++
                 }
-                dataStore.updateData { it.copy(notificationsList = byteArrayList) }
+                dataStore.updateData { it.copy(
+                    notificationsList = byteArrayList,
+                    notificationText = dataMap.getString(NOTIFICATION_TEXT,""),
+                    notificationTitle = dataMap.getString(NOTIFICATION_TITLE,"")
+                ) }
                 //Log.i("MobileListener", "Icons count: ${byteArrayList.size}")
-                updateComplication(NotificationsIconsComplicationService::class.java)
+                updateNotificationComplications()
             }
         }
     }
