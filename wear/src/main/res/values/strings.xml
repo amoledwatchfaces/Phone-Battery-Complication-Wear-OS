@@ -23,11 +23,12 @@
 
     <!-- Notifications Complication -->
     <string name="phone_notifications_complication">Phone notifications</string>
-    <string name="phone_notifications_preview_complication">Phone notifications preview</string>
     <string name="notifications_section" translatable="false">Phone Notifications Complication</string>
     <string name="notif_comp_force_icon_type" translatable="false">Icon Type</string>
     <string name="type_icon">ICON</string>
     <string name="type_photo">PHOTO</string>
+    <string name="phone_notifications_preview_complication">Phone notifications preview</string>
+    <string name="no_notifications">No notifications</string>
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Phone battery</string>

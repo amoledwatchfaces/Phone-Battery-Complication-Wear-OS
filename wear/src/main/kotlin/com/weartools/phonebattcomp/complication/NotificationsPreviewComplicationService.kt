@@ -87,7 +87,7 @@ class NotificationsPreviewComplicationService : SuspendingComplicationDataSource
 
                 if (notificationsList.isEmpty()){
                     return LongTextComplicationData.Builder(
-                        text = PlainComplicationText.Builder(text = "No notifications").build(),
+                        text = PlainComplicationText.Builder(text = getString(R.string.no_notifications)).build(),
                         contentDescription = ComplicationText.EMPTY)
                         .build()
                 }

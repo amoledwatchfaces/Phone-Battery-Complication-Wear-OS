@@ -47,6 +47,8 @@ class NotificationListener : NotificationListenerService() {
 
     // Store the previous bitmaps
     private var lastBitmapsSent = mutableListOf<Bitmap>()
+    // Store the previous text+title
+    private var lastTextTitleSent = ""
 
     companion object {
         private const val ICON_SIZE = 48
@@ -122,12 +124,21 @@ class NotificationListener : NotificationListenerService() {
 
             // Initialize current bitmaps list.
             val currentBitmaps = mutableListOf<Bitmap>()
+            var hasPreview = false
+            var notificationText = ""
+            var notificationTitle = ""
 
             // Get activeNotifications bitmaps and add unique ones to currentBitmaps.
             for (notification in notifications) {
 
+
                 if (notification.isOngoing) { continue }
                 if (currentBitmaps.size >= 9) { break } // Break the loop when we have 9 distinct icons (...)
+
+                val text = notification.notification.extras.getCharSequence("android.text") ?: ""
+                val title = notification.notification.extras.getCharSequence("android.title") ?: ""
+
+                if (text.isBlank() && title.isBlank()) { continue }
 
                 notification.notification.smallIcon?.let {
                     it.loadDrawable(this@NotificationListener)?.let { drawable ->
@@ -136,6 +147,11 @@ class NotificationListener : NotificationListenerService() {
                 }?.let { bitmap ->
                     if (currentBitmaps.none { it.sameAs(bitmap) }) {
                         currentBitmaps.add(bitmap)
+                        if (hasPreview.not()){
+                            hasPreview = true
+                            notificationText = text.toString()
+                            if (text != title) { notificationTitle = title.toString() }
+                        }
                     }
                 }
             }
@@ -144,6 +160,7 @@ class NotificationListener : NotificationListenerService() {
              * to see if the bitmaps on their positions matches. If bitmaps match, return early
              * so there is no need to send new complication update, else, continue with sending
             **/
+
             if (!forceSend && currentBitmaps.size == lastBitmapsSent.size) {
                 var allIdentical = true
                 for (i in 0 until minOf(8, currentBitmaps.size)) {
@@ -153,12 +170,14 @@ class NotificationListener : NotificationListenerService() {
                         break
                     }
                 }
+                if (lastTextTitleSent != (notificationText + notificationTitle)) allIdentical = false
                 // If loop completes without breaking, all bitmaps are identical
                 if (allIdentical) { return@withLock }
             }
 
             // Set currentBitmaps as lastBitmapsSent for next comparison
             lastBitmapsSent = currentBitmaps
+            lastTextTitleSent = notificationText + notificationTitle
 
             // Create DataMap Request
             val putDataMapReq = PutDataMapRequest.create(URI)
@@ -173,8 +192,8 @@ class NotificationListener : NotificationListenerService() {
                     }
                 }
                 putLong(NOTIFICATIONS_UPDATE_KEY, updateTime)
-                putString(NOTIFICATION_TEXT, notifications.firstOrNull()?.notification?.extras?.getString("android.text")?:"")
-                putString(NOTIFICATION_TITLE, notifications.firstOrNull()?.notification?.extras?.getString("android.title")?:"")
+                putString(NOTIFICATION_TEXT, notificationText)
+                putString(NOTIFICATION_TITLE, notificationTitle)
             }
 
             // Send DataMap to watch using DataClient

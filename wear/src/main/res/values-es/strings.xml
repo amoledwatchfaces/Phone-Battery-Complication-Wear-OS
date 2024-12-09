@@ -27,6 +27,9 @@
     <string name="notif_comp_force_icon_type" translatable="false">Tipo de icono</string>
     <string name="type_icon">ICONO</string>
     <string name="type_photo">FOTO</string>
+    <string name="phone_notifications_preview_complication">Vista previa de notificaciones del teléfono</string>
+    <string name="no_notifications">Sin notificaciones</string>
+
 
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Batería del teléfono</string>
