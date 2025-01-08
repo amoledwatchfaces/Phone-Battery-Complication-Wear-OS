@@ -26,7 +26,13 @@ fun Context.openPlayStorePortfolio() {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/dev?id=5591589606735981545")))
     }
 }
-
+fun Context.openFacebookSocialLink() {
+    try {
+        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.social_facebook))))
+    } catch (e: ActivityNotFoundException) {
+        Log.d(TAG,"No Browser available")
+    }
+}
 fun Context.openTelegramSocialLink() {
     try {
         startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.social_telegram))))

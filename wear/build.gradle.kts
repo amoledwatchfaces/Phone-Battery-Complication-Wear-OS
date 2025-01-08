@@ -71,13 +71,13 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.7.5"
+    val composeUiVersion = "1.7.6"
     val composeWearVersion = "1.4.0"
 
     // Wearable
-    implementation ("com.google.android.gms:play-services-wearable:18.2.0")
+    implementation ("com.google.android.gms:play-services-wearable:19.0.0")
     implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha04")
-    implementation ("androidx.wear:wear-remote-interactions:1.0.0")
+    implementation ("androidx.wear:wear-remote-interactions:1.1.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     // Compose
@@ -96,8 +96,8 @@ dependencies {
     debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.9.0")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
     // DataStore
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
@@ -118,12 +118,15 @@ dependencies {
     implementation("androidx.wear.protolayout:protolayout-material:1.2.1")
     implementation("androidx.wear.tiles:tiles:1.4.1")
 
+    // ListenableFuture
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.1")
+
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
     implementation ("com.google.dagger:hilt-android:2.52")
     ksp ("com.google.dagger:hilt-compiler:2.52")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.6.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

@@ -86,9 +86,10 @@ class NotificationsPreviewComplicationService : SuspendingComplicationDataSource
             ComplicationType.LONG_TEXT -> {
 
                 if (notificationsList.isEmpty()){
-                    return LongTextComplicationData.Builder(
+                    LongTextComplicationData.Builder(
                         text = PlainComplicationText.Builder(text = getString(R.string.no_notifications)).build(),
                         contentDescription = ComplicationText.EMPTY)
+                        .setMonochromaticImage(null)
                         .build()
                 }
                 else {

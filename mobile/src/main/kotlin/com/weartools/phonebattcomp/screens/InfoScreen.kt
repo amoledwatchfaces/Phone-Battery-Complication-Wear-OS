@@ -1,11 +1,8 @@
 package com.weartools.phonebattcomp.screens
 
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.view.SoundEffectConstants
 import android.view.View
-import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -16,8 +13,6 @@ import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CurrencyBitcoin
-import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.Mail
 import androidx.compose.material.icons.filled.Policy
 import androidx.compose.material.icons.filled.RateReview
@@ -38,7 +33,6 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
@@ -52,7 +46,7 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.utils.openAmoledWebPage
-import com.weartools.phonebattcomp.utils.openBuyMeACoffeeSocialLink
+import com.weartools.phonebattcomp.utils.openFacebookSocialLink
 import com.weartools.phonebattcomp.utils.openGithubSocialLink
 import com.weartools.phonebattcomp.utils.openPlayStorePortfolio
 import com.weartools.phonebattcomp.utils.openPrivacyPolicyLink
@@ -170,13 +164,76 @@ fun InfoScreen(
 
             item {
                 ElevatedCard(
-                    elevation = CardDefaults.cardElevation(
-                        defaultElevation = 6.dp
-                    ),
                     modifier = Modifier
                         .fillMaxWidth(0.9f)
                         .padding(bottom = 20.dp, top = 10.dp)
                 ){
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(all = 10.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            modifier = Modifier.padding(start = 16.dp),
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = stringResource(id = R.string.follow_us),
+                            fontWeight = FontWeight.Medium)
+                        Row {
+                            IconButton(onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.openFacebookSocialLink()}) {
+                                Icon(
+                                    tint = colorScheme.primary,
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.social_facebook),
+                                    contentDescription = null,
+                                )
+                            }
+                            IconButton(onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.openTelegramSocialLink()}) {
+                                Icon(
+                                    tint = colorScheme.primary,
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.social_telegram_2),
+                                    contentDescription = null,
+                                )
+                            }
+                            IconButton(onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.openGithubSocialLink()
+                            }) {
+                                Icon(
+                                    tint = colorScheme.primary,
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.social_github),
+                                    contentDescription = null,
+                                )
+                            }
+                            /*
+                            IconButton(onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.openFacebookSocialLink()}) {
+                                Icon(
+                                    tint = colorScheme.onPrimaryContainer,
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.social_facebook),
+                                    contentDescription = null,
+                                )
+                            }
+
+                             */
+                            IconButton(onClick = {
+                                view.playSoundEffect(SoundEffectConstants.CLICK)
+                                context.openTwitterSocialLink()
+                            }) {
+                                Icon(
+                                    tint = colorScheme.primary,
+                                    imageVector = ImageVector.vectorResource(id = R.drawable.social_x),
+                                    contentDescription = null,
+                                )
+                            }
+                        }
+                    }
+                    /*
                     Column(
                         modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.SpaceBetween,
@@ -240,6 +297,7 @@ fun InfoScreen(
                                 }
                             }
                         }
+
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth(0.9F)
@@ -286,6 +344,7 @@ fun InfoScreen(
                         }
 
                     }
+                     */
                 }
             }
 

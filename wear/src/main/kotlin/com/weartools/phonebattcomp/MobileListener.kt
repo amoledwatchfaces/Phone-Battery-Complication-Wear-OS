@@ -145,7 +145,8 @@ class MobileListener : WearableListenerService() {
                                 phoneIsCharging = false,
                                 phoneIsConnected = false,
                                 afterMobileResult = false,
-                                lastUpdate = System.currentTimeMillis()
+                                lastUpdate = System.currentTimeMillis(),
+                                lastNotificationsUpdateTime = 0L
                             )
                         }
                         //Log.d(TAG, "Phone Companion Uninstalled!")
@@ -171,7 +172,7 @@ class MobileListener : WearableListenerService() {
                     }
                 }
                 // we are sending battery level now when change is detected on mobile app
-                //sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
+                // sendPhoneBatteryRequest(0,dataClient, forceUpdate = true)
             }
             else {
                 //Log.d("MobileListener", "capability ${capabilityInfo.name} disconnected!")
@@ -180,7 +181,8 @@ class MobileListener : WearableListenerService() {
                         it.copy(
                             phoneIsConnected = false,
                             afterMobileResult = true,
-                            notificationsList = mutableListOf()
+                            notificationsList = mutableListOf(),
+                            lastNotificationsUpdateTime = 0L
                         )
                     }
                     updateComplication(MobileBatteryComplicationService::class.java)
@@ -197,8 +199,13 @@ class MobileListener : WearableListenerService() {
                 //Log.i("MobileListener", "processDataItem, lastNotificationsUpdateTime: $lastUpdateTime")
                 val updateTime = dataMap.getLong(NOTIFICATIONS_UPDATE_KEY)
                 if (updateTime < lastUpdateTime){
-                    //Log.i("MobileListener", "Notifications Update Time is lower than Last Update Time, discard & return!")
-                    return@launch
+                    if (lastUpdateTime - updateTime >= 300000L){
+                        // If there is huge positive delay (5 minutes) between lastUpdateTime (in future) and updateTime,
+                        // then it may signalize that currently saved lastUpdateTime is wrong, therefore we're resetting it
+                        dataStore.updateData { it.copy(lastNotificationsUpdateTime = 0L) }
+                    }
+                    // small difference between lastUpdateTime (in future) and updateTime means this notification list is outdated
+                    else return@launch
                 }
 
                 //Log.i("MobileListener", "processDataItem, setting new last update time $updateTime")

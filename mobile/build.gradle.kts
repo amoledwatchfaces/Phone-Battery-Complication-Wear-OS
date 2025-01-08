@@ -70,22 +70,22 @@ android {
 dependencies {
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.8.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.1")
 
     // Review
     implementation ("com.google.android.play:review-ktx:2.0.2")
     implementation ("com.google.android.play:review:2.0.2")
 
     // Wearable
-    implementation ("com.google.android.gms:play-services-wearable:18.2.0")
-    implementation ("androidx.wear:wear-remote-interactions:1.0.0")
+    implementation ("com.google.android.gms:play-services-wearable:19.0.0")
+    implementation ("androidx.wear:wear-remote-interactions:1.1.0")
 
     // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // Compose
-    implementation (platform("androidx.compose:compose-bom:2024.10.00"))
+    implementation (platform("androidx.compose:compose-bom:2024.12.01"))
     implementation ("androidx.activity:activity-compose")
     implementation ("androidx.navigation:navigation-compose")
     implementation ("androidx.compose.material3:material3")
@@ -98,11 +98,11 @@ dependencies {
 
 
     implementation ("androidx.activity:activity-ktx:1.9.3")
-    implementation ("androidx.core:core-ktx:1.13.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.6")
+    implementation ("androidx.core:core-ktx:1.15.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // Used for Datastore
     implementation ("androidx.datastore:datastore-preferences:1.1.1")
@@ -114,7 +114,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2024.10.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2024.12.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
@@ -125,6 +125,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.52")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.5.1"))
+    implementation (platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }
