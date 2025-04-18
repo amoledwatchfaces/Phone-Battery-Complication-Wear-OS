@@ -202,8 +202,8 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             //Log.i("CalendarEventTimerComplication", "Event isToday: $eventIsToday")
 
             icon = when {
-                eventIsAllDay -> getTodayIcon()
                 eventIsOngoing -> drawable.ic_today
+                eventIsToday -> getTodayIcon()
                 else -> drawable.ic_event_upcoming_2
             }
         }
@@ -249,8 +249,8 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(
-                        text = if (eventIsAllDay && eventIsToday.not()) getString(R.string.no_upcoming_events_long_text)
-                        else closestEventName
+                        text = /*if (eventIsAllDay && eventIsToday.not()) getString(R.string.no_upcoming_events_long_text) else*/
+                        closestEventName
                     ).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
@@ -259,7 +259,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                             /** Do not show Title when event is all day and today **/
                             closestEvent == null -> null
                             /** Do not show Title when closest event is all day but not today **/
-                            eventIsAllDay && eventIsToday.not() -> null
+                            //eventIsAllDay && eventIsToday.not() -> null //TODO: we want to show ALL DAY events in the future so this is removed
                             /** Show 'Today' if event is all day and ongoing **/
                             eventIsAllDay && eventIsOngoing -> PlainComplicationText.Builder(text = getString(R.string.today)).build()
                             /** Show Localized 'Now' when event is ongoing **/
@@ -272,8 +272,8 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
                                 .build()
                             /** Show normal event start time (HH:mm) when start time is above 2 hours but today  **/
                             eventIsToday -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
-                            /** If event is tomorrow show 'Tomorrow'  **/
-                            eventIsTomorrow && (eventUpdateDelay >= 43200000) -> PlainComplicationText.Builder(text = getString(R.string.tomorrow)).build()
+                            /** If event is tomorrow and starts in more than 12 hours or is ALL DAY, show 'Tomorrow'  **/
+                            eventIsTomorrow && ((eventUpdateDelay >= 43200000) || eventIsAllDay) -> PlainComplicationText.Builder(text = getString(R.string.tomorrow)).build()
                             /** Show Localized 'in x days' when event start time is not today  **/
                             else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
                                 .setText(String.format(getString(R.string.countdown_text), "^1"))
@@ -286,10 +286,14 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
                     text = when {
-                        /** Show None when there are no events or when event is all day or when event is not today **/
-                        closestEvent == null || eventIsAllDay || eventIsToday.not() -> PlainComplicationText.Builder(text = getString(R.string.no_upcoming_events_short_text)).build()
-                        /** Else show normal event start time (HH:mm) but today  **/
-                        else -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
+                        /** Show None when there are no upcoming events or the even is TODAY and it is ALL DAY **/
+                        closestEvent == null || (eventIsAllDay && eventIsToday) -> PlainComplicationText.Builder(text = getString(R.string.no_upcoming_events_short_text)).build()
+                        /** If event is today but not ALL DAY, show normal event start time (HH:mm) **/
+                        eventIsToday -> PlainComplicationText.Builder(text = convertUtcToLocalTime(closestEventTime, is24h)).build()
+                        /** Else show 'in x days / hours' because event is not today, it is tomorrow or in the future, no matter it is ALL DAY or not  **/
+                        else -> TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_WORDS_SINGLE_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime)))
+                            .setText(String.format(getString(R.string.countdown_text), "^1"))
+                            .build()
                     },
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())

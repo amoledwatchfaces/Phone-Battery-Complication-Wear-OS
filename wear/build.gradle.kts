@@ -76,7 +76,7 @@ dependencies {
 
     // Wearable
     implementation ("com.google.android.gms:play-services-wearable:19.0.0")
-    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha05")
+    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha06")
     implementation ("androidx.wear:wear-remote-interactions:1.1.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
@@ -100,8 +100,8 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
     // DataStore
-    implementation ("androidx.datastore:datastore-preferences:1.1.3")
-    implementation ("androidx.datastore:datastore:1.1.3")
+    implementation ("androidx.datastore:datastore-preferences:1.1.4")
+    implementation ("androidx.datastore:datastore:1.1.4")
 
     // Serialization
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
@@ -127,6 +127,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.52")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.10.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.12.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

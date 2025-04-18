@@ -17,4 +17,6 @@
     <string name="now">Teraz</string>
     <string name="today">Dzisiaj</string>
     <string name="tomorrow">Jutro</string>
+
+    <string name="no_notifications">Brak powiadomień</string>
 </resources>

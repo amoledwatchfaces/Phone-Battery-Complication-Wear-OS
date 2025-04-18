@@ -87,7 +87,7 @@ class CalendarContentObserver @Inject constructor(
             // Use the Instances content URI with the time range
             val builder = CalendarContract.Instances.CONTENT_URI.buildUpon()
             ContentUris.appendId(builder,currentTime)
-            ContentUris.appendId(builder,currentTime + TimeUnit.DAYS.toMillis(14)) // generate 2 weeks ahead
+            ContentUris.appendId(builder,currentTime + TimeUnit.DAYS.toMillis(31)) // generate 31 days into future
 
             // Query for all future events
             val cursor = context.contentResolver.query(
