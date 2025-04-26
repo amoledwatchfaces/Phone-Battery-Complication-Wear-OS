@@ -4,11 +4,13 @@ import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.ACTIVE_SYNC_KEY
 import com.weartools.phonebattcomp.ACTIVE_SYNC_PATH
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.utils.registerCalendarObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -21,7 +23,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class AppUpdateBroadcastReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var dataRepository: DataStoreRepository
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
     @Inject lateinit var dataClient: DataClient
     @Inject lateinit var calendarContentObserver: CalendarContentObserver
 
@@ -33,7 +38,7 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
         }
 
         ioScope.launch {
-            if (dataRepository.activeSync.first()){
+            if (preferences.first().activeSync){
                 BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
             }
             else {
@@ -46,16 +51,22 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
                 dataClient.putDataItem(request)
             }
 
-            if (dataRepository.calendarSync.first()){
+            if (preferences.first().calendarSync){
                 if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
                     // TODO: I'm not sure if this is really needed because this is first time implementing calendars sync
-                    if (dataRepository.syncedCalendarsIdsString.first().isEmpty()){
-                        dataRepository.saveCalendars(CalendarContentObserver.getAllCalendars(context))
+                    if (preferences.first().syncedCalendarsIds.isEmpty()){
+                        val allCalendars = CalendarContentObserver.getAllCalendars(context)
+                        dataStore.updateData {
+                            it.copy(
+                                syncedCalendars = allCalendars,
+                                syncedCalendarsIds = allCalendars.map { calendar -> calendar.calendarId }.joinToString(",")
+                            )
+                        }
                     }
                     context.registerCalendarObserver(calendarContentObserver)
                 }
                 else {
-                    dataRepository.setCalendarSyncState(false)
+                    dataStore.updateData { it.copy(calendarSync = false) }
                 }
             }
         }

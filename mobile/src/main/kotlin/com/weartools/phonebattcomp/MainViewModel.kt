@@ -12,6 +12,7 @@ import android.os.Build
 import android.util.Log
 import androidx.concurrent.futures.await
 import androidx.core.app.NotificationManagerCompat
+import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
@@ -24,7 +25,8 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.play.core.review.ReviewManager
 import com.google.android.play.core.review.ReviewManagerFactory
 import com.weartools.phonebattcomp.data.CalendarInfo
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.di.ServiceCommunication
 import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
@@ -41,8 +43,6 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -56,10 +56,19 @@ class MainViewModel @Inject constructor(
     private val nodeClient: NodeClient,
     private val remoteActivityHelper: RemoteActivityHelper,
     private val dataClient: DataClient,
-    private val dataRepository: DataStoreRepository,
     private val batteryManager: BatteryManager,
     private val calendarContentObserver: CalendarContentObserver,
+    private val dataStore: DataStore<UserPreferences>,
+    repository: UserPreferencesRepository,
 ) : ViewModel(){
+
+    val preferences: StateFlow<UserPreferences> = repository
+        .getPreferences()
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(),
+            initialValue = UserPreferences()
+        )
 
     private lateinit var reviewManager: ReviewManager
 
@@ -91,22 +100,6 @@ class MainViewModel @Inject constructor(
     val commonNodesStateFlow: StateFlow<List<Node>?> = commonNodesMutableStateFlow.asStateFlow()
 
     var message: String = ""
-
-    val activeSync = dataRepository.activeSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-    val calendarSync = dataRepository.calendarSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-    val notificationsSync = dataRepository.notificationsSync.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-    val backgroundService = dataRepository.backgroundServiceState.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), false)
-    val syncedCalendars = dataRepository.getCalendars().stateIn(viewModelScope, SharingStarted.WhileSubscribed(), emptyList())
-
-    init {
-        viewModelScope.launch {
-            dataRepository.activeSync.distinctUntilChanged().collect {}
-            dataRepository.calendarSync.distinctUntilChanged().collect {}
-            dataRepository.notificationsSync.distinctUntilChanged().collect {}
-            dataRepository.backgroundServiceState.distinctUntilChanged().collect {}
-            dataRepository.getCalendars().distinctUntilChanged().collect {}
-        }
-    }
 
     private fun setMessageShown(){
         viewModelScope.launch {
@@ -176,8 +169,10 @@ class MainViewModel @Inject constructor(
                         dataClient = dataClient,
                         batteryManager = batteryManager,
                     )
-                    if (notificationsSync.value){
-                        viewModelScope.launch { ServiceCommunication.sendToWatchFlow.emit(Unit) }
+                    if (preferences.value.notificationsSync){
+                        viewModelScope.launch {
+                            ServiceCommunication.sendToWatchFlow.emit(Unit)
+                        }
                     }
                 }else {
                     commonNodesMutableStateFlow.value = emptyList()
@@ -254,7 +249,7 @@ class MainViewModel @Inject constructor(
 
     fun setActiveSyncState(state: Boolean) {
         viewModelScope.launch {
-            dataRepository.setActiveSyncState(state)
+            dataStore.updateData { it.copy(activeSync = state) }
         }
         val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
             dataMap.putBoolean(ACTIVE_SYNC_KEY, state)
@@ -267,26 +262,26 @@ class MainViewModel @Inject constructor(
 
     fun setCalendarSyncState(state: Boolean) {
         viewModelScope.launch {
-            dataRepository.setCalendarSyncState(state)
+            dataStore.updateData { it.copy(calendarSync = state) }
         }
     }
 
     fun setNotificationsSyncState(state: Boolean) {
         viewModelScope.launch {
-            dataRepository.setNotificationsSyncState(state)
+            dataStore.updateData { it.copy(notificationsSync = state) }
             ServiceCommunication.sendToWatchFlow.emit(Unit)
         }
     }
     fun setBackgroundServiceState(state: Boolean) {
         viewModelScope.launch {
-            dataRepository.setBackgroundServiceState(state)
+            dataStore.updateData { it.copy(backgroundServiceState = state) }
         }
     }
 
     fun isMyNotificationsServiceRunning(context: Context): Boolean {
         val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(context).contains(BuildConfig.APPLICATION_ID)
         viewModelScope.launch {
-            dataRepository.setBackgroundServiceState(isServiceRunning)
+            dataStore.updateData { it.copy(backgroundServiceState = isServiceRunning) }
         }
         return isServiceRunning
     }
@@ -296,7 +291,11 @@ class MainViewModel @Inject constructor(
         if (register){
             context.registerCalendarObserver(calendarContentObserver)
             // Send Events immediately
-            viewModelScope.launch { CalendarContentObserver.queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())}
+            viewModelScope.launch {
+                CalendarContentObserver.queryAllFutureCalendarEventAndSend(
+                    context, preferences.value.syncedCalendarsIds
+                )
+            }
         }
         else {
             context.unregisterCalendarObserver(calendarContentObserver)
@@ -316,22 +315,33 @@ class MainViewModel @Inject constructor(
     }
     fun saveAllCalendarsOnEnabled(context: Context){
         viewModelScope.launch {
-            val calendars = withContext(Dispatchers.IO) {
-                getAllCalendars(context)
-            }
-            dataRepository.saveCalendars(calendars)
+            val allCalendars = withContext(Dispatchers.IO) { getAllCalendars(context) }
+            dataStore.updateData { it.copy(
+                syncedCalendars = allCalendars,
+                syncedCalendarsIds = allCalendars.map { calendar -> calendar.calendarId }.joinToString(",")
+            ) }
         }
     }
     fun addSyncedCalendar(calendarInfo: CalendarInfo){
-        val syncedCalendars = syncedCalendars.value
         viewModelScope.launch {
-            dataRepository.saveCalendars(syncedCalendars.plus(calendarInfo))
+            val updatedCalendars = preferences.value.syncedCalendars.plus(calendarInfo)
+            dataStore.updateData {
+                it.copy(
+                    syncedCalendars = updatedCalendars,
+                    syncedCalendarsIds = updatedCalendars.map { calendar -> calendar.calendarId }.joinToString(",")
+                )
+            }
         }
     }
     fun removeSyncedCalendar(calendarInfo: CalendarInfo){
-        val syncedCalendars = syncedCalendars.value
         viewModelScope.launch {
-            dataRepository.saveCalendars(syncedCalendars.minus(calendarInfo))
+            val updatedCalendars = preferences.value.syncedCalendars.minus(calendarInfo)
+            dataStore.updateData {
+                it.copy(
+                    syncedCalendars = updatedCalendars,
+                    syncedCalendarsIds = updatedCalendars.map { calendar -> calendar.calendarId }.joinToString(",")
+                )
+            }
         }
     }
 

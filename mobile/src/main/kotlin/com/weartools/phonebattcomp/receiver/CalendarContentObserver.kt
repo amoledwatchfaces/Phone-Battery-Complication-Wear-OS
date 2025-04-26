@@ -9,11 +9,12 @@ import android.database.Cursor
 import android.os.Handler
 import android.provider.CalendarContract
 import androidx.core.content.ContextCompat
+import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.Wearable
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.CalendarInfo
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.utils.unregisterCalendarObserver
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.CoroutineScope
@@ -31,7 +32,7 @@ import javax.inject.Inject
 class CalendarContentObserver @Inject constructor(
     handler: Handler,
     @ApplicationContext private val context: Context,
-    private val dataRepository: DataStoreRepository
+    private val dataStore: DataStore<UserPreferences>,
 ) : ContentObserver(handler) {
 
     // Coroutine scope for managing coroutines (using Dispatchers.Main for debouncing)
@@ -55,7 +56,7 @@ class CalendarContentObserver @Inject constructor(
             if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
                 // Call the suspend function after the delay
                 withContext(Dispatchers.IO){
-                    queryAllFutureCalendarEventAndSend(context, dataRepository.syncedCalendarsIdsString.first())
+                    queryAllFutureCalendarEventAndSend(context, dataStore.data.first().syncedCalendarsIds)
                 }
             } else {
                 context.unregisterCalendarObserver(this@CalendarContentObserver)

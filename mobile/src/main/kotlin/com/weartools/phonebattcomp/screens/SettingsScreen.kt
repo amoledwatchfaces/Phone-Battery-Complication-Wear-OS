@@ -55,6 +55,7 @@ import com.google.accompanist.permissions.isGranted
 import com.google.android.gms.wearable.Node
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.utils.askForNotificationAccess
 import com.weartools.phonebattcomp.utils.openAmoledWebPage
@@ -64,6 +65,7 @@ import com.weartools.phonebattcomp.utils.openAmoledWebPage
 fun SettingsScreen(
     view: View,
     context: Context,
+    preferences: State<UserPreferences>,
     viewModel: MainViewModel,
     isWatchConnected: State<Boolean>,
     commonNodesList: State<List<Node>?>,
@@ -72,14 +74,9 @@ fun SettingsScreen(
 ) {
 
     val listState = rememberLazyListState()
-    val activeSyncState by viewModel.activeSync.collectAsState()
-    val calendarSyncState by viewModel.calendarSync.collectAsState()
-    val notificationsSyncState by viewModel.notificationsSync.collectAsState()
-    val backgroundSyncState by viewModel.backgroundService.collectAsState()
 
     // Calendars
     val allCalendars by viewModel.calendarsStateFlow.collectAsState()
-    val syncedCalendars by viewModel.syncedCalendars.collectAsState()
     var openCalendars by remember { mutableStateOf(false) }
 
 
@@ -155,7 +152,7 @@ fun SettingsScreen(
                         }
                         Switch(
                             modifier = Modifier.weight(0.2f),
-                            checked = backgroundSyncState,
+                            checked = preferences.value.backgroundServiceState,
                             onCheckedChange = {
                                 viewModel.isMyNotificationsServiceRunning(context)
                                 context.askForNotificationAccess()
@@ -186,8 +183,8 @@ fun SettingsScreen(
 
                         Switch(
                             modifier = Modifier.weight(0.2f),
-                            enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
-                            checked = activeSyncState,
+                            enabled = preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            checked = preferences.value.activeSync,
                             onCheckedChange = {
                             if (it){
                                 viewModel.setActiveSyncState(true)
@@ -222,8 +219,8 @@ fun SettingsScreen(
                         }
                         Switch(
                             modifier = Modifier.weight(0.2f),
-                            enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
-                            checked = notificationsSyncState,
+                            enabled = preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            checked = preferences.value.notificationsSync,
                             onCheckedChange = {
                             if (it){
                                 viewModel.setNotificationsSyncState(true)
@@ -257,8 +254,8 @@ fun SettingsScreen(
 
                         Switch(
                             modifier = Modifier.weight(0.2f),
-                            enabled = backgroundSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
-                            checked = calendarSyncState,
+                            enabled = preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            checked = preferences.value.calendarSync,
                             onCheckedChange = {
                                 if (it){
                                     if (permissionStateCalendar.status.isGranted){
@@ -276,7 +273,7 @@ fun SettingsScreen(
                     }
                     OutlinedButton(
                         modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-                        enabled = calendarSyncState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                        enabled = preferences.value.calendarSync && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
                         onClick = {
                             viewModel.fetchCalendars(context)
                             openCalendars=openCalendars.not()
@@ -344,7 +341,7 @@ fun SettingsScreen(
                             ) {
                                 Text(allCalendars[it].displayName)
                                 Checkbox(
-                                    checked = allCalendars[it] in syncedCalendars,
+                                    checked = allCalendars[it] in preferences.value.syncedCalendars,
                                     onCheckedChange = { checked ->
                                         if (checked){
                                             viewModel.addSyncedCalendar(allCalendars[it])

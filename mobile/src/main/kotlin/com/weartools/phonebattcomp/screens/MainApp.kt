@@ -55,6 +55,7 @@ fun MainApp(
     viewModel: MainViewModel = hiltViewModel()
 ) {
     val context = LocalContext.current
+    val preferences = viewModel.preferences.collectAsState()
     val view = LocalView.current
     val navController = rememberNavController()
     val lifecycleOwner = LocalLifecycleOwner.current
@@ -96,10 +97,8 @@ fun MainApp(
         }
     }
     LaunchedEffect(Unit) {
-        viewModel.activeSync.collectLatest { isActive ->
-            if (isActive) {
-                viewModel.activateBatterySync(context)
-            }
+        if (preferences.value.activeSync) {
+            viewModel.activateBatterySync(context)
         }
         if (permissionStateCalendar.status.isGranted.not()) {
             viewModel.setCalendarSyncState(false)
@@ -170,7 +169,7 @@ fun MainApp(
                     action = Intent.ACTION_VIEW
                 }),
                 route = Screen.Settings.route) {
-                SettingsScreen(view, context, viewModel,isWearableConnected,commonNodesList, connectedNodesList, permissionStateCalendar )
+                SettingsScreen(view, context,preferences, viewModel,isWearableConnected,commonNodesList, connectedNodesList, permissionStateCalendar )
             }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }

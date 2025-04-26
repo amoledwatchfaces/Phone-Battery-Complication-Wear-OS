@@ -23,6 +23,7 @@ import android.os.BatteryManager
 import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationManagerCompat
+import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
@@ -30,7 +31,8 @@ import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.di.ServiceCommunication
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
@@ -60,7 +62,10 @@ class WearListener : WearableListenerService() {
 
     private val ioScope = CoroutineScope(Dispatchers.IO)
 
-    @Inject lateinit var dataRepository: DataStoreRepository
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
     @Inject lateinit var dataClient: DataClient
     @Inject lateinit var batteryManager: BatteryManager
 
@@ -86,18 +91,18 @@ class WearListener : WearableListenerService() {
                         }
                         CALENDAR_REQUEST_PATH -> {
                             ioScope.launch {
-                                if (dataRepository.calendarSync.first()){
+                                if (preferences.first().calendarSync){
                                     if (applicationContext.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
-                                        CalendarContentObserver.queryAllFutureCalendarEventAndSend(applicationContext, dataRepository.syncedCalendarsIdsString.first())
+                                        CalendarContentObserver.queryAllFutureCalendarEventAndSend(applicationContext, preferences.first().syncedCalendarsIds)
                                     }
                                     else {
-                                        dataRepository.setCalendarSyncState(false)
+                                        dataStore.updateData { it.copy(calendarSync = false) }
                                     }
                                 }
                             }
                         }
                         NOTIFICATIONS_REQUEST_PATH -> {
-                            ioScope.launch { sendNotificationsToWatch(this@WearListener,dataRepository) }
+                            ioScope.launch { sendNotificationsToWatch(this@WearListener, preferences.first().notificationsSync) }
                         }
                     }
                 }
@@ -123,7 +128,7 @@ class WearListener : WearableListenerService() {
                     batteryManager = batteryManager,
                 )
                 // TODO: Test: maybe it's good to also send notifications to watch when watch is reconnected?
-                ioScope.launch { sendNotificationsToWatch(this@WearListener,dataRepository) }
+                ioScope.launch { sendNotificationsToWatch(this@WearListener,preferences.first().notificationsSync) }
             }
         }
     }
@@ -150,9 +155,9 @@ class WearListener : WearableListenerService() {
 
             dataClient.putDataItem(request)
         }
-        suspend fun sendNotificationsToWatch(context: Context, dataRepository: DataStoreRepository){
+        suspend fun sendNotificationsToWatch(context: Context, notificationsSync: Boolean){
             val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(context).contains(BuildConfig.APPLICATION_ID)
-            if (isServiceRunning && dataRepository.notificationsSync.first()){
+            if (isServiceRunning && notificationsSync){
                 //Log.i(TAG, "Wear OS device connected, sending notifications")
                 ServiceCommunication.sendToWatchFlow.emit(Unit)
             }

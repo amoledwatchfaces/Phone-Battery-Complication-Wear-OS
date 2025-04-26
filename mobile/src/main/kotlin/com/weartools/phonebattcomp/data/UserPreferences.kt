@@ -17,30 +17,14 @@ import javax.inject.Inject
 data class UserPreferences(
 
     // Phone Battery
-    val phoneBatteryLevel: Int = 0,
-    val phoneIsCharging: Boolean = false,
-    val phoneIsConnected: Boolean = false,
-    val afterMobileResult: Boolean = false,
-    val lastUpdate: Long = 0L,
+    val backgroundServiceState: Boolean = false,
     val activeSync: Boolean = false,
-    val nodeName: String = "Disconnected",
-    val materialSymbols: Boolean = false,
-    val chargingSymbolInsideIcon: Boolean = false,
-    val chargeRemainingTime: Long = -1,
-
-    // Phone Notifications
-    val notificationsIconType: Int = 2,
-    val lastNotificationsUpdateTime: Long = 0L,
-    val notificationsList: List<ByteArray> = mutableListOf(),
-    val notificationText: String = "",
-    val notificationTitle: String = "",
+    val calendarSync: Boolean = false,
+    val notificationsSync: Boolean = true,
 
     // Calendar Events
-    val calendarEvents: List<CalendarEvent> = emptyList(),
-
-    // Common
-    val tempUnit: Boolean = true,
-    val percentage: Boolean = true,
+    val syncedCalendarsIds: String = "",
+    val syncedCalendars: List<CalendarInfo> = emptyList(),
 )
 
 /** REPOSITORY **/
@@ -75,6 +59,3 @@ object UserPreferencesSerializer : Serializer<UserPreferences> {
         }
     }
 }
-
-
-

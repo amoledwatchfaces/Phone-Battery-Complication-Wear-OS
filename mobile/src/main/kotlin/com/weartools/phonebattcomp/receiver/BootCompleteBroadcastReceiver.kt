@@ -5,11 +5,13 @@ import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.ACTIVE_SYNC_KEY
 import com.weartools.phonebattcomp.ACTIVE_SYNC_PATH
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.utils.registerCalendarObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -22,7 +24,10 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class BootCompleteBroadcastReceiver : BroadcastReceiver() {
 
-    @Inject lateinit var dataRepository: DataStoreRepository
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
     @Inject lateinit var dataClient: DataClient
     @Inject lateinit var calendarContentObserver: CalendarContentObserver
 
@@ -31,7 +36,7 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == "android.intent.action.QUICKBOOT_POWERON") {
 
             ioScope.launch {
-                if (dataRepository.activeSync.first()){
+                if (preferences.first().activeSync){
                     BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
                 }
                 else {
@@ -45,12 +50,12 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
 
                 }
 
-                if (dataRepository.calendarSync.first()){
+                if (preferences.first().calendarSync){
                     if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
                         context.registerCalendarObserver(calendarContentObserver)
                     }
                     else {
-                        dataRepository.setCalendarSyncState(false)
+                        dataStore.updateData { it.copy(calendarSync = false) }
                     }
                 }
             }

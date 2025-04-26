@@ -7,10 +7,12 @@ import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.firebase.crashlytics.FirebaseCrashlytics
-import com.weartools.phonebattcomp.data.DataStoreRepository
+import com.weartools.phonebattcomp.data.UserPreferences
+import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.di.ServiceCommunication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -32,7 +34,9 @@ import javax.inject.Inject
 class NotificationListener : NotificationListenerService() {
 
     @Inject
-    lateinit var dataRepository: DataStoreRepository
+    lateinit var dataStore: DataStore<UserPreferences>
+    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
     @Inject
     lateinit var dataClient: DataClient
 
@@ -62,16 +66,16 @@ class NotificationListener : NotificationListenerService() {
         super.onListenerConnected()
         serviceScope.launch {
             // Set background service state to true
-            dataRepository.setBackgroundServiceState(true)
+            dataStore.updateData { it.copy(backgroundServiceState = true) }
 
             // Send notifications to watch when listener is connected
-            syncEnabled = dataRepository.notificationsSync.first()
+            syncEnabled = preferences.first().notificationsSync
             if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
 
             // Send notifications to watch when WearListener requests it using flow collection
             ServiceCommunication.sendToWatchFlow.collect {
 
-                syncEnabled = dataRepository.notificationsSync.first()
+                syncEnabled = preferences.first().notificationsSync
 
                 if (syncEnabled){
                     debounceSendToWatch(

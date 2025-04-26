@@ -1,31 +1,19 @@
 package com.weartools.phonebattcomp.data
 
 import android.content.Context
-import android.util.Log
-import androidx.datastore.core.DataMigration
 import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStoreFile
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.booleanPreferencesKey
-import androidx.datastore.preferences.core.intPreferencesKey
-import androidx.datastore.preferences.core.longPreferencesKey
-import androidx.datastore.preferences.core.stringPreferencesKey
-import androidx.datastore.preferences.preferencesDataStore
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.serialization.json.Json
 import javax.inject.Singleton
 
-// Proto DataStore --> New
+// Proto DataStore
 private const val DATA_STORE_FILE_NAME = "user_prefs.pb"
-// Preferences DataStore --> Old (not used)
-private val Context.oldPreferencesDataStore by preferencesDataStore(name = "phone_batt_comp_prefs")
 
 @InstallIn(SingletonComponent::class)
 @Module
@@ -37,6 +25,7 @@ object ProtoDataStoreModule {
             serializer = UserPreferencesSerializer,
             produceFile = { appContext.dataStoreFile(DATA_STORE_FILE_NAME) },
             corruptionHandler = ReplaceFileCorruptionHandler(produceNewData = { UserPreferences() }),
+            /*
             migrations = listOf(
                 object : DataMigration<UserPreferences> {
                     override suspend fun cleanUp() {}
@@ -86,6 +75,7 @@ object ProtoDataStoreModule {
                     }
                 }
             )
+            */
         )
     }
 }
