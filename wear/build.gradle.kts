@@ -100,7 +100,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
 
     // DataStore
-    implementation ("androidx.datastore:datastore:1.1.5")
+    implementation ("androidx.datastore:datastore:1.1.4")
 
     // Serialization
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")

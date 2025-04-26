@@ -105,7 +105,7 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
 
     // Used for Datastore
-    implementation ("androidx.datastore:datastore:1.1.5")
+    implementation ("androidx.datastore:datastore:1.1.4")
 
     // Permissions
     implementation ("com.google.accompanist:accompanist-permissions:0.34.0")

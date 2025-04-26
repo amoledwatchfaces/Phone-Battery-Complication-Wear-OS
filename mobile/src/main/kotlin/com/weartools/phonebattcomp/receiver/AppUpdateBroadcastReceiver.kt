@@ -46,7 +46,6 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
                 dataStore.updateData { it.copy(
                     backgroundServiceState = true,
                     activeSync = true,
-                    notificationsSync = true,
                     calendarSync = true
                 ) }
                 // Initiate Active Sync
@@ -79,7 +78,6 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
                 dataStore.updateData { it.copy(
                     backgroundServiceState = false,
                     activeSync = false,
-                    notificationsSync = false,
                     calendarSync = false
                 ) }
                 // Notify watch that active sync is disabled
