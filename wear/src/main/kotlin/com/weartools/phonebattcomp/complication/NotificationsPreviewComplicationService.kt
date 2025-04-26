@@ -31,7 +31,6 @@ import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -44,7 +43,6 @@ class NotificationsPreviewComplicationService : SuspendingComplicationDataSource
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject
     lateinit var dataClient: DataClient
@@ -78,7 +76,7 @@ class NotificationsPreviewComplicationService : SuspendingComplicationDataSource
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val preferences = preferences.first()
+        val preferences = dataStore.data.first()
         val notificationsList = preferences.notificationsList
 
         return when (request.complicationType) {

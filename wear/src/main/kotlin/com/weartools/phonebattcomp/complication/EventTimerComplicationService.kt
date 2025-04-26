@@ -44,7 +44,6 @@ import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.R.drawable
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -57,7 +56,6 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject
     lateinit var dataClient: DataClient
@@ -126,7 +124,7 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
 
         val currentTime = System.currentTimeMillis()
-        val repository = preferences.first()
+        val repository = dataStore.data.first()
         val events = repository.calendarEvents
 
         /** When currently some event is running, show countdown to event endTime

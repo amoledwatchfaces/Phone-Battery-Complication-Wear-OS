@@ -31,7 +31,6 @@ import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import com.weartools.phonebattcomp.utils.updateCalendarComplications
 import com.weartools.phonebattcomp.utils.updateComplication
@@ -73,7 +72,6 @@ class MobileListener : WearableListenerService() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject lateinit var dataClient: DataClient
 
@@ -195,7 +193,7 @@ class MobileListener : WearableListenerService() {
     private fun processDataItem(dataMap: DataMap) {
         ioScope.launch {
             mutex.withLock {
-                val lastUpdateTime = preferences.first().lastNotificationsUpdateTime
+                val lastUpdateTime = dataStore.data.first().lastNotificationsUpdateTime
                 //Log.i("MobileListener", "processDataItem, lastNotificationsUpdateTime: $lastUpdateTime")
                 val updateTime = dataMap.getLong(NOTIFICATIONS_UPDATE_KEY)
                 if (updateTime < lastUpdateTime){

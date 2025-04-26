@@ -4,13 +4,14 @@ import android.Manifest
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.ACTIVE_SYNC_KEY
 import com.weartools.phonebattcomp.ACTIVE_SYNC_PATH
+import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.utils.registerCalendarObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -25,7 +26,6 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject lateinit var dataClient: DataClient
     @Inject lateinit var calendarContentObserver: CalendarContentObserver
@@ -38,23 +38,29 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
         }
 
         ioScope.launch {
-            if (preferences.first().activeSync){
-                BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
-            }
-            else {
+            // CHECK BACKGROUND SERVICE ON UPDATE
+            // Enable all syncs when user had background service running
+            val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(context).contains(BuildConfig.APPLICATION_ID)
+
+            if (isServiceRunning){
+                dataStore.updateData { it.copy(
+                    backgroundServiceState = true,
+                    activeSync = true,
+                    notificationsSync = true,
+                    calendarSync = true
+                ) }
+                // Initiate Active Sync
                 val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
-                    dataMap.putBoolean(ACTIVE_SYNC_KEY, false)
+                    dataMap.putBoolean(ACTIVE_SYNC_KEY, true)
                     dataMap.putLong("immediate-update", System.currentTimeMillis()) }
                     .asPutDataRequest()
                     .setUrgent()
-
                 dataClient.putDataItem(request)
-            }
+                BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
 
-            if (preferences.first().calendarSync){
+                // Initiate Calendar Sync
                 if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
-                    // TODO: I'm not sure if this is really needed because this is first time implementing calendars sync
-                    if (preferences.first().syncedCalendarsIds.isEmpty()){
+                    if (dataStore.data.first().syncedCalendarsIds.isEmpty()){
                         val allCalendars = CalendarContentObserver.getAllCalendars(context)
                         dataStore.updateData {
                             it.copy(
@@ -68,6 +74,22 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
                 else {
                     dataStore.updateData { it.copy(calendarSync = false) }
                 }
+            }
+            else {
+                dataStore.updateData { it.copy(
+                    backgroundServiceState = false,
+                    activeSync = false,
+                    notificationsSync = false,
+                    calendarSync = false
+                ) }
+                // Notify watch that active sync is disabled
+                val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
+                    dataMap.putBoolean(ACTIVE_SYNC_KEY, false)
+                    dataMap.putLong("immediate-update", System.currentTimeMillis()) }
+                    .asPutDataRequest()
+                    .setUrgent()
+
+                dataClient.putDataItem(request)
             }
         }
     }

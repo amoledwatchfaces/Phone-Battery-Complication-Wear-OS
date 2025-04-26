@@ -35,7 +35,6 @@ import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
 import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
@@ -48,7 +47,6 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject
     lateinit var dataClient: DataClient
@@ -105,7 +103,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(this,ComplicationToggleArgs(ComponentName(this, javaClass),request.complicationInstanceId))
 
-        val repository = preferences.first()
+        val repository = dataStore.data.first()
 
         val activeSync = repository.activeSync
         val showPercentage = repository.percentage

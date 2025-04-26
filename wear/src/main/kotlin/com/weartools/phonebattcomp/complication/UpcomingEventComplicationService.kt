@@ -46,7 +46,6 @@ import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.R.drawable
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -65,7 +64,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
+
     @Inject lateinit var dataClient: DataClient
 
     var icon = drawable.ic_calendar_today
@@ -215,7 +214,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
 
         val currentTime = System.currentTimeMillis()
         val is24h = DateFormat.is24HourFormat(this)
-        val events = preferences.first().calendarEvents
+        val events = dataStore.data.first().calendarEvents
 
         val closestEvent = findClosestEventWithTime(events, currentTime)
         val (closestEventName, closestEventTime) = closestEvent?.let { it.first to it.second } ?: (getString(R.string.no_upcoming_events) to 0L)

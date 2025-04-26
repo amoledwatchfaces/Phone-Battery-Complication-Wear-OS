@@ -11,7 +11,6 @@ import com.google.android.gms.wearable.PutDataMapRequest
 import com.weartools.phonebattcomp.ACTIVE_SYNC_KEY
 import com.weartools.phonebattcomp.ACTIVE_SYNC_PATH
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
 import com.weartools.phonebattcomp.utils.registerCalendarObserver
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +25,6 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject lateinit var dataClient: DataClient
     @Inject lateinit var calendarContentObserver: CalendarContentObserver
@@ -36,7 +34,8 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
         if (intent.action == Intent.ACTION_BOOT_COMPLETED || intent.action == "android.intent.action.QUICKBOOT_POWERON") {
 
             ioScope.launch {
-                if (preferences.first().activeSync){
+                // CHECK ACTIVE SYNC ON BOOT
+                if (dataStore.data.first().activeSync){
                     BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
                 }
                 else {
@@ -50,7 +49,8 @@ class BootCompleteBroadcastReceiver : BroadcastReceiver() {
 
                 }
 
-                if (preferences.first().calendarSync){
+                // CHECK CALENDAR SYNC ON BOOT
+                if (dataStore.data.first().calendarSync){
                     if (context.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
                         context.registerCalendarObserver(calendarContentObserver)
                     }

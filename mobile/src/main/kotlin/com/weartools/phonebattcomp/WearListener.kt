@@ -32,7 +32,6 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.di.ServiceCommunication
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
@@ -64,7 +63,6 @@ class WearListener : WearableListenerService() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject lateinit var dataClient: DataClient
     @Inject lateinit var batteryManager: BatteryManager
@@ -91,9 +89,9 @@ class WearListener : WearableListenerService() {
                         }
                         CALENDAR_REQUEST_PATH -> {
                             ioScope.launch {
-                                if (preferences.first().calendarSync){
+                                if (dataStore.data.first().calendarSync){
                                     if (applicationContext.arePermissionsGranted(Manifest.permission.READ_CALENDAR)) {
-                                        CalendarContentObserver.queryAllFutureCalendarEventAndSend(applicationContext, preferences.first().syncedCalendarsIds)
+                                        CalendarContentObserver.queryAllFutureCalendarEventAndSend(applicationContext, dataStore.data.first().syncedCalendarsIds)
                                     }
                                     else {
                                         dataStore.updateData { it.copy(calendarSync = false) }
@@ -102,7 +100,7 @@ class WearListener : WearableListenerService() {
                             }
                         }
                         NOTIFICATIONS_REQUEST_PATH -> {
-                            ioScope.launch { sendNotificationsToWatch(this@WearListener, preferences.first().notificationsSync) }
+                            ioScope.launch { sendNotificationsToWatch(this@WearListener, dataStore.data.first().notificationsSync) }
                         }
                     }
                 }
@@ -128,7 +126,7 @@ class WearListener : WearableListenerService() {
                     batteryManager = batteryManager,
                 )
                 // TODO: Test: maybe it's good to also send notifications to watch when watch is reconnected?
-                ioScope.launch { sendNotificationsToWatch(this@WearListener,preferences.first().notificationsSync) }
+                ioScope.launch { sendNotificationsToWatch(this@WearListener,dataStore.data.first().notificationsSync) }
             }
         }
     }

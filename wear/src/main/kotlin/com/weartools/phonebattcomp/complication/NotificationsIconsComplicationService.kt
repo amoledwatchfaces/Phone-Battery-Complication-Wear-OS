@@ -32,7 +32,6 @@ import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.utils.BitmapCreator
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -46,7 +45,6 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject
     lateinit var dataClient: DataClient
@@ -86,7 +84,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val notificationsList = preferences.first().notificationsList
+        val notificationsList = dataStore.data.first().notificationsList
 
         return when (request.complicationType) {
 
@@ -107,7 +105,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                                     //.setTint(Color.WHITE)
                             }
                         },
-                        type = if (preferences.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON)
+                        type = if (dataStore.data.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON)
                         .build(),
                     contentDescription = ComplicationText.EMPTY)
                     .build()

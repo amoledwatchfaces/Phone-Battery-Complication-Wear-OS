@@ -43,10 +43,10 @@ import kotlin.coroutines.cancellation.CancellationException
 @HiltViewModel
 class MainViewModel @Inject constructor(
     private val dataStore: DataStore<UserPreferences>,
-    repository: UserPreferencesRepository,
+    preferences: UserPreferencesRepository,
 ) : ViewModel(){
 
-    val preferences: StateFlow<UserPreferences> = repository
+    val preferences: StateFlow<UserPreferences> = preferences
         .getPreferences()
         .stateIn(
             scope = viewModelScope,

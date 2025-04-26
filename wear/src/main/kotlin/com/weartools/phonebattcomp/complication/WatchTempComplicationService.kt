@@ -32,7 +32,6 @@ import androidx.wear.watchface.complications.datasource.ComplicationRequest
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.ComplicationTapBroadcastReceiver
 import com.weartools.phonebattcomp.receiver.ComplicationToggleArgs
 import dagger.hilt.android.AndroidEntryPoint
@@ -44,7 +43,6 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     fun getCurrentBatteryTemperature(): Int {
         val batteryStatus = this.registerReceiver(null, IntentFilter(Intent.ACTION_BATTERY_CHANGED))
@@ -70,7 +68,7 @@ class WatchTempComplicationService : SuspendingComplicationDataSourceService() {
         val args = ComplicationToggleArgs(providerComponent = ComponentName(this, javaClass), complicationInstanceId = request.complicationInstanceId)
         val complicationPendingIntent = ComplicationTapBroadcastReceiver.getToggleIntent(context = this, args = args)
 
-        val tempunit = preferences.first().tempUnit
+        val tempunit = dataStore.data.first().tempUnit
 
         val temp = getCurrentBatteryTemperature()
 

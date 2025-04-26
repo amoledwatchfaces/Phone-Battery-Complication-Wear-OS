@@ -12,7 +12,6 @@ import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.di.ServiceCommunication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
@@ -35,7 +34,6 @@ class NotificationListener : NotificationListenerService() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     @Inject
     lateinit var dataClient: DataClient
@@ -69,13 +67,13 @@ class NotificationListener : NotificationListenerService() {
             dataStore.updateData { it.copy(backgroundServiceState = true) }
 
             // Send notifications to watch when listener is connected
-            syncEnabled = preferences.first().notificationsSync
+            syncEnabled = dataStore.data.first().notificationsSync
             if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
 
             // Send notifications to watch when WearListener requests it using flow collection
             ServiceCommunication.sendToWatchFlow.collect {
 
-                syncEnabled = preferences.first().notificationsSync
+                syncEnabled = dataStore.data.first().notificationsSync
 
                 if (syncEnabled){
                     debounceSendToWatch(

@@ -24,7 +24,6 @@ import androidx.wear.watchface.complications.datasource.SuspendingComplicationDa
 import androidx.work.WorkManager
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.receiver.getCurrentBatteryChargingStatus
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
@@ -37,7 +36,6 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
-    private val preferences by lazy { UserPreferencesRepository(dataStore).getPreferences() }
 
     fun openScreen(): PendingIntent? {
         val batteryIntent = Intent(Settings.ACTION_BATTERY_SAVER_SETTINGS)
@@ -85,7 +83,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val repository = preferences.first()
+        val repository = dataStore.data.first()
         val showPercentage = repository.percentage
         val materialSymbols = repository.materialSymbols
         val chargingSymbolInside = repository.chargingSymbolInsideIcon
