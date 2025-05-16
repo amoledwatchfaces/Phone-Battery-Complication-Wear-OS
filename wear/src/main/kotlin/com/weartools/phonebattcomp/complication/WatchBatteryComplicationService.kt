@@ -108,7 +108,7 @@ class WatchBatteryComplicationService : SuspendingComplicationDataSourceService(
 
             ComplicationType.RANGED_VALUE -> {
                 RangedValueComplicationData.Builder(
-                    value = batteryLevel.toFloat(),
+                    value = batteryLevel.toFloat().coerceIn(0f, 100f),
                     min = 0f,
                     max = 100f,
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.watch_battery_at)+" $batteryLevel%").build())

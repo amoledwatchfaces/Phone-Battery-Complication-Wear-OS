@@ -153,7 +153,7 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
             ComplicationType.RANGED_VALUE -> {
                 RangedValueComplicationData.Builder(
-                    value = repository.phoneBatteryLevel.toFloat(),
+                    value = repository.phoneBatteryLevel.toFloat().coerceIn(0f, 100f),
                     min = 0f,
                     max = 100f,
                     contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())
