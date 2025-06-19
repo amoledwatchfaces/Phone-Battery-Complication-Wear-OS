@@ -29,7 +29,7 @@ android {
         }
     }
 
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
@@ -71,7 +71,7 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.8.0"
+    val composeUiVersion = "1.8.3"
     val composeWearVersion = "1.4.1"
 
     // Wearable
@@ -88,44 +88,44 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
     implementation ("androidx.activity:activity-compose:1.10.1")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.8.7")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.1")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     // DataStore
     implementation ("androidx.datastore:datastore:1.1.4")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
     // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // WorkManager
-    implementation ("androidx.work:work-runtime-ktx:2.10.1")
+    implementation ("androidx.work:work-runtime-ktx:2.10.2")
 
     // Tile
-    implementation("androidx.wear.protolayout:protolayout-expression:1.2.1")
-    implementation("androidx.wear.protolayout:protolayout:1.2.1")
-    implementation("androidx.wear.protolayout:protolayout-material:1.2.1")
-    implementation("androidx.wear.tiles:tiles:1.5.0-beta01")
+    implementation("androidx.wear.protolayout:protolayout-expression:1.3.0")
+    implementation("androidx.wear.protolayout:protolayout:1.3.0")
+    implementation("androidx.wear.protolayout:protolayout-material:1.3.0")
+    implementation("androidx.wear.tiles:tiles:1.5.0")
 
     // ListenableFuture
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2")
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.dagger:hilt-android:2.52")
-    ksp ("com.google.dagger:hilt-compiler:2.52")
+    implementation ("com.google.dagger:hilt-android:2.56.2")
+    ksp ("com.google.dagger:hilt-compiler:2.56.2")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

@@ -18,9 +18,9 @@ package com.weartools.phonebattcomp
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
 import androidx.concurrent.futures.await
+import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -103,14 +103,14 @@ class MainViewModel @Inject constructor(
             // Intent to launch your MainActivity
             val launchIntent = Intent(Intent.ACTION_VIEW)
                 .addCategory(Intent.CATEGORY_BROWSABLE)
-                .setData(Uri.parse("https://amoledwatchfaces.com/phonebattcomp"))
+                .setData("https://amoledwatchfaces.com/phonebattcomp".toUri())
 
             try {
                 RemoteActivityHelper(context).startRemoteActivity(targetIntent = launchIntent,targetNodeId = null).await()
                 Toast.makeText(context,"Check more settings on your phone",Toast.LENGTH_LONG).show()
-            } catch (cancellationException: CancellationException) {
+            } catch (_: CancellationException) {
                 // Request was cancelled normally
-            } catch (throwable: Throwable) {
+            } catch (_: Throwable) {
                 Toast.makeText(context,"Companion app not reachable",Toast.LENGTH_LONG).show()
             }
         }

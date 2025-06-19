@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import androidx.core.graphics.createBitmap
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -214,7 +215,7 @@ class NotificationListener : NotificationListenerService() {
         return stream.toByteArray()
     }
     private fun drawableToBitmap(drawable: Drawable): Bitmap {
-        val bitmap = Bitmap.createBitmap(ICON_SIZE, ICON_SIZE, Bitmap.Config.ARGB_8888)
+        val bitmap = createBitmap(ICON_SIZE, ICON_SIZE)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
         drawable.setTint(Color.WHITE)

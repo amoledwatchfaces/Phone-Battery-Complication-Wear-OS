@@ -67,6 +67,18 @@
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
                 android:value="SMALL_IMAGE, LONG_TEXT"/>
         </service>
+        <service android:name=".complication.NotificationsIcons4ComplicationService"
+            android:icon="@drawable/ic_notif"
+            android:label="@string/phone_notifications_complication_4"
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST"/>
+            </intent-filter>
+            <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="0"/>
+            <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
+                android:value="SHORT_TEXT"/>
+        </service>
         <service android:name=".complication.NotificationsPreviewComplicationService"
             android:icon="@drawable/ic_notif_alt"
             android:label="@string/phone_notifications_preview_complication"

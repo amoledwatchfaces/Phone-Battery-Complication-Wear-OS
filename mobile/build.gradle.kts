@@ -26,7 +26,7 @@ android {
         }
     }
 
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
@@ -70,8 +70,8 @@ android {
 dependencies {
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.1")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
 
     // Review
     implementation ("com.google.android.play:review-ktx:2.0.2")
@@ -85,7 +85,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // Compose
-    implementation (platform("androidx.compose:compose-bom:2025.04.01"))
+    implementation (platform("androidx.compose:compose-bom:2025.06.01"))
     implementation ("androidx.activity:activity-compose")
     implementation ("androidx.navigation:navigation-compose")
     implementation ("androidx.compose.material3:material3")
@@ -99,32 +99,32 @@ dependencies {
 
     implementation ("androidx.activity:activity-ktx:1.10.1")
     implementation ("androidx.core:core-ktx:1.16.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.7.3")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
 
     // Used for Datastore
     implementation ("androidx.datastore:datastore:1.1.4")
 
     // Permissions
-    implementation ("com.google.accompanist:accompanist-permissions:0.34.0")
+    implementation ("com.google.accompanist:accompanist-permissions:0.37.3")
 
     // Debug
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2025.04.01"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2025.06.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.dagger:hilt-android:2.52")
-    ksp ("com.google.dagger:hilt-compiler:2.52")
+    implementation ("com.google.dagger:hilt-android:2.56.2")
+    ksp ("com.google.dagger:hilt-compiler:2.56.2")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.13.0"))
+    implementation (platform("com.google.firebase:firebase-bom:33.15.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

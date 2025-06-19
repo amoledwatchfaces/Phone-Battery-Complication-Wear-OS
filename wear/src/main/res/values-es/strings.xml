@@ -23,6 +23,7 @@
 
     <!-- Notifications Complication -->
     <string name="phone_notifications_complication">Notificaciones del teléfono</string>
+    <string name="phone_notifications_complication_4">Notificaciones del teléfono (4x)</string>
     <string name="notifications_section" translatable="false">Complicación de notificaciones del teléfono</string>
     <string name="notif_comp_force_icon_type" translatable="false">Tipo de icono</string>
     <string name="type_icon">ICONO</string>

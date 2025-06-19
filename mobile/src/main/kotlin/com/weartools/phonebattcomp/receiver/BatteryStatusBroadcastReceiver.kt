@@ -62,12 +62,13 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
                         val isChargingSafe = isCharging ?: lastChargingStatus ?: false
 
                         //Log.i("BSBR","Active Sync: Sending Battery Level: $batteryLevel")
+                        /*
                         Log.i("BSBR","ChargingTimeRemaining: ${
                             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                                 batteryManager.computeChargeTimeRemaining()
                             }
                             else {""}
-                        }")
+                        }")*/
 
                         val request = PutDataMapRequest.create(BATTERY_PATH).apply{
                             dataMap.putInt(BATTERY_KEY, batteryLevelSafe)
@@ -128,7 +129,7 @@ class BatteryStatusBroadcastReceiver : BroadcastReceiver() {
         fun unsubscribeFromUpdates(context: Context) {
             try {
                 context.applicationContext.unregisterReceiver(receiver)
-            } catch (e: IllegalArgumentException) {
+            } catch (_: IllegalArgumentException) {
                 // Receiver not registered, ignoring
             }
             isSubscribed = false

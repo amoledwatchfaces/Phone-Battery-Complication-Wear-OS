@@ -23,6 +23,7 @@
 
     <!-- Notifications Complication -->
     <string name="phone_notifications_complication">Notifikácie z telefónu</string>
+    <string name="phone_notifications_complication_4">Notifikácie z telefónu (4x)</string>
     <string name="notifications_section">Notifikácie z telefónu</string>
     <string name="notif_comp_force_icon_type">Typ Ikony</string>
     <string name="type_icon">ICON</string>
