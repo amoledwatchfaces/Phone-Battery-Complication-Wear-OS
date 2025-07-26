@@ -191,7 +191,7 @@ object BitmapCreator {
 
     fun generateMoreBitmap(context: Context): Bitmap {
         // Load the drawable resource
-        val drawable = ContextCompat.getDrawable(context, R.drawable.ic_more) ?: throw IllegalArgumentException("Drawable not found")
+        val drawable = ContextCompat.getDrawable(context, R.drawable.ic_more_2) ?: throw IllegalArgumentException("Drawable not found")
 
         // Define the size for the bitmap
         val size = 48

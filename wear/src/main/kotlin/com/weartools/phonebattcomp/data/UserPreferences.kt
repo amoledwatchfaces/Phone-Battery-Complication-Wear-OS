@@ -40,7 +40,7 @@ data class UserPreferences(
 
     // Common
     val tempUnit: Boolean = true,
-    val percentage: Boolean = true,
+    val percentage: Boolean = false,
 )
 
 /** REPOSITORY **/

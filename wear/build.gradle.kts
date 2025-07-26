@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
@@ -34,7 +35,7 @@ android {
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 27
-        targetSdk = 34
+        targetSdk = 36
         versionCode = rootProject.extra["versionCode"] as Int
         versionName = rootProject.extra["versionName"] as String
 
@@ -64,8 +65,10 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlinOptions {
-        jvmTarget = "17"
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(JvmTarget.JVM_17)
+        }
     }
     namespace = "com.weartools.phonebattcomp"
 }
@@ -88,8 +91,8 @@ dependencies {
     implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
     implementation ("androidx.activity:activity-compose:1.10.1")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.1")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.1")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.2")
 
     androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
     debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
@@ -103,7 +106,7 @@ dependencies {
     implementation ("androidx.datastore:datastore:1.1.4")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.8.1")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
 
     // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.0.1")
@@ -122,10 +125,10 @@ dependencies {
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.dagger:hilt-android:2.56.2")
-    ksp ("com.google.dagger:hilt-compiler:2.56.2")
+    implementation ("com.google.dagger:hilt-android:2.57")
+    ksp ("com.google.dagger:hilt-compiler:2.57")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:33.15.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.0.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

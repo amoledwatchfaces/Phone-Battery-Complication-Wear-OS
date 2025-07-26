@@ -55,7 +55,8 @@ class NotificationsIcons4ComplicationService : SuspendingComplicationDataSourceS
                     text = PlainComplicationText.Builder(text = "---").build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(
-                        image = Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview_4))
+                        image = Icon.createWithResource(this, R.drawable.ic_notif_none))
+                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview_4))
                         .build())
                     .build()
             }
@@ -82,13 +83,15 @@ class NotificationsIcons4ComplicationService : SuspendingComplicationDataSourceS
                     text = PlainComplicationText.Builder(text = "---").build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(
-                        image =
-                        if (notificationsList.isEmpty()){
-                            Icon.createWithBitmap(BitmapCreator.createLineBitmapEmptyMax4())
-                        }
-                        else {
-                            Icon.createWithBitmap(BitmapCreator.createLineCompositeBitmapMax4(notificationsList, this))
-                        })
+                        image = Icon.createWithResource(this, R.drawable.ic_notif_none))
+                        .setAmbientImage(
+                            if (notificationsList.isEmpty()){
+                                Icon.createWithBitmap(BitmapCreator.createLineBitmapEmptyMax4())
+                            }
+                            else {
+                                Icon.createWithBitmap(BitmapCreator.createLineCompositeBitmapMax4(notificationsList, this))
+                            }
+                        )
                         .build())
                     .build()
             }

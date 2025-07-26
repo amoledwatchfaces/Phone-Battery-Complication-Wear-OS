@@ -4,6 +4,7 @@ import android.os.Handler
 import android.text.format.DateUtils
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.core.graphics.toColorInt
 import androidx.datastore.core.DataStore
 import androidx.wear.protolayout.ActionBuilders
 import androidx.wear.protolayout.ColorBuilders
@@ -292,9 +293,10 @@ class PhoneBatteryTileService : TileService() {
         //runBlocking { repo2.storeTileSetState(true) }
         MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
     }
-    override fun onTileEnterEvent(requestParams: EventBuilders.TileEnterEvent) {
-        super.onTileEnterEvent(requestParams)
+
+    override fun onRecentInteractionEventsAsync(events: List<EventBuilders.TileInteractionEvent?>): ListenableFuture<Void?> {
         MobileListener.sendPhoneBatteryRequest(0, dataClient, true)
+        return super.onRecentInteractionEventsAsync(events)
     }
 
     companion object {
@@ -320,8 +322,8 @@ internal fun openApp() = ActionBuilders.AndroidActivity.Builder()
 
 object TileColors {
     val Black = Color.Black.toArgb()
-    val Blue = android.graphics.Color.parseColor("#b9f7ff")
-    val Gray = android.graphics.Color.parseColor("#BDC1C6")
+    val Blue = "#b9f7ff".toColorInt()
+    val Gray = "#bdc1c6".toColorInt()
     val White = Color.White.toArgb()
     val White10Pc = Color(1f, 1f, 1f, 0.15f).toArgb()
 }

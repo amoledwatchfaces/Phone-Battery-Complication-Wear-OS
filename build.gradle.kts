@@ -1,9 +1,9 @@
 plugins {
     id ("com.android.application") version ("8.2.2") apply false
-    id ("org.jetbrains.kotlin.android") version ("2.0.21") apply false
-    id ("org.jetbrains.kotlin.plugin.compose") version ("2.0.21") apply false
-    id ("com.google.dagger.hilt.android") version ("2.56.2") apply false
-    id ("com.google.devtools.ksp") version ("2.0.21-1.0.25") apply false
+    id ("org.jetbrains.kotlin.android") version ("2.2.0") apply false
+    id ("org.jetbrains.kotlin.plugin.compose") version ("2.2.0") apply false
+    id ("com.google.dagger.hilt.android") version ("2.57") apply false
+    id ("com.google.devtools.ksp") version ("2.2.0-2.0.2") apply false
     id ("com.google.gms.google-services") version ("4.4.2") apply false
     id ("com.google.firebase.crashlytics") version ("3.0.2") apply false
 }
@@ -15,12 +15,12 @@ tasks.register("clean", Delete::class) {
 buildscript {
 
     /** Set version for wear & mobile modules **/
-    val versionCode by extra(10000552)
-    val versionName by extra("5.5.2")
+    val versionCode by extra(10000559)
+    val versionName by extra("5.5.9")
 
     dependencies {
-        classpath ("com.android.tools.build:gradle:8.10.1")
-        classpath ("org.jetbrains.kotlin:kotlin-serialization:2.0.21")
+        classpath ("com.android.tools.build:gradle:8.11.1")
+        classpath ("org.jetbrains.kotlin:kotlin-serialization:2.2.0")
     }
     repositories {
         google()

@@ -71,13 +71,13 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                     min = 0f,
                     max = 100f,
                     contentDescription = ComplicationText.EMPTY)
-                    .setText(PlainComplicationText.Builder(text = "86%").build())
+                    .setText(PlainComplicationText.Builder(text = "86").build())
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone)).build())
                     .build()
             }
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
+                    text = PlainComplicationText.Builder(text = "\uFEFF86").build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone))
                         .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch))
