@@ -85,6 +85,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
         val notificationsList = dataStore.data.first().notificationsList
+        val iconType = if (dataStore.data.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON
 
         return when (request.complicationType) {
 
@@ -105,9 +106,9 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                                     //.setTint(Color.WHITE)
                             }
                         },
-                        type = if (dataStore.data.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON)
+                        type = iconType)
                         .build(),
-                    contentDescription = ComplicationText.EMPTY)
+                    contentDescription = PlainComplicationText.Builder(text = iconType.name).build())
                     .build()
             }
             ComplicationType.LONG_TEXT -> {
