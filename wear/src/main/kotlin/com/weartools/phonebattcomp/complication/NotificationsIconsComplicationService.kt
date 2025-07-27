@@ -22,6 +22,7 @@ import androidx.wear.watchface.complications.data.ComplicationData
 import androidx.wear.watchface.complications.data.ComplicationText
 import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.LongTextComplicationData
+import androidx.wear.watchface.complications.data.MonochromaticImage
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.SmallImage
 import androidx.wear.watchface.complications.data.SmallImageComplicationData
@@ -39,6 +40,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.random.Random
 
 @AndroidEntryPoint
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
@@ -64,6 +66,10 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = "---").build(),
                     contentDescription = ComplicationText.EMPTY)
+                    .setMonochromaticImage(MonochromaticImage.Builder(
+                        image = Icon.createWithResource(this, R.drawable.ic_notif_none))
+                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview))
+                        .build())
                     .setSmallImage(SmallImage.Builder(
                         image = Icon.createWithResource(this, R.drawable.ic_notif_none_line_preview),
                         type = SmallImageType.ICON)
@@ -86,6 +92,7 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
 
         val notificationsList = dataStore.data.first().notificationsList
         val iconType = if (dataStore.data.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON
+        val pushText = PlainComplicationText.Builder(text = Random.nextInt(0, 10000).toString()).build()
 
         return when (request.complicationType) {
 
@@ -108,22 +115,28 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
                         },
                         type = iconType)
                         .build(),
-                    contentDescription = PlainComplicationText.Builder(text = iconType.name).build())
+                    contentDescription = pushText)
                     .build()
             }
             ComplicationType.LONG_TEXT -> {
+
+                val icon = if (notificationsList.isEmpty()){
+                    Icon.createWithBitmap(BitmapCreator.createLineBitmapEmpty())
+                }
+                else {
+                    Icon.createWithBitmap(BitmapCreator.createLineCompositeBitmap(notificationsList, this))
+                    //.setTint(Color.WHITE)
+                }
+
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = "---").build(),
-                    contentDescription = ComplicationText.EMPTY)
+                    contentDescription = pushText)
+                    .setMonochromaticImage(MonochromaticImage.Builder(
+                        image = Icon.createWithResource(this, R.drawable.ic_notif_none))
+                        .setAmbientImage(icon)
+                        .build())
                     .setSmallImage(SmallImage.Builder(
-                        image =
-                        if (notificationsList.isEmpty()){
-                            Icon.createWithBitmap(BitmapCreator.createLineBitmapEmpty())
-                        }
-                        else {
-                            Icon.createWithBitmap(BitmapCreator.createLineCompositeBitmap(notificationsList, this))
-                                //.setTint(Color.WHITE)
-                        },
+                        image = icon,
                         type = SmallImageType.ICON)
                         .build())
                     .build()

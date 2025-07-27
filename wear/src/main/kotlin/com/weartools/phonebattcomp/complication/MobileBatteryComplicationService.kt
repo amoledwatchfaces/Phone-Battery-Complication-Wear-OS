@@ -176,7 +176,9 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                  LongTextComplicationData.Builder(
                      text = PlainComplicationText.Builder(text = level).build(),
                      contentDescription = PlainComplicationText.Builder(text = getString(R.string.phone_battery_at)+" $level").build())
-                     .setMonochromaticImage(MonochromaticImage.Builder(image = phoneIcon).build())
+                     .setMonochromaticImage(MonochromaticImage.Builder(image = phoneIcon)
+                         .setAmbientImage(watchIcon)
+                         .build())
                      .setTitle(PlainComplicationText.Builder(text = repository.nodeName).build())
                      .setSmallImage(smallImage = SmallImage.Builder(image = phoneIcon, type = SmallImageType.ICON)
                          .setAmbientImage(watchIcon)
