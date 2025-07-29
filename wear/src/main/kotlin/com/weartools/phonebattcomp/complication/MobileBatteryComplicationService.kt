@@ -88,7 +88,9 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = "\uFEFF86%").build(),
                     contentDescription = ComplicationText.EMPTY)
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone)).build())
+                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone))
+                        .setAmbientImage(Icon.createWithResource(this, R.drawable.ic_watch))
+                        .build())
                     .setTitle(PlainComplicationText.Builder(text = "Pixel 9 Pro").build())
                     .setSmallImage(smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.ic_phone), type = SmallImageType.ICON)
                         .setAmbientImage(ambientImage = Icon.createWithResource(this, R.drawable.ic_watch))
