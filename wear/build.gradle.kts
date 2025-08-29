@@ -74,8 +74,6 @@ android {
 }
 
 dependencies {
-    val composeUiVersion = "1.8.3"
-    val composeWearVersion = "1.4.1"
 
     // Wearable
     implementation ("com.google.android.gms:play-services-wearable:19.0.0")
@@ -84,26 +82,29 @@ dependencies {
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     // Compose
-    implementation ("androidx.core:core-ktx:1.16.0")
-    implementation ("androidx.compose.ui:ui:$composeUiVersion")
-    implementation ("androidx.wear.compose:compose-material:$composeWearVersion")
-    implementation ("androidx.wear.compose:compose-foundation:$composeWearVersion")
-    implementation ("androidx.compose.ui:ui-tooling-preview:$composeUiVersion")
+    implementation ("androidx.core:core-ktx:1.17.0")
+    implementation ("androidx.compose.ui:ui:1.9.0")
+
+
+    implementation ("androidx.wear.compose:compose-material3:1.5.0")
+    implementation ("androidx.wear.compose:compose-foundation:1.5.0")
+
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.9.0")
     implementation ("androidx.activity:activity-compose:1.10.1")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.2")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.2")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.3")
 
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:$composeUiVersion")
-    debugImplementation ("androidx.compose.ui:ui-tooling:$composeUiVersion")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:$composeUiVersion")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.9.0")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.9.0")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.9.0")
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
 
     // DataStore
-    implementation ("androidx.datastore:datastore:1.1.4")
+    implementation ("androidx.datastore:datastore:1.1.7")
 
     // Serialization
     implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
@@ -112,7 +113,7 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // WorkManager
-    implementation ("androidx.work:work-runtime-ktx:2.10.2")
+    implementation ("androidx.work:work-runtime-ktx:2.10.3")
 
     // Tile
     implementation("androidx.wear.protolayout:protolayout-expression:1.3.0")
@@ -125,10 +126,10 @@ dependencies {
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.dagger:hilt-android:2.57")
-    ksp ("com.google.dagger:hilt-compiler:2.57")
+    implementation ("com.google.dagger:hilt-android:2.57.1")
+    ksp ("com.google.dagger:hilt-compiler:2.57.1")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.2.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

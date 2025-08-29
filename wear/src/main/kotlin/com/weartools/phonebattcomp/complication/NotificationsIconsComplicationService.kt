@@ -1,19 +1,3 @@
-/*
- * Copyright 2022 amoledwatchfaces™
- * support@amoledwatchfaces.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.weartools.phonebattcomp.complication
 
 import android.graphics.drawable.Icon
@@ -40,7 +24,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.random.Random
 
 @AndroidEntryPoint
 class NotificationsIconsComplicationService : SuspendingComplicationDataSourceService() {
@@ -90,9 +73,12 @@ class NotificationsIconsComplicationService : SuspendingComplicationDataSourceSe
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData {
 
-        val notificationsList = dataStore.data.first().notificationsList
-        val iconType = if (dataStore.data.first().notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON
-        val pushText = PlainComplicationText.Builder(text = Random.nextInt(0, 10000).toString()).build()
+        val repository = dataStore.data.first()
+
+        val notificationsList = repository.notificationsList
+        val updateTime = repository.lastNotificationsUpdateTime
+        val iconType = if (repository.notificationsIconType == 1) SmallImageType.PHOTO else SmallImageType.ICON
+        val pushText = PlainComplicationText.Builder(text = updateTime.toString()).build()
 
         return when (request.complicationType) {
 

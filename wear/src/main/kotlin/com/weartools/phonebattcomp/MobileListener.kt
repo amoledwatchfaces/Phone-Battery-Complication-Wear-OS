@@ -190,9 +190,6 @@ class MobileListener : WearableListenerService() {
                     else return@launch
                 }
 
-                //Log.i("MobileListener", "processDataItem, setting new last update time $updateTime")
-                dataStore.updateData { it.copy(lastNotificationsUpdateTime = updateTime) }
-
                 val byteArrayList = mutableListOf<ByteArray>()
                 var i = 0
                 while (true) {
@@ -200,11 +197,15 @@ class MobileListener : WearableListenerService() {
                     byteArrayList.add(byteArray)
                     i++
                 }
-                dataStore.updateData { it.copy(
-                    notificationsList = byteArrayList,
-                    notificationText = dataMap.getString(NOTIFICATION_TEXT,""),
-                    notificationTitle = dataMap.getString(NOTIFICATION_TITLE,"")
-                ) }
+
+                dataStore.updateData {
+                    it.copy(
+                        notificationsList = byteArrayList,
+                        notificationText = dataMap.getString(NOTIFICATION_TEXT,""),
+                        notificationTitle = dataMap.getString(NOTIFICATION_TITLE,""),
+                        lastNotificationsUpdateTime = updateTime,
+                    )
+                }
                 //Log.i("MobileListener", "Icons count: ${byteArrayList.size}")
                 updateNotificationComplications()
             }

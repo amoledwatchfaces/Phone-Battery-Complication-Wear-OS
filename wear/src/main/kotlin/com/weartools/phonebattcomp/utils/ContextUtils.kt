@@ -4,8 +4,8 @@ import android.content.ActivityNotFoundException
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.widget.Toast
+import androidx.core.net.toUri
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
@@ -21,9 +21,9 @@ import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 
 fun Context.openPlayStore() {
     try {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("market://details?id=$packageName")))
-    } catch (e: ActivityNotFoundException) {
-        startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://play.google.com/store/apps/details?id=$packageName")))
+        startActivity(Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri()))
+    } catch (_: ActivityNotFoundException) {
+        startActivity(Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=$packageName".toUri()))
     }
 }
 
@@ -33,25 +33,25 @@ fun Context.updateComplication(service: Class<out SuspendingComplicationDataSour
 }
 
 fun Context.updateBatteriesComplications() {
-    this.updateComplication(MobileBatteryComplicationService::class.java)
-    this.updateComplication(WatchBatteryComplicationService::class.java)
+    updateComplication(MobileBatteryComplicationService::class.java)
+    updateComplication(WatchBatteryComplicationService::class.java)
 }
 
 fun Context.updateCalendarComplications() {
-    this.updateComplication(EventTimerComplicationService::class.java)
-    this.updateComplication(UpcomingEventComplicationService::class.java)
+    updateComplication(EventTimerComplicationService::class.java)
+    updateComplication(UpcomingEventComplicationService::class.java)
 }
 fun Context.updateNotificationComplications() {
-    this.updateComplication(NotificationsIconsComplicationService::class.java)
-    this.updateComplication(NotificationsIcons4ComplicationService::class.java)
-    this.updateComplication(NotificationsPreviewComplicationService::class.java)
+    updateComplication(NotificationsIconsComplicationService::class.java)
+    updateComplication(NotificationsIcons4ComplicationService::class.java)
+    updateComplication(NotificationsPreviewComplicationService::class.java)
 }
 
 fun Context.openAppStoreOnPhone() {
     val remoteActivityHelper = RemoteActivityHelper(this)
     val intentAndroid = Intent(Intent.ACTION_VIEW)
         .addCategory(Intent.CATEGORY_BROWSABLE)
-        .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
+        .setData(BuildConfig.PLAY_STORE_APP_URI.toUri())
     remoteActivityHelper.startRemoteActivity(intentAndroid,targetNodeId = null)
     Toast.makeText(this, this.getString(R.string.check_phone), Toast.LENGTH_LONG).show()
 }
