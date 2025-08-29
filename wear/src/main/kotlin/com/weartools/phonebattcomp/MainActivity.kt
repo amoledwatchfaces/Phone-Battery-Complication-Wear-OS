@@ -1,19 +1,3 @@
-/*
- * Copyright 2022 amoledwatchfaces™
- * support@amoledwatchfaces.com
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.weartools.phonebattcomp
 
 import android.content.ContentValues.TAG
@@ -89,7 +73,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
     override fun onCapabilityChanged(capabilityInfo: CapabilityInfo) {
         if (capabilityInfo.name == BuildConfig.CAPABILITY_MOBILE_APP){
             //Log.d("MainActivity", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
-            if (capabilityInfo.nodes.size > 0){
+            if (capabilityInfo.nodes.isNotEmpty()){
                 //Log.d("MainActivity", "capability ${capabilityInfo.name} connected!")
                 capabilityInfo.nodes.firstOrNull()?.let { node ->
                     lifecycleScope.launch {
@@ -117,7 +101,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
         } catch (cancellationException: CancellationException) {
             // Request was cancelled normally
             throw cancellationException
-        } catch (throwable: Throwable) {
+        } catch (_: Throwable) {
             Log.d(TAG, "Capability request failed to return any results.")
         }
     }

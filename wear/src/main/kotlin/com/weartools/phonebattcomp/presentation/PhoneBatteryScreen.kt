@@ -43,30 +43,34 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.ScalingLazyListState
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
+import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
-import androidx.wear.compose.material.ChipDefaults
-import androidx.wear.compose.material.Icon
-import androidx.wear.compose.material.ListHeader
-import androidx.wear.compose.material.MaterialTheme
-import androidx.wear.compose.material.OutlinedButton
-import androidx.wear.compose.material.OutlinedCompactChip
-import androidx.wear.compose.material.Text
-import androidx.wear.compose.material.ToggleChipDefaults
+import androidx.wear.compose.material3.ButtonDefaults
+import androidx.wear.compose.material3.CompactButton
+import androidx.wear.compose.material3.Icon
+import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.OutlinedButton
+import androidx.wear.compose.material3.SurfaceTransformation
+import androidx.wear.compose.material3.SwitchButton
+import androidx.wear.compose.material3.SwitchButtonDefaults
+import androidx.wear.compose.material3.Text
+import androidx.wear.compose.material3.lazy.TransformationSpec
+import androidx.wear.compose.material3.lazy.transformedHeight
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.theme.wearColorPalette
 import com.weartools.phonebattcomp.utils.openAppStoreOnPhone
 
 @Composable
 fun PhoneBatteryAppScreen(
-    listState: ScalingLazyListState = rememberScalingLazyListState(),
+    listState: TransformingLazyColumnState = rememberTransformingLazyColumnState(),
+    transformationSpec: TransformationSpec,
     focusRequester: FocusRequester,
     viewModel: MainViewModel,
     dataClient: DataClient,
@@ -75,7 +79,7 @@ fun PhoneBatteryAppScreen(
     val preferences = viewModel.preferences.collectAsState()
     var openHowTo by remember{ mutableStateOf(false) }
 
-    ScalingLazyColumn(
+    TransformingLazyColumn(
         modifier = Modifier
             .fillMaxSize()
             .rotaryScrollable(
@@ -88,9 +92,9 @@ fun PhoneBatteryAppScreen(
         item { ListHeader {
             Text(
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.primary,
+                color = MaterialTheme.colorScheme.primary,
                 text = stringResource(id = R.string.app_info),
-                style = MaterialTheme.typography.title3
+                style = MaterialTheme.typography.titleSmall
             )
         } }
 
@@ -112,7 +116,7 @@ fun PhoneBatteryAppScreen(
                         }
                         ),
                         contentDescription = "Play Store Icon",
-                        tint = wearColorPalette.secondaryVariant) },
+                        tint = MaterialTheme.colorScheme.onTertiary) },
                 title = preferences.value.nodeName,
                 onClick = {
                     if (preferences.value.lastUpdate == 0L){ context.openAppStoreOnPhone() }
@@ -127,7 +131,7 @@ fun PhoneBatteryAppScreen(
                     Icon(
                         imageVector = Icons.Outlined.Info,
                         contentDescription = "Play Store Icon",
-                        tint = wearColorPalette.secondaryVariant) },
+                        tint = MaterialTheme.colorScheme.onTertiary) },
                 title = BuildConfig.VERSION_NAME,
                 onClick = {context.openPlayStore()}
             )
@@ -138,12 +142,12 @@ fun PhoneBatteryAppScreen(
                     modifier = Modifier.padding(end = 12.dp),
                     onClick = {openHowTo=openHowTo.not()}
                 ) {
-                    Icon(imageVector = Icons.AutoMirrored.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                    Icon(imageVector = Icons.AutoMirrored.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.onTertiary)
                 }
                 OutlinedButton(
                     onClick = { context.openAppStoreOnPhone() }
                 ) {
-                    Icon(imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                    Icon(imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.onTertiary)
                 }
             }
         }
@@ -151,48 +155,43 @@ fun PhoneBatteryAppScreen(
         // Phone / Watch Battery Complications
         item { PreferenceCategory(title = stringResource(id = R.string.percentage_section)) }
         item {
-            ToggleChip(
-                label = stringResource(id = R.string.percentage_toggle),
-                secondaryLabelOn = stringResource(id = R.string.percentage_on),
-                secondaryLabelOff = stringResource(id = R.string.percentage_off),
+            SwitchButton(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
                 checked = preferences.value.percentage,
-                onCheckedChange = {viewModel.togglePercentage(context)}
-            )
-        }
-        item {
-            androidx.wear.compose.material.ToggleChip(
-                modifier = Modifier.fillMaxWidth(),
-                checked = preferences.value.materialSymbols,
-                colors = ToggleChipDefaults.toggleChipColors(
-                    checkedEndBackgroundColor = wearColorPalette.primaryVariant,
-                    checkedToggleControlColor = Color(0xFFb9f7ff)
-                ),
-                onCheckedChange = { enabled -> viewModel.toggleMaterialSymbols(enabled,context) },
-                label = { Text(stringResource(R.string.pbc_material_symbols)) },
-                appIcon = {
-                    Icon(
-                        painter = if (preferences.value.materialSymbols){ painterResource(R.drawable.ic_phone_material_symbols) }
-                        else {painterResource(R.drawable.ic_phone)},
-                        contentDescription = "Phone Icon", tint = wearColorPalette.primary) },
-                toggleControl = {
-                    Icon(
-                        imageVector = ToggleChipDefaults.switchIcon(preferences.value.materialSymbols),
-                        contentDescription = "compose_toggle"
-                    )
+                onCheckedChange = {viewModel.togglePercentage(context)},
+                label = { Text(stringResource(id = R.string.percentage_toggle)) },
+                secondaryLabel = {
+                    if (preferences.value.percentage) {
+                        Text(text = stringResource(id = R.string.percentage_on), color = Color.LightGray)
+                    } else Text(text = stringResource(id = R.string.percentage_off), color = Color.LightGray)
                 }
             )
         }
         item {
-            androidx.wear.compose.material.ToggleChip(
-                modifier = Modifier.fillMaxWidth(),
+            SwitchButton(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                checked = preferences.value.materialSymbols,
+                colors = SwitchButtonDefaults.switchButtonColors(),
+                onCheckedChange = { enabled -> viewModel.toggleMaterialSymbols(enabled,context) },
+                label = { Text(stringResource(R.string.pbc_material_symbols)) },
+                icon = {
+                    Icon(
+                        painter = if (preferences.value.materialSymbols){ painterResource(R.drawable.ic_phone_material_symbols) }
+                        else {painterResource(R.drawable.ic_phone)},
+                        contentDescription = "Phone Icon", tint = MaterialTheme.colorScheme.primary) },
+            )
+        }
+        item {
+            SwitchButton(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
                 checked = preferences.value.chargingSymbolInsideIcon,
-                colors = ToggleChipDefaults.toggleChipColors(
-                    checkedEndBackgroundColor = wearColorPalette.primaryVariant,
-                    checkedToggleControlColor = Color(0xFFb9f7ff)
-                ),
+                colors = SwitchButtonDefaults.switchButtonColors(),
                 onCheckedChange = { enabled -> viewModel.toggleChargingSymbol(enabled,context) },
                 label = { Text(stringResource(R.string.charging_symbol_inside_icon)) },
-                appIcon = {
+                icon = {
                     Icon(
                         painter = painterResource(
                             when {
@@ -202,66 +201,70 @@ fun PhoneBatteryAppScreen(
                                 else -> R.drawable.ic_phone_charging
                             }
                         ),
-                        contentDescription = "Phone Icon", tint = wearColorPalette.primary) },
-                toggleControl = {
-                    Icon(
-                        imageVector = ToggleChipDefaults.switchIcon(preferences.value.chargingSymbolInsideIcon),
-                        contentDescription = "compose_toggle"
-                    )
-                }
+                        contentDescription = "Phone Icon", tint = MaterialTheme.colorScheme.primary) },
+
             )
         }
 
         // Watch Battery Temperature Complication
         item { PreferenceCategory(title = stringResource(id = R.string.setting_preference_category_title)) }
         item {
-            ToggleChip(
-                label = stringResource(id = R.string.temp_unit_pref_title),
-                secondaryLabelOn = stringResource(id = R.string.temp_unit_C),
-                secondaryLabelOff = stringResource(id = R.string.temp_unit_F),
+            SwitchButton(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
                 checked = preferences.value.tempUnit,
-                onCheckedChange = {viewModel.toggleEnabled(context)}
+                onCheckedChange = {viewModel.toggleEnabled(context)},
+                label = { Text(stringResource(id = R.string.temp_unit_pref_title)) },
+                secondaryLabel = {
+                    if (preferences.value.percentage) {
+                        Text(text = stringResource(id = R.string.temp_unit_C), color = Color.LightGray)
+                    } else Text(text = stringResource(id = R.string.temp_unit_F), color = Color.LightGray)
+                }
             )
         }
 
         // Phone Notifications Complication
         item { PreferenceCategory(title = stringResource(id = R.string.notifications_section)) }
         item {
-            ToggleChip(
-                label = stringResource(id = R.string.notif_comp_force_icon_type),
-                secondaryLabelOn = stringResource(id = R.string.type_icon),
-                secondaryLabelOff = stringResource(id = R.string.type_photo),
+
+            SwitchButton(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
                 checked = preferences.value.notificationsIconType == 2,
                 onCheckedChange = {
                     viewModel.storeNotificationIconType(
                         context, if (it) 2 else 1
                     )
+                },
+                label = { Text(stringResource(id = R.string.notif_comp_force_icon_type)) },
+                secondaryLabel = {
+                    if (preferences.value.percentage) {
+                        Text(text = stringResource(id = R.string.type_icon), color = Color.LightGray)
+                    } else Text(text = stringResource(id = R.string.type_photo), color = Color.LightGray)
                 }
             )
         }
-
         item {
-            OutlinedCompactChip(
-                colors = ChipDefaults.chipColors(
-                    backgroundColor = Color(0xFF0E1011)
+            CompactButton(
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF0E1011)
                 ),
-                border = ChipDefaults.outlinedChipBorder(),
+                border = ButtonDefaults.outlinedButtonBorder(true),
                 label = { Text(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = wearColorPalette.secondary,
+                    color = MaterialTheme.colorScheme.secondary,
                     text = stringResource(R.string.more_settings)
                 )},
                 modifier = Modifier.padding(top = 12.dp),
                 icon = {
-                    Icon(imageVector = Icons.Filled.SettingsSuggest, contentDescription = "Play Store Icon", tint = wearColorPalette.secondaryVariant)
+                    Icon(imageVector = Icons.Filled.SettingsSuggest, contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.onTertiary)
                 },
                 onClick = {
                     viewModel.openExperimentalSettings(context)
                 }
             )
         }
-
         item {
             SectionText(
                 text = "amoledwatchfaces.com",
@@ -287,7 +290,7 @@ fun PhoneBatteryAppScreen(
 fun Context.openPlayStore() {
     try {
         startActivity(Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri()))
-    } catch (e: ActivityNotFoundException) {
+    } catch (_: ActivityNotFoundException) {
         startActivity(Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=$packageName".toUri()))
     }
 }
