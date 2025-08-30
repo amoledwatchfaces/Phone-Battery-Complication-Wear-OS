@@ -23,21 +23,26 @@ import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material3.AlertDialog
 import androidx.wear.compose.material3.Button
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.CompactButton
 import androidx.wear.compose.material3.MaterialTheme
+import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TitleCard
 
 @Composable
 fun DialogChip(
+    modifier: Modifier,
+    transformation: SurfaceTransformation,
     text: String,
     title: String,
     onClick: (() -> Unit)? = null,
     icon: @Composable (BoxScope.() -> Unit)?
 ) {
     Button(
-        modifier = Modifier
-            .fillMaxWidth(),
+        colors = ButtonDefaults.filledTonalButtonColors(),
+        modifier = modifier,
+        transformation = transformation,
         onClick = {
             onClick?.invoke()
         },
@@ -102,7 +107,7 @@ fun SectionText(modifier: Modifier = Modifier, text: String) {
     Text(
         modifier = modifier,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.onSecondary,
+        color = MaterialTheme.colorScheme.outline,
         text = text,
         style = MaterialTheme.typography.bodySmall
     )

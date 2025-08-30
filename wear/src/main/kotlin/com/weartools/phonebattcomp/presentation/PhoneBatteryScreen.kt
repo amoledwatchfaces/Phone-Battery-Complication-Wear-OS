@@ -18,6 +18,7 @@ package com.weartools.phonebattcomp.presentation
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -48,7 +49,6 @@ import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
-import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.CompactButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
@@ -80,6 +80,7 @@ fun PhoneBatteryAppScreen(
     var openHowTo by remember{ mutableStateOf(false) }
 
     TransformingLazyColumn(
+        contentPadding = PaddingValues(top = 25.dp, bottom = 65.dp, start = 12.dp, end = 12.dp),
         modifier = Modifier
             .fillMaxSize()
             .rotaryScrollable(
@@ -101,6 +102,8 @@ fun PhoneBatteryAppScreen(
         // Main
         item {
             DialogChip(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
                 text = if (preferences.value.phoneBatteryLevel==0) "--" else "${preferences.value.phoneBatteryLevel} %",
                 icon = {
                     Icon(painter = painterResource(
@@ -115,8 +118,7 @@ fun PhoneBatteryAppScreen(
                             else -> R.drawable.ic_phone_disconnected
                         }
                         ),
-                        contentDescription = "Play Store Icon",
-                        tint = MaterialTheme.colorScheme.onTertiary) },
+                        contentDescription = "Play Store Icon") },
                 title = preferences.value.nodeName,
                 onClick = {
                     if (preferences.value.lastUpdate == 0L){ context.openAppStoreOnPhone() }
@@ -126,28 +128,34 @@ fun PhoneBatteryAppScreen(
         }
         item {
             DialogChip(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
                 text = stringResource(id = R.string.version),
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.Info,
-                        contentDescription = "Play Store Icon",
-                        tint = MaterialTheme.colorScheme.onTertiary) },
+                        contentDescription = "Play Store Icon") },
                 title = BuildConfig.VERSION_NAME,
                 onClick = {context.openPlayStore()}
             )
         }
         item {
-            Row(modifier = Modifier.padding(top = 12.dp)) {
+            Row(
+                modifier = Modifier.padding(top = 12.dp)) {
                 OutlinedButton(
                     modifier = Modifier.padding(end = 12.dp),
                     onClick = {openHowTo=openHowTo.not()}
                 ) {
-                    Icon(imageVector = Icons.AutoMirrored.Outlined.ContactSupport, contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.onTertiary)
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Outlined.ContactSupport,
+                        contentDescription = "Play Store Icon")
                 }
                 OutlinedButton(
                     onClick = { context.openAppStoreOnPhone() }
                 ) {
-                    Icon(imageVector = Icons.Outlined.InstallMobile, contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.onTertiary)
+                    Icon(
+                        imageVector = Icons.Outlined.InstallMobile,
+                        contentDescription = "Play Store Icon")
                 }
             }
         }
@@ -228,6 +236,7 @@ fun PhoneBatteryAppScreen(
         item {
 
             SwitchButton(
+                colors = SwitchButtonDefaults.switchButtonColors(),
                 modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
                 transformation = SurfaceTransformation(transformationSpec),
                 checked = preferences.value.notificationsIconType == 2,
@@ -246,19 +255,18 @@ fun PhoneBatteryAppScreen(
         }
         item {
             CompactButton(
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF0E1011)
-                ),
-                border = ButtonDefaults.outlinedButtonBorder(true),
                 label = { Text(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.secondary,
                     text = stringResource(R.string.more_settings)
                 )},
-                modifier = Modifier.padding(top = 12.dp),
+                modifier = Modifier.padding(top = 12.dp).transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
                 icon = {
-                    Icon(imageVector = Icons.Filled.SettingsSuggest, contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.onTertiary)
+                    Icon(
+                        imageVector = Icons.Filled.SettingsSuggest,
+                        contentDescription = "Play Store Icon"
+                    )
                 },
                 onClick = {
                     viewModel.openExperimentalSettings(context)
