@@ -18,7 +18,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
+import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material3.AlertDialog
@@ -120,7 +120,7 @@ fun ListItemsWidget(
 ) {
     val state = remember { mutableStateOf(true) }
 
-        val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+        val listState = rememberTransformingLazyColumnState()
         val focusRequester = remember { FocusRequester() }
 
         LaunchedEffect(Unit) {focusRequester.requestFocus()}
