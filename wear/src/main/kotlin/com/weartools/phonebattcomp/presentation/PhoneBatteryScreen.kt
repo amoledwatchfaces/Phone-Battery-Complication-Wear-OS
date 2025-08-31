@@ -49,6 +49,7 @@ import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
+import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.CompactButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
@@ -141,9 +142,13 @@ fun PhoneBatteryAppScreen(
         }
         item {
             Row(
-                modifier = Modifier.padding(top = 12.dp)) {
+                modifier = Modifier.padding(top = 12.dp).transformedHeight(this, transformationSpec)
+            ) {
                 OutlinedButton(
-                    modifier = Modifier.padding(end = 12.dp),
+                    border = ButtonDefaults.outlinedButtonBorder(true, MaterialTheme.colorScheme.primaryContainer, borderWidth = 2.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.padding(end = 6.dp),
+                    transformation = SurfaceTransformation(transformationSpec),
                     onClick = {openHowTo=openHowTo.not()}
                 ) {
                     Icon(
@@ -151,6 +156,10 @@ fun PhoneBatteryAppScreen(
                         contentDescription = "Play Store Icon")
                 }
                 OutlinedButton(
+                    border = ButtonDefaults.outlinedButtonBorder(true, MaterialTheme.colorScheme.primaryContainer, borderWidth = 2.dp),
+                    colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.padding(start = 6.dp),
+                    transformation = SurfaceTransformation(transformationSpec),
                     onClick = { context.openAppStoreOnPhone() }
                 ) {
                     Icon(

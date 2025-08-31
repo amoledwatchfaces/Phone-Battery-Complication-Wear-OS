@@ -107,7 +107,7 @@ fun SectionText(modifier: Modifier = Modifier, text: String) {
     Text(
         modifier = modifier,
         textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.outline,
+        color = MaterialTheme.colorScheme.outlineVariant,
         text = text,
         style = MaterialTheme.typography.bodySmall
     )
@@ -133,8 +133,8 @@ fun ListItemsWidget(
                 ),
             verticalArrangement = Arrangement.spacedBy(4.dp, Alignment.Top),
             contentPadding = PaddingValues(
-                start = 10.dp,
-                end = 10.dp,
+                start = 12.dp,
+                end = 12.dp,
                 top = 24.dp,
                 bottom = 52.dp
             ),
@@ -170,7 +170,10 @@ fun ListItemsWidget(
 }
 
 @Composable
-fun HowToCard(title: String, text: String) {
+fun HowToCard(
+    title: String,
+    text: String
+) {
     TitleCard(
         onClick = {  },
         title = {
@@ -178,7 +181,7 @@ fun HowToCard(title: String, text: String) {
                 title,
                 fontSize = 12.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onTertiary,
+                color = MaterialTheme.colorScheme.primary,
                 lineHeight = 16.sp)
                 },
         content = {
