@@ -74,6 +74,7 @@ android {
 }
 
 dependencies {
+    val composeBom = platform ("androidx.compose:compose-bom:2025.08.00")
 
     // Wearable
     implementation ("com.google.android.gms:play-services-wearable:19.0.0")
@@ -81,23 +82,37 @@ dependencies {
     implementation ("androidx.wear:wear-remote-interactions:1.1.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
-    // Compose
-    implementation ("androidx.core:core-ktx:1.17.0")
-    implementation ("androidx.compose.ui:ui:1.9.0")
-
-
-    implementation ("androidx.wear.compose:compose-material3:1.5.0")
-    implementation ("androidx.wear.compose:compose-foundation:1.5.0")
-
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.9.0")
-    implementation ("androidx.activity:activity-compose:1.10.1")
+    // General compose dependencies
+    implementation (composeBom)
+    implementation ("androidx.activity:activity-compose:1.11.0")
+    implementation ("androidx.compose.ui:ui:1.9.1")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.9.1")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
+
+    // Compose for Wear OS dependencies
+    implementation ("androidx.wear.compose:compose-material3:1.5.1")
+    implementation ("androidx.wear.compose:compose-navigation:1.5.1")
+
+    // Foundation is additive, so you can use the mobile version in your Wear OS app.
+    implementation ("androidx.wear.compose:compose-foundation:1.5.1")
+
+    // Wear OS preview annotations
+    implementation ("androidx.wear.compose:compose-ui-tooling:1.5.1")
+
+    // Testing
+    testImplementation ("junit:junit:4.13.2")
+    androidTestImplementation ("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation ("androidx.test.espresso:espresso-core:3.7.0")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.9.1")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.9.1")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.9.1")
+
+    // Core
+    implementation ("androidx.core:core-ktx:1.17.0")
+
+    // Lifecycle
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.9.3")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.3")
-
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.9.0")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.9.0")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.9.0")
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
@@ -113,19 +128,19 @@ dependencies {
     implementation ("androidx.core:core-splashscreen:1.0.1")
 
     // WorkManager
-    implementation ("androidx.work:work-runtime-ktx:2.10.3")
+    implementation ("androidx.work:work-runtime-ktx:2.10.4")
 
     // Tile
-    implementation("androidx.wear.protolayout:protolayout-expression:1.3.0")
-    implementation("androidx.wear.protolayout:protolayout:1.3.0")
-    implementation("androidx.wear.protolayout:protolayout-material:1.3.0")
-    implementation("androidx.wear.tiles:tiles:1.5.0")
+    implementation ("androidx.wear.protolayout:protolayout-expression:1.3.0")
+    implementation ("androidx.wear.protolayout:protolayout:1.3.0")
+    implementation ("androidx.wear.protolayout:protolayout-material:1.3.0")
+    implementation ("androidx.wear.tiles:tiles:1.5.0")
 
     // ListenableFuture
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.10.2")
 
     // Hilt
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.3.0")
     implementation ("com.google.dagger:hilt-android:2.57.1")
     ksp ("com.google.dagger:hilt-compiler:2.57.1")
 

@@ -1,18 +1,3 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.weartools.phonebattcomp.presentation
 
 import android.content.ActivityNotFoundException
@@ -30,10 +15,6 @@ import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material.icons.outlined.InstallMobile
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
@@ -44,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import androidx.navigation.NavHostController
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
 import androidx.wear.compose.foundation.lazy.rememberTransformingLazyColumnState
@@ -70,6 +52,7 @@ import com.weartools.phonebattcomp.utils.openAppStoreOnPhone
 
 @Composable
 fun PhoneBatteryAppScreen(
+    navController: NavHostController,
     listState: TransformingLazyColumnState = rememberTransformingLazyColumnState(),
     transformationSpec: TransformationSpec,
     focusRequester: FocusRequester,
@@ -78,7 +61,6 @@ fun PhoneBatteryAppScreen(
 ) {
     val context = LocalContext.current
     val preferences = viewModel.preferences.collectAsState()
-    var openHowTo by remember{ mutableStateOf(false) }
 
     TransformingLazyColumn(
         contentPadding = PaddingValues(top = 25.dp, bottom = 65.dp, start = 12.dp, end = 12.dp),
@@ -91,6 +73,7 @@ fun PhoneBatteryAppScreen(
         state = listState,
     )
     {
+        // List Header
         item { ListHeader {
             Text(
                 textAlign = TextAlign.Center,
@@ -149,7 +132,7 @@ fun PhoneBatteryAppScreen(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                     modifier = Modifier.padding(end = 6.dp),
                     transformation = SurfaceTransformation(transformationSpec),
-                    onClick = {openHowTo=openHowTo.not()}
+                    onClick = { navController.navigate("guide_screen")}
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ContactSupport,
@@ -181,7 +164,8 @@ fun PhoneBatteryAppScreen(
                 secondaryLabel = {
                     if (preferences.value.percentage) {
                         Text(text = stringResource(id = R.string.percentage_on), color = Color.LightGray)
-                    } else Text(text = stringResource(id = R.string.percentage_off), color = Color.LightGray)
+                    } else
+                        Text(text = stringResource(id = R.string.percentage_off), color = Color.LightGray)
                 }
             )
         }
@@ -233,9 +217,10 @@ fun PhoneBatteryAppScreen(
                 onCheckedChange = {viewModel.toggleEnabled(context)},
                 label = { Text(stringResource(id = R.string.temp_unit_pref_title)) },
                 secondaryLabel = {
-                    if (preferences.value.percentage) {
+                    if (preferences.value.tempUnit) {
                         Text(text = stringResource(id = R.string.temp_unit_C), color = Color.LightGray)
-                    } else Text(text = stringResource(id = R.string.temp_unit_F), color = Color.LightGray)
+                    } else
+                        Text(text = stringResource(id = R.string.temp_unit_F), color = Color.LightGray)
                 }
             )
         }
@@ -256,9 +241,10 @@ fun PhoneBatteryAppScreen(
                 },
                 label = { Text(stringResource(id = R.string.notif_comp_force_icon_type)) },
                 secondaryLabel = {
-                    if (preferences.value.percentage) {
+                    if (preferences.value.notificationsIconType == 2) {
                         Text(text = stringResource(id = R.string.type_icon), color = Color.LightGray)
-                    } else Text(text = stringResource(id = R.string.type_photo), color = Color.LightGray)
+                    } else
+                        Text(text = stringResource(id = R.string.type_photo), color = Color.LightGray)
                 }
             )
         }
@@ -291,17 +277,6 @@ fun PhoneBatteryAppScreen(
             )
         }
 
-    }
-
-    if (openHowTo){
-        ListItemsWidget(titles = stringResource(id = R.string.faq), callback = {
-            if (it == -1) {
-                openHowTo = false
-                return@ListItemsWidget
-            } else {
-                openHowTo = openHowTo.not()
-            }
-        })
     }
 }
 fun Context.openPlayStore() {
