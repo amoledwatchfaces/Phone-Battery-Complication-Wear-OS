@@ -76,7 +76,7 @@ android {
 dependencies {
     val composeBom = platform ("androidx.compose:compose-bom:2025.08.00")
 
-    // Wearable
+    // Wear OS
     implementation ("com.google.android.gms:play-services-wearable:19.0.0")
     implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha07")
     implementation ("androidx.wear:wear-remote-interactions:1.1.0")
