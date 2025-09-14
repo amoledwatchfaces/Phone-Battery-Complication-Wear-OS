@@ -21,7 +21,6 @@ import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
-import androidx.wear.compose.material3.CompactButton
 import androidx.wear.compose.material3.ListHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -60,31 +59,6 @@ fun DialogChip(
         },
     )
 }
-
-@Composable
-fun SimpleChip(
-    text: String,
-    onClick: (() -> Unit)? = null,
-    icon: @Composable (BoxScope.() -> Unit)?
-) {
-    CompactButton(
-        modifier = Modifier
-            .fillMaxWidth(),
-        onClick = {
-            onClick?.invoke()
-        },
-        label = {
-            Text(
-                text = text,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-        },
-        icon = icon
-    )
-}
-
-
 
 @Composable
 fun PreferenceCategory(
