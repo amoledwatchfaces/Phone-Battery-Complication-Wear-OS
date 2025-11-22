@@ -6,7 +6,6 @@ import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.BatteryManager
 import android.os.Build
 import android.util.Log
@@ -48,6 +47,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import androidx.core.net.toUri
 
 
 @HiltViewModel
@@ -111,7 +111,7 @@ class MainViewModel @Inject constructor(
         viewModelScope.launch {
             val intent = Intent(Intent.ACTION_VIEW)
                 .addCategory(Intent.CATEGORY_BROWSABLE)
-                .setData(Uri.parse(BuildConfig.PLAY_STORE_APP_URI))
+                .setData(BuildConfig.PLAY_STORE_APP_URI.toUri())
             try {
                 remoteActivityHelper.startRemoteActivity(targetIntent = intent,targetNodeId = null).await()
                 message = context.getString(R.string.toast_check_wearable)
@@ -217,7 +217,7 @@ class MainViewModel @Inject constructor(
                     context.startActivity(
                         Intent(
                             Intent.ACTION_VIEW,
-                            Uri.parse("market://details?id=${context.packageName}")
+                            "market://details?id=${context.packageName}".toUri()
                         )
                     )
                 }
