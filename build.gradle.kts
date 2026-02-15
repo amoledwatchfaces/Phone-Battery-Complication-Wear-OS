@@ -19,7 +19,7 @@ buildscript {
     val versionName by extra("5.7.0")
 
     dependencies {
-        classpath ("com.android.tools.build:gradle:8.13.1")
+        classpath ("com.android.tools.build:gradle:9.0.1")
         classpath ("org.jetbrains.kotlin:kotlin-serialization:2.2.0")
     }
     repositories {
