@@ -1,16 +1,22 @@
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
     id ("com.android.application")
-    id ("org.jetbrains.kotlin.android")
     id ("org.jetbrains.kotlin.plugin.compose")
     id ("kotlinx-serialization")
     id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
     id ("com.google.gms.google-services")
     id ("com.google.firebase.crashlytics")
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_17)
+    }
 }
 
 android {
@@ -48,11 +54,6 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_17)
-        }
-    }
     buildFeatures {
         compose = true
         buildConfig = true
@@ -85,10 +86,10 @@ dependencies {
     implementation ("androidx.wear:wear-remote-interactions:1.1.0")
 
     // Splash Screen
-    implementation ("androidx.core:core-splashscreen:1.0.1")
+    implementation ("androidx.core:core-splashscreen:1.2.0")
 
     // Compose
-    implementation (platform("androidx.compose:compose-bom:2025.07.00"))
+    implementation (platform("androidx.compose:compose-bom:2026.02.00"))
     implementation ("androidx.activity:activity-compose")
     implementation ("androidx.navigation:navigation-compose")
     implementation ("androidx.compose.material3:material3")
@@ -100,34 +101,34 @@ dependencies {
     implementation ("androidx.compose.material:material-icons-extended")
 
 
-    implementation ("androidx.activity:activity-ktx:1.10.1")
-    implementation ("androidx.core:core-ktx:1.16.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.9.2")
+    implementation ("androidx.activity:activity-ktx:1.12.4")
+    implementation ("androidx.core:core-ktx:1.17.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
 
     // Used for Datastore
-    implementation ("androidx.datastore:datastore:1.1.4")
+    implementation ("androidx.datastore:datastore:1.2.0")
 
     // Permissions
     implementation ("com.google.accompanist:accompanist-permissions:0.37.3")
 
     // Debug
     testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.2.1")
-    androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2025.07.00"))
+    androidTestImplementation("androidx.test.ext:junit:1.3.0")
+    androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.02.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Hilt
-    implementation ("androidx.hilt:hilt-navigation-compose:1.2.0")
-    implementation ("com.google.dagger:hilt-android:2.57")
-    ksp ("com.google.dagger:hilt-compiler:2.57")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.3.0")
+    implementation ("com.google.dagger:hilt-android:2.59.1")
+    ksp ("com.google.dagger:hilt-compiler:2.59.1")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.0.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.9.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

@@ -1,17 +1,23 @@
+
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
     id ("com.android.application")
-    id ("org.jetbrains.kotlin.android")
-    id ("kotlin-parcelize")
     id ("kotlinx-serialization")
     id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
     id ("org.jetbrains.kotlin.plugin.compose")
+    id ("org.jetbrains.kotlin.plugin.parcelize")
     id ("com.google.gms.google-services")
     id ("com.google.firebase.crashlytics")
+}
+
+kotlin {
+    compilerOptions {
+        jvmTarget.set(JvmTarget.JVM_21)
+    }
 }
 
 android {
@@ -54,7 +60,6 @@ android {
         }
     }
 
-
     buildFeatures {
         compose = true
         buildConfig = true
@@ -65,11 +70,6 @@ android {
         targetCompatibility = JavaVersion.VERSION_21
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(JvmTarget.JVM_21)
-        }
-    }
     namespace = "com.weartools.phonebattcomp"
 }
 
@@ -78,34 +78,34 @@ dependencies {
 
     // Wear OS
     implementation ("com.google.android.gms:play-services-wearable:19.0.0")
-    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-alpha07")
+    implementation ("androidx.wear.watchface:watchface-complications-data-source-ktx:1.3.0-rc01")
     implementation ("androidx.wear:wear-remote-interactions:1.1.0")
     compileOnly ("com.google.android.wearable:wearable:2.9.0")
 
     // General compose dependencies
     implementation (composeBom)
-    implementation ("androidx.activity:activity-compose:1.12.0")
-    implementation ("androidx.compose.ui:ui:1.9.5")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.9.5")
+    implementation ("androidx.activity:activity-compose:1.12.4")
+    implementation ("androidx.compose.ui:ui:1.10.3")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.10.3")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
 
     // Compose for Wear OS dependencies
-    implementation ("androidx.wear.compose:compose-material3:1.5.5")
-    implementation ("androidx.wear.compose:compose-navigation:1.5.5")
+    implementation ("androidx.wear.compose:compose-material3:1.5.6")
+    implementation ("androidx.wear.compose:compose-navigation:1.5.6")
 
     // Foundation is additive, so you can use the mobile version in your Wear OS app.
-    implementation ("androidx.wear.compose:compose-foundation:1.5.5")
+    implementation ("androidx.wear.compose:compose-foundation:1.5.6")
 
     // Wear OS preview annotations
-    implementation ("androidx.wear.compose:compose-ui-tooling:1.5.5")
+    implementation ("androidx.wear.compose:compose-ui-tooling:1.5.6")
 
     // Testing
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.3.0")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.9.5")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.9.5")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.9.5")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.10.3")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.10.3")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.10.3")
 
     // Core
     implementation ("androidx.core:core-ktx:1.17.0")
@@ -122,13 +122,13 @@ dependencies {
     implementation ("androidx.datastore:datastore:1.2.0")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.9.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
 
     // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.2.0")
 
     // WorkManager
-    implementation ("androidx.work:work-runtime-ktx:2.11.0")
+    implementation ("androidx.work:work-runtime-ktx:2.11.1")
 
     // Tile
     implementation ("androidx.wear.protolayout:protolayout-expression:1.3.0")
@@ -141,10 +141,10 @@ dependencies {
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.3.0")
-    implementation ("com.google.dagger:hilt-android:2.57.2")
-    ksp ("com.google.dagger:hilt-compiler:2.57.2")
+    implementation ("com.google.dagger:hilt-android:2.59.1")
+    ksp ("com.google.dagger:hilt-compiler:2.59.1")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.6.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.9.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }
