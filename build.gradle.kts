@@ -21,7 +21,7 @@ buildscript {
 
     dependencies {
         classpath ("com.android.tools.build:gradle:9.0.1")
-        classpath ("org.jetbrains.kotlin:kotlin-serialization:2.2.10")
+        classpath ("org.jetbrains.kotlin:kotlin-serialization:2.3.10")
     }
     repositories {
         google()
