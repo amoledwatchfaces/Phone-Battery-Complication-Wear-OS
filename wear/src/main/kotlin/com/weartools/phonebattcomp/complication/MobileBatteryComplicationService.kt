@@ -107,20 +107,17 @@ class MobileBatteryComplicationService : SuspendingComplicationDataSourceService
 
         val repository = dataStore.data.first()
 
-        val activeSync = repository.activeSync
         val showPercentage = repository.percentage
         val materialSymbols = repository.materialSymbols
         val chargingSymbolInside = repository.chargingSymbolInsideIcon
         val watchCharging = watchIsCharging?: getCurrentBatteryChargingStatus(this)
 
-        /** When Active Sync is not enabled **/
-        if (activeSync.not()) {
-            if (repository.afterMobileResult.not()) {
-                MobileListener.sendPhoneBatteryRequest(repository.lastUpdate, dataClient, false)
-            }
-            else {
-                dataStore.updateData { it.copy(afterMobileResult = false) }
-            }
+        /** Refresh logic **/
+        if (repository.afterMobileResult.not()) {
+            MobileListener.sendPhoneBatteryRequest(repository.lastUpdate, dataClient, false)
+        }
+        else {
+            dataStore.updateData { it.copy(afterMobileResult = false) }
         }
 
         //Log.i("MobileBatteryComplicationService", "lastUpdate: ${batteryState.lastUpdate.value}")

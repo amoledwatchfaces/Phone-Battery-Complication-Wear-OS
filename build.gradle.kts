@@ -3,7 +3,7 @@ plugins {
     id ("org.jetbrains.kotlin.android") version ("2.2.0") apply false
     id ("org.jetbrains.kotlin.plugin.compose") version ("2.2.0") apply false
     id ("org.jetbrains.kotlin.plugin.parcelize") version ("2.3.10") apply false
-    id ("com.google.dagger.hilt.android") version ("2.59.1") apply false
+    id ("com.google.dagger.hilt.android") version ("2.59.2") apply false
     id ("com.google.devtools.ksp") version ("2.3.4") apply false
     id ("com.google.gms.google-services") version ("4.4.2") apply false
     id ("com.google.firebase.crashlytics") version ("3.0.2") apply false
@@ -16,8 +16,8 @@ tasks.register("clean", Delete::class) {
 buildscript {
 
     /** Set version for wear & mobile modules **/
-    val versionCode by extra(10000571)
-    val versionName by extra("5.7.1")
+    val versionCode by extra(10000575)
+    val versionName by extra("5.7.5")
 
     dependencies {
         classpath ("com.android.tools.build:gradle:9.0.1")

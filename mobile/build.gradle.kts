@@ -83,13 +83,13 @@ dependencies {
 
     // Wearable
     implementation ("com.google.android.gms:play-services-wearable:19.0.0")
-    implementation ("androidx.wear:wear-remote-interactions:1.1.0")
+    implementation ("androidx.wear:wear-remote-interactions:1.2.0")
 
     // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.2.0")
 
     // Compose
-    implementation (platform("androidx.compose:compose-bom:2026.02.00"))
+    implementation (platform("androidx.compose:compose-bom:2026.02.01"))
     implementation ("androidx.activity:activity-compose")
     implementation ("androidx.navigation:navigation-compose")
     implementation ("androidx.compose.material3:material3")
@@ -118,17 +118,17 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2026.02.00"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.02.01"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
     // Hilt
     implementation ("androidx.hilt:hilt-navigation-compose:1.3.0")
-    implementation ("com.google.dagger:hilt-android:2.59.1")
-    ksp ("com.google.dagger:hilt-compiler:2.59.1")
+    implementation ("com.google.dagger:hilt-android:2.59.2")
+    ksp ("com.google.dagger:hilt-compiler:2.59.2")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.9.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.10.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

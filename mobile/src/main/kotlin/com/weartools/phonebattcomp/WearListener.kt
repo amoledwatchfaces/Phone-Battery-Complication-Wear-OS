@@ -50,9 +50,6 @@ const val CHARGE_TIME_REMAINING_KEY = "charge-time-remaining-key"
 private const val REQUEST_PATH = "/request"
 private const val FORCE_UPDATE_KEY = "force-update-key"
 
-const val ACTIVE_SYNC_PATH = "/active-sync"
-const val ACTIVE_SYNC_KEY = "active-sync-key"
-
 private const val CALENDAR_REQUEST_PATH = "/calendar-request"
 private const val NOTIFICATIONS_REQUEST_PATH = "/notifications-request"
 
@@ -116,7 +113,7 @@ class WearListener : WearableListenerService() {
         super.onCapabilityChanged(capabilityInfo)
         if (capabilityInfo.name == BuildConfig.CAPABILITY_WEAR_APP){
             //Log.d("MobileListener", "capabilityInfo.name matches ${BuildConfig.CAPABILITY_MOBILE_APP}")
-            if (capabilityInfo.nodes.size > 0){
+            if (capabilityInfo.nodes.isNotEmpty()){
                 //Log.d("MobileListener", "capability ${capabilityInfo.name} connected!")
                 sendBatteryInfoToWatch(
                     level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),

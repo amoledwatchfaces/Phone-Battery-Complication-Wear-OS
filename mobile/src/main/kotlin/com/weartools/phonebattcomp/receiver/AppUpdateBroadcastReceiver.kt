@@ -7,9 +7,6 @@ import android.content.Intent
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
-import com.google.android.gms.wearable.PutDataMapRequest
-import com.weartools.phonebattcomp.ACTIVE_SYNC_KEY
-import com.weartools.phonebattcomp.ACTIVE_SYNC_PATH
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.receiver.CalendarContentObserver.Companion.arePermissionsGranted
@@ -45,16 +42,9 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
             if (isServiceRunning){
                 dataStore.updateData { it.copy(
                     backgroundServiceState = true,
-                    activeSync = true,
                     calendarSync = true
                 ) }
-                // Initiate Active Sync
-                val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
-                    dataMap.putBoolean(ACTIVE_SYNC_KEY, true)
-                    dataMap.putLong("immediate-update", System.currentTimeMillis()) }
-                    .asPutDataRequest()
-                    .setUrgent()
-                dataClient.putDataItem(request)
+
                 BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
 
                 // Initiate Calendar Sync
@@ -77,17 +67,8 @@ class AppUpdateBroadcastReceiver : BroadcastReceiver() {
             else {
                 dataStore.updateData { it.copy(
                     backgroundServiceState = false,
-                    activeSync = false,
                     calendarSync = false
                 ) }
-                // Notify watch that active sync is disabled
-                val request = PutDataMapRequest.create(ACTIVE_SYNC_PATH).apply{
-                    dataMap.putBoolean(ACTIVE_SYNC_KEY, false)
-                    dataMap.putLong("immediate-update", System.currentTimeMillis()) }
-                    .asPutDataRequest()
-                    .setUrgent()
-
-                dataClient.putDataItem(request)
             }
         }
     }

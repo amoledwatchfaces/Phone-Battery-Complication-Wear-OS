@@ -56,7 +56,6 @@ import com.google.android.gms.wearable.Node
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import com.weartools.phonebattcomp.utils.askForNotificationAccess
 import com.weartools.phonebattcomp.utils.openAmoledWebPage
 
@@ -86,7 +85,7 @@ fun SettingsScreen(
         //if (destination != null) {
         CenterAlignedTopAppBar(
             title = { Text(fontWeight = FontWeight.Medium, text = "Settings") },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+            colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = Color.Transparent,
             )
         )
@@ -158,43 +157,6 @@ fun SettingsScreen(
                                 context.askForNotificationAccess()
                         }
                         )
-                    }
-                    // Active Sync Switch
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Column(
-                            modifier = Modifier.weight(0.8f)
-                        ) {
-                            Text(
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Medium,
-                                text = "Active Sync")
-                            Text(
-                                style = MaterialTheme.typography.bodySmall,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.Gray,
-                                text = "Battery charging status + live updates")
-                        }
-
-                        Switch(
-                            modifier = Modifier.weight(0.2f),
-                            enabled = preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
-                            checked = preferences.value.activeSync,
-                            onCheckedChange = {
-                            if (it){
-                                viewModel.setActiveSyncState(true)
-                                BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
-                            }
-                            else {
-                                viewModel.setActiveSyncState(false)
-                                BatteryStatusBroadcastReceiver.unsubscribeFromUpdates(context)
-                            }
-                        })
                     }
                     // Notifications Sync Switch
                     Row(

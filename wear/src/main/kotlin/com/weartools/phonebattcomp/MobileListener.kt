@@ -34,8 +34,6 @@ private const val REQUEST_PATH = "/request"
 private const val REQUEST_KEY = "request-key"
 private const val FORCE_UPDATE_KEY = "force-update-key"
 
-private const val ACTIVE_SYNC_PATH = "/active-sync"
-private const val ACTIVE_SYNC_KEY = "active-sync-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
 private const val CHARGE_TIME_REMAINING_KEY = "charge-time-remaining-key"
 private const val URI = "/foobar"
@@ -94,12 +92,6 @@ class MobileListener : WearableListenerService() {
                                 }
                                 updateComplication(MobileBatteryComplicationService::class.java)
                                 TileService.getUpdater(this@MobileListener).requestUpdate(PhoneBatteryTileService::class.java)
-                            }
-                        }
-                        ACTIVE_SYNC_PATH -> {
-                            val state = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap.getBoolean(ACTIVE_SYNC_KEY)
-                            ioScope.launch {
-                                dataStore.updateData { it.copy(activeSync = state) }
                             }
                         }
                         URI -> {

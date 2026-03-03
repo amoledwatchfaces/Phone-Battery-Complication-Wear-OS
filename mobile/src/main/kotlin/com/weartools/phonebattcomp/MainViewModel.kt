@@ -116,9 +116,9 @@ class MainViewModel @Inject constructor(
                 remoteActivityHelper.startRemoteActivity(targetIntent = intent,targetNodeId = null).await()
                 message = context.getString(R.string.toast_check_wearable)
                 _isMessageShown.emit(true)
-            } catch (cancellationException: CancellationException) {
+            } catch (_: CancellationException) {
                 // Request was cancelled normally
-            } catch (throwable: Throwable) {
+            } catch (_: Throwable) {
                 message = "Play Store Request Failed. Wear device(s) may not support Play Store"
                 _isMessageShown.emit(true)
             }
@@ -136,10 +136,10 @@ class MainViewModel @Inject constructor(
                 delay(1_000L)
                 updateUI()
             }
-        } catch (cancellationException: CancellationException) {
+        } catch (_: CancellationException) {
             // Request was cancelled normally
             loaderStateMutableStateFlow.value = false
-        } catch (throwable: Throwable) {
+        } catch (_: Throwable) {
             loaderStateMutableStateFlow.value = false
 
             message = "Node request failed to return any results."
@@ -226,27 +226,24 @@ class MainViewModel @Inject constructor(
     }
 
     fun activateBatterySync(context: Context) {
+
         BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
 
         viewModelScope.launch {
-            try {
-                val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                    dataMap.putInt(BATTERY_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
-                    dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                        dataMap.putLong(CHARGE_TIME_REMAINING_KEY, batteryManager.computeChargeTimeRemaining())
-                    }
+            val request = PutDataMapRequest.create(BATTERY_PATH).apply{
+                dataMap.putInt(BATTERY_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
+                dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                    dataMap.putLong(CHARGE_TIME_REMAINING_KEY, batteryManager.computeChargeTimeRemaining())
                 }
-                    .asPutDataRequest()
-                    .setUrgent()
-                dataClient.putDataItem(request)
-            } catch (e: Exception) {
-                if (e is CancellationException) throw e
-                Log.e(TAG, "Error while activating battery sync", e)
             }
+                .asPutDataRequest()
+                .setUrgent()
+            dataClient.putDataItem(request)
         }
     }
 
+    /*
     fun setActiveSyncState(state: Boolean) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(activeSync = state) }
@@ -259,6 +256,7 @@ class MainViewModel @Inject constructor(
 
         dataClient.putDataItem(request)
     }
+    */
 
     fun setCalendarSyncState(state: Boolean) {
         viewModelScope.launch {

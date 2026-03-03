@@ -6,14 +6,13 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
-import android.util.Log
 import androidx.core.graphics.createBitmap
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.PutDataMapRequest
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.di.ServiceCommunication
+import com.weartools.phonebattcomp.receiver.BatteryStatusBroadcastReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -45,6 +44,8 @@ class NotificationListener : NotificationListenerService() {
 
     private val mutex = Mutex()
 
+    private var notificationsCount = 0
+
     // Shared Job to cancel previous task before starting a new one
     private var notificationJob: Job? = null
 
@@ -63,6 +64,9 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onListenerConnected() {
         super.onListenerConnected()
+
+        BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
+
         serviceScope.launch {
             // Set background service state to true
             dataStore.updateData { it.copy(backgroundServiceState = true) }
@@ -87,6 +91,9 @@ class NotificationListener : NotificationListenerService() {
     }
 
     override fun onNotificationPosted(sbn: StatusBarNotification) {
+        if (++notificationsCount % 10 == 0) {
+            BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
+        }
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
     }
 
@@ -120,8 +127,9 @@ class NotificationListener : NotificationListenerService() {
         mutex.withLock {
 
             /** Catch exceptions when onListenerConnected is not called before accessing notifications **/
-            val notifications = try { activeNotifications } catch (e: Exception) {
-                FirebaseCrashlytics.getInstance().recordException(e)
+            val notifications = try {
+                activeNotifications
+            } catch (_: Exception) {
                 return@withLock
             }
 
@@ -200,12 +208,9 @@ class NotificationListener : NotificationListenerService() {
             }
 
             // Send DataMap to watch using DataClient
-            try {
-                dataClient.putDataItem(putDataMapReq.asPutDataRequest().setUrgent()).await()
-            } catch (e: Exception) {
-                FirebaseCrashlytics.getInstance().recordException(e)
-                Log.e("NotificationListener", "Notification sending failed: ${e.message}")
-            }
+            dataClient
+                .putDataItem(putDataMapReq.asPutDataRequest().setUrgent())
+                .await()
         }
     }
 

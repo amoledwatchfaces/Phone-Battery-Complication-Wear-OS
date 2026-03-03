@@ -97,9 +97,7 @@ fun MainApp(
         }
     }
     LaunchedEffect(Unit) {
-        if (preferences.value.activeSync) {
-            viewModel.activateBatterySync(context)
-        }
+        viewModel.activateBatterySync(context)
         if (permissionStateCalendar.status.isGranted.not()) {
             viewModel.setCalendarSyncState(false)
         }
