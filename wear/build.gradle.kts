@@ -74,7 +74,7 @@ android {
 }
 
 dependencies {
-    val composeBom = platform ("androidx.compose:compose-bom:2025.08.00")
+    val composeBom = platform ("androidx.compose:compose-bom:2026.03.00")
 
     // Wear OS
     implementation ("com.google.android.gms:play-services-wearable:19.0.0")
