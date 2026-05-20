@@ -148,7 +148,11 @@ class WearListener : WearableListenerService() {
                 .asPutDataRequest()
                 .setUrgent()
 
-            dataClient.putDataItem(request)
+            try {
+                dataClient.putDataItem(request)
+            } catch (e: Exception) {
+                Log.e(TAG, "sendBatteryInfoToWatch failed: ${e.message}")
+            }
         }
         suspend fun sendNotificationsToWatch(context: Context, notificationsSync: Boolean){
             val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(context).contains(BuildConfig.APPLICATION_ID)

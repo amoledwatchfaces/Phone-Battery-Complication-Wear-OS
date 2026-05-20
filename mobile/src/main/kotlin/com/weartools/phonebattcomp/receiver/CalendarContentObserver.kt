@@ -8,6 +8,7 @@ import android.database.ContentObserver
 import android.database.Cursor
 import android.os.Handler
 import android.provider.CalendarContract
+import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.PutDataMapRequest
@@ -216,7 +217,11 @@ class CalendarContentObserver @Inject constructor(
             val putDataMapReq = PutDataMapRequest.create("/calendar-events")
             putDataMapReq.dataMap.putDataMapArrayList("events", ArrayList(dataMapList))
             putDataMapReq.setUrgent()
-            dataClient.putDataItem(putDataMapReq.asPutDataRequest())
+            try {
+                dataClient.putDataItem(putDataMapReq.asPutDataRequest())
+            } catch (e: Exception) {
+                Log.e("CalendarContentObserver", "putDataItem failed: ${e.message}")
+            }
         }
         /*
         fun julianDayToUtcMillis(julianDay: Int, minutesFromMidnight: Int): Long {

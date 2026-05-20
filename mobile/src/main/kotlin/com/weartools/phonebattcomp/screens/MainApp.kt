@@ -28,7 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
@@ -83,6 +83,7 @@ fun MainApp(
     val currentDestination = navBackStackEntry?.destination
 
     val isWearableConnected = viewModel.watchAvailableStateStateFlow.collectAsState()
+    val isWearableApiSupported = viewModel.isWearableApiSupportedStateFlow.collectAsState()
     val commonNodesList = viewModel.commonNodesStateFlow.collectAsState()
     val connectedNodesList = viewModel.connectedNodesStateFlow.collectAsState()
 
@@ -113,7 +114,7 @@ fun MainApp(
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         floatingActionButton = {
-            if (isWearableConnected.value && (currentDestination?.route == Screen.Home.route)) {
+            if (isWearableApiSupported.value && isWearableConnected.value && (currentDestination?.route == Screen.Home.route)) {
                 ExtendedFloatingActionButton(
                     icon = {
                         Icon(
@@ -128,7 +129,7 @@ fun MainApp(
                     expanded = (fabVisibility && commonNodesList.value.isNullOrEmpty())
                 )
             }
-            else if (currentDestination?.route == Screen.Home.route)
+            else if (isWearableApiSupported.value && currentDestination?.route == Screen.Home.route)
             {
                 FloatingActionButton(
                     containerColor = colorScheme.primaryContainer,
@@ -159,7 +160,7 @@ fun MainApp(
             navController,
             startDestination = Screen.Home.route,
             Modifier.padding(padding)) {
-            composable(Screen.Home.route) { HomeScreen(view, context, viewModel, scope, isWearableConnected, commonNodesList,connectedNodesList, listState) }
+            composable(Screen.Home.route) { HomeScreen(view, context, viewModel, scope, isWearableConnected, isWearableApiSupported, commonNodesList,connectedNodesList, listState) }
             composable(
                 deepLinks = listOf(
                     navDeepLink{
@@ -167,7 +168,7 @@ fun MainApp(
                     action = Intent.ACTION_VIEW
                 }),
                 route = Screen.Settings.route) {
-                SettingsScreen(view, context,preferences, viewModel,isWearableConnected,commonNodesList, connectedNodesList, permissionStateCalendar )
+                SettingsScreen(view, context,preferences, viewModel,isWearableConnected, isWearableApiSupported, commonNodesList, connectedNodesList, permissionStateCalendar )
             }
             composable(Screen.About.route) { InfoScreen(view, context, viewModel) }
         }

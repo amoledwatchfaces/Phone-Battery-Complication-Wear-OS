@@ -15,6 +15,7 @@ import androidx.datastore.core.DataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
+import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
@@ -88,6 +89,7 @@ class MainViewModel @Inject constructor(
     private val watchAvailableStateMutableStateFlow = MutableStateFlow(value = false)
     private val connectedNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
     private val commonNodesMutableStateFlow = MutableStateFlow(emptyList<Node>())
+    private val isWearableApiSupportedMutableStateFlow = MutableStateFlow(value = true)
 
     // Backing property to hold the mutable state of the calendar list
     private val _calendarsStateFlow = MutableStateFlow<List<CalendarInfo>>(emptyList())
@@ -98,6 +100,7 @@ class MainViewModel @Inject constructor(
     val watchAvailableStateStateFlow: StateFlow<Boolean> = watchAvailableStateMutableStateFlow.asStateFlow()
     val connectedNodesStateFlow: StateFlow<List<Node>?> = connectedNodesMutableStateFlow.asStateFlow()
     val commonNodesStateFlow: StateFlow<List<Node>?> = commonNodesMutableStateFlow.asStateFlow()
+    val isWearableApiSupportedStateFlow: StateFlow<Boolean> = isWearableApiSupportedMutableStateFlow.asStateFlow()
 
     var message: String = ""
 
@@ -139,49 +142,65 @@ class MainViewModel @Inject constructor(
         } catch (_: CancellationException) {
             // Request was cancelled normally
             loaderStateMutableStateFlow.value = false
-        } catch (_: Throwable) {
+        } catch (t: Throwable) {
             loaderStateMutableStateFlow.value = false
-
-            message = "Node request failed to return any results."
+            if (t is ApiException && t.statusCode == 17) {
+                isWearableApiSupportedMutableStateFlow.value = false
+                message = "Wearable API is not supported on this device."
+            } else {
+                message = "Node request failed to return any results."
+            }
             _isMessageShown.emit(true)
         }
     }
 
     private fun findWearDevicesWithApp() {
         Log.d(TAG, "findWearDevicesWithApp()")
-        val capabilityInfoTask = capabilityClient.getCapability(BuildConfig.CAPABILITY_WEAR_APP, CapabilityClient.FILTER_ALL)
+        try {
+            val capabilityInfoTask = capabilityClient.getCapability(BuildConfig.CAPABILITY_WEAR_APP, CapabilityClient.FILTER_ALL)
 
-        capabilityInfoTask.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                Log.d(TAG, "Capability request succeeded.")
-                wearNodesWithApp = task.result.nodes
+            capabilityInfoTask.addOnCompleteListener { task ->
+                if (task.isSuccessful) {
+                    Log.d(TAG, "Capability request succeeded.")
+                    wearNodesWithApp = task.result.nodes
 
-                // Find common nodes
-                val commonNodes = wearNodesWithApp?.filter {
-                    it in (connectedNodesStateFlow.value?.toSet() ?: emptySet())
-                }
-                if (!commonNodes.isNullOrEmpty()) {
-                    commonNodesMutableStateFlow.value = commonNodes
-                    WearListener.sendBatteryInfoToWatch(
-                        level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
-                        isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
-                        forceUpdate = true,
-                        dataClient = dataClient,
-                        batteryManager = batteryManager,
-                    )
-                    if (preferences.value.notificationsSync){
-                        viewModelScope.launch {
-                            ServiceCommunication.sendToWatchFlow.emit(Unit)
-                        }
+                    // Find common nodes
+                    val commonNodes = wearNodesWithApp?.filter {
+                        it in (connectedNodesStateFlow.value?.toSet() ?: emptySet())
                     }
-                }else {
-                    commonNodesMutableStateFlow.value = emptyList()
+                    if (!commonNodes.isNullOrEmpty()) {
+                        commonNodesMutableStateFlow.value = commonNodes
+                        WearListener.sendBatteryInfoToWatch(
+                            level = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY),
+                            isCharging = batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING,
+                            forceUpdate = true,
+                            dataClient = dataClient,
+                            batteryManager = batteryManager,
+                        )
+                        if (preferences.value.notificationsSync){
+                            viewModelScope.launch {
+                                ServiceCommunication.sendToWatchFlow.emit(Unit)
+                            }
+                        }
+                    }else {
+                        commonNodesMutableStateFlow.value = emptyList()
+                    }
+                    loaderStateMutableStateFlow.value = false
+                } else {
+                    val exception = task.exception
+                    if (exception is ApiException && exception.statusCode == 17) {
+                        isWearableApiSupportedMutableStateFlow.value = false
+                    }
+                    Log.d(TAG, "Capability request failed to return any results.")
+                    loaderStateMutableStateFlow.value = false
                 }
-                loaderStateMutableStateFlow.value = false
-            } else {
-                Log.d(TAG, "Capability request failed to return any results.")
-                loaderStateMutableStateFlow.value = false
             }
+        } catch (e: Exception) {
+            if (e is ApiException && e.statusCode == 17) {
+                isWearableApiSupportedMutableStateFlow.value = false
+            }
+            Log.e(TAG, "Capability request failed: ${e.message}")
+            loaderStateMutableStateFlow.value = false
         }
     }
 
@@ -230,16 +249,20 @@ class MainViewModel @Inject constructor(
         BatteryStatusBroadcastReceiver.subscribeToUpdates(context)
 
         viewModelScope.launch {
-            val request = PutDataMapRequest.create(BATTERY_PATH).apply{
-                dataMap.putInt(BATTERY_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
-                dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
-                    dataMap.putLong(CHARGE_TIME_REMAINING_KEY, batteryManager.computeChargeTimeRemaining())
+            try {
+                val request = PutDataMapRequest.create(BATTERY_PATH).apply{
+                    dataMap.putInt(BATTERY_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_CAPACITY))
+                    dataMap.putBoolean(IS_CHARGING_KEY, batteryManager.getIntProperty(BatteryManager.BATTERY_PROPERTY_STATUS) == BatteryManager.BATTERY_STATUS_CHARGING)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                        dataMap.putLong(CHARGE_TIME_REMAINING_KEY, batteryManager.computeChargeTimeRemaining())
+                    }
                 }
+                    .asPutDataRequest()
+                    .setUrgent()
+                dataClient.putDataItem(request)
+            } catch (e: Exception) {
+                Log.e(TAG, "activateBatterySync failed: ${e.message}")
             }
-                .asPutDataRequest()
-                .setUrgent()
-            dataClient.putDataItem(request)
         }
     }
 

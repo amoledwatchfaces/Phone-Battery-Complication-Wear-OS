@@ -1,6 +1,7 @@
 package com.weartools.phonebattcomp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
@@ -31,7 +32,11 @@ class MainActivity : ComponentActivity() {
         installSplashScreen()
         super.onCreate(savedInstanceState)
 
-        capabilityClient.addListener(listener, BuildConfig.CAPABILITY_WEAR_APP)
+        try {
+            capabilityClient.addListener(listener, BuildConfig.CAPABILITY_WEAR_APP)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "addListener failed: ${e.message}")
+        }
 
         enableEdgeToEdge(
             statusBarStyle = SystemBarStyle.auto(
@@ -49,21 +54,37 @@ class MainActivity : ComponentActivity() {
 
     override fun onPause() {
         super.onPause()
-        capabilityClient.removeListener(listener)
+        try {
+            capabilityClient.removeListener(listener)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "removeListener failed: ${e.message}")
+        }
     }
 
     override fun onStop() {
         super.onStop()
-        capabilityClient.removeListener(listener)
+        try {
+            capabilityClient.removeListener(listener)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "removeListener failed: ${e.message}")
+        }
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        capabilityClient.removeListener(listener)
+        try {
+            capabilityClient.removeListener(listener)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "removeListener failed: ${e.message}")
+        }
     }
 
     override fun onResume() {
         super.onResume()
-        capabilityClient.addListener(listener, BuildConfig.CAPABILITY_WEAR_APP)
+        try {
+            capabilityClient.addListener(listener, BuildConfig.CAPABILITY_WEAR_APP)
+        } catch (e: Exception) {
+            Log.e("MainActivity", "addListener failed: ${e.message}")
+        }
     }
 }

@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.Drawable
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
+import android.util.Log
 import androidx.core.graphics.createBitmap
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
@@ -208,9 +209,13 @@ class NotificationListener : NotificationListenerService() {
             }
 
             // Send DataMap to watch using DataClient
-            dataClient
-                .putDataItem(putDataMapReq.asPutDataRequest().setUrgent())
-                .await()
+            try {
+                dataClient
+                    .putDataItem(putDataMapReq.asPutDataRequest().setUrgent())
+                    .await()
+            } catch (e: Exception) {
+                Log.e("NotificationListener", "sendToWatch failed: ${e.message}")
+            }
         }
     }
 

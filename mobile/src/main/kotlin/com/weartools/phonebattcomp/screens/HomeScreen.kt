@@ -78,6 +78,7 @@ fun HomeScreen(
     viewModel: MainViewModel,
     scope: CoroutineScope,
     isWatchConnected: State<Boolean>,
+    isWearableApiSupported: State<Boolean>,
     commonNodesList: State<List<Node>?>,
     connectedNodesList: State<List<Node>?>,
     listState: LazyListState
@@ -116,8 +117,8 @@ fun HomeScreen(
                     text = stringResource(id = R.string.app_name)
                 )
             },
-            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                containerColor = colorScheme.background,
+            colors = TopAppBarDefaults.topAppBarColors(
+                containerColor = colorScheme.background
             )
         )
 
@@ -183,7 +184,8 @@ fun HomeScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = colorScheme.onSurfaceVariant,
-                        text = if (isWatchConnected.value.not()) "Disconnected  •  Pull to refresh"
+                        text = if (isWearableApiSupported.value.not()) "Wearable API not supported"
+                        else if (isWatchConnected.value.not()) "Disconnected  •  Pull to refresh"
                         else  "Connected  •  "+"${connectedNodesList.value?.joinToString(", ") {it.displayName}}"
                     )
                 }

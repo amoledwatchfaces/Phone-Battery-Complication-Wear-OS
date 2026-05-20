@@ -33,12 +33,12 @@ android {
         }
     }
 
-    compileSdk = 36
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
         minSdk = 26
-        targetSdk = 36
+        targetSdk = 37
         versionCode = rootProject.extra["versionCode"] as Int
         versionName = rootProject.extra["versionName"] as String
 
@@ -74,22 +74,22 @@ android {
 dependencies {
 
     // Coroutines
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.10.2")
-    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.10.2")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.11.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
 
     // Review
     implementation ("com.google.android.play:review-ktx:2.0.2")
     implementation ("com.google.android.play:review:2.0.2")
 
     // Wearable
-    implementation ("com.google.android.gms:play-services-wearable:19.0.0")
+    implementation ("com.google.android.gms:play-services-wearable:20.0.1")
     implementation ("androidx.wear:wear-remote-interactions:1.2.0")
 
     // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.2.0")
 
     // Compose
-    implementation (platform("androidx.compose:compose-bom:2026.02.01"))
+    implementation (platform("androidx.compose:compose-bom:2026.05.00"))
     implementation ("androidx.activity:activity-compose")
     implementation ("androidx.navigation:navigation-compose")
     implementation ("androidx.compose.material3:material3")
@@ -101,15 +101,15 @@ dependencies {
     implementation ("androidx.compose.material:material-icons-extended")
 
 
-    implementation ("androidx.activity:activity-ktx:1.12.4")
-    implementation ("androidx.core:core-ktx:1.17.0")
+    implementation ("androidx.activity:activity-ktx:1.13.0")
+    implementation ("androidx.core:core-ktx:1.18.0")
     implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.10.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
 
     // Used for Datastore
-    implementation ("androidx.datastore:datastore:1.2.0")
+    implementation ("androidx.datastore:datastore:1.2.1")
 
     // Permissions
     implementation ("com.google.accompanist:accompanist-permissions:0.37.3")
@@ -118,7 +118,7 @@ dependencies {
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.3.0")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation(platform("androidx.compose:compose-bom:2026.02.01"))
+    androidTestImplementation(platform("androidx.compose:compose-bom:2026.05.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
@@ -129,6 +129,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.59.2")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.10.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.13.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

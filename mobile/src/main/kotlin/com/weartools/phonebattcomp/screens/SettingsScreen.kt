@@ -67,6 +67,7 @@ fun SettingsScreen(
     preferences: State<UserPreferences>,
     viewModel: MainViewModel,
     isWatchConnected: State<Boolean>,
+    isWearableApiSupported: State<Boolean>,
     commonNodesList: State<List<Node>?>,
     connectedNodesList: State<List<Node>?>,
     permissionStateCalendar: PermissionState
@@ -116,7 +117,8 @@ fun SettingsScreen(
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        text = if (isWatchConnected.value.not()) "Disconnected"
+                        text = if (isWearableApiSupported.value.not()) "Wearable API not supported"
+                        else if (isWatchConnected.value.not()) "Disconnected"
                         else  "Connected  •  "+"${connectedNodesList.value?.joinToString(", ") {it.displayName}}"
                     )
                 }
@@ -181,7 +183,7 @@ fun SettingsScreen(
                         }
                         Switch(
                             modifier = Modifier.weight(0.2f),
-                            enabled = preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            enabled = isWearableApiSupported.value && preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
                             checked = preferences.value.notificationsSync,
                             onCheckedChange = {
                             if (it){
@@ -216,7 +218,7 @@ fun SettingsScreen(
 
                         Switch(
                             modifier = Modifier.weight(0.2f),
-                            enabled = preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            enabled = isWearableApiSupported.value && preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
                             checked = preferences.value.calendarSync,
                             onCheckedChange = {
                                 if (it){
@@ -235,7 +237,7 @@ fun SettingsScreen(
                     }
                     OutlinedButton(
                         modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-                        enabled = preferences.value.calendarSync && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                        enabled = isWearableApiSupported.value && preferences.value.calendarSync && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
                         onClick = {
                             viewModel.fetchCalendars(context)
                             openCalendars=openCalendars.not()
