@@ -1,5 +1,5 @@
 plugins {
-    id ("com.android.application") version ("8.2.2") apply false
+    id ("com.android.application") version ("9.2.1") apply false
     id ("org.jetbrains.kotlin.android") version ("2.2.0") apply false
     id ("org.jetbrains.kotlin.plugin.compose") version ("2.2.0") apply false
     id ("org.jetbrains.kotlin.plugin.parcelize") version ("2.3.10") apply false
@@ -10,6 +10,7 @@ plugins {
 }
 
 tasks.register("clean", Delete::class) {
+    description = "Clean build directory"
     delete(rootProject.layout.buildDirectory)
 }
 

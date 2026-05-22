@@ -85,27 +85,27 @@ dependencies {
     // General compose dependencies
     implementation (composeBom)
     implementation ("androidx.activity:activity-compose:1.13.0")
-    implementation ("androidx.compose.ui:ui:1.11.1")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.11.1")
+    implementation ("androidx.compose.ui:ui:1.11.2")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.11.2")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
 
     // Compose for Wear OS dependencies
-    implementation ("androidx.wear.compose:compose-material3:1.6.1")
-    implementation ("androidx.wear.compose:compose-navigation:1.6.1")
+    implementation ("androidx.wear.compose:compose-material3:1.6.2")
+    implementation ("androidx.wear.compose:compose-navigation:1.6.2")
 
     // Foundation is additive, so you can use the mobile version in your Wear OS app.
-    implementation ("androidx.wear.compose:compose-foundation:1.6.1")
+    implementation ("androidx.wear.compose:compose-foundation:1.6.2")
 
     // Wear OS preview annotations
-    implementation ("androidx.wear.compose:compose-ui-tooling:1.6.1")
+    implementation ("androidx.wear.compose:compose-ui-tooling:1.6.2")
 
     // Testing
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.3.0")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.11.1")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.11.1")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.11.1")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.11.2")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.11.2")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.11.2")
 
     // Core
     implementation ("androidx.core:core-ktx:1.18.0")
