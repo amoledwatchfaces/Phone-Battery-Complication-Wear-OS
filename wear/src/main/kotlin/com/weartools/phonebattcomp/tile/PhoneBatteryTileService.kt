@@ -13,6 +13,7 @@ import androidx.wear.protolayout.expression.DynamicBuilders
 import androidx.wear.protolayout.expression.PlatformEventSources
 import androidx.wear.protolayout.layout.androidImageResource
 import androidx.wear.protolayout.layout.imageResource
+import androidx.wear.protolayout.material3.ButtonDefaults.filledVariantButtonColors
 import androidx.wear.protolayout.material3.CardDefaults.filledTonalCardColors
 import androidx.wear.protolayout.material3.CircularProgressIndicatorDefaults
 import androidx.wear.protolayout.material3.GraphicDataCardDefaults.constructGraphic
@@ -104,7 +105,9 @@ class PhoneBatteryTileService : TileService() {
                     },
                     content = {
                         text(
-                            formatChargeTimeRemaining(
+                            scalable = true,
+                            maxLines = 2,
+                            text = formatChargeTimeRemaining(
                                 chargeRemainingTime,
                                 phoneIsConnected,
                                 phoneIsCharging,
@@ -158,7 +161,10 @@ class PhoneBatteryTileService : TileService() {
                 )
             },
             bottomSlot = {
-                textEdgeButton(onClick = launchAppClickable(openApp())) { text("Open App".layoutString) }
+                textEdgeButton(
+                    colors = filledVariantButtonColors(),
+                    onClick = launchAppClickable(openApp()))
+                { text("Open App".layoutString) }
             }
         )
     }
