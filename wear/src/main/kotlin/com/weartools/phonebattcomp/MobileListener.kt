@@ -91,7 +91,7 @@ class MobileListener : WearableListenerService() {
                                     )
                                 }
                                 updateComplication(MobileBatteryComplicationService::class.java)
-                                TileService.getUpdater(this@MobileListener).requestUpdate(PhoneBatteryTileService::class.java)
+                                TileService.getUpdater(applicationContext).requestUpdate(PhoneBatteryTileService::class.java)
                             }
                         }
                         URI -> {

@@ -133,7 +133,7 @@ dependencies {
     // Tile
     implementation ("androidx.wear.protolayout:protolayout-expression:1.4.0")
     implementation ("androidx.wear.protolayout:protolayout:1.4.0")
-    implementation ("androidx.wear.protolayout:protolayout-material:1.4.0")
+    implementation ("androidx.wear.protolayout:protolayout-material3:1.4.0")
     implementation ("androidx.wear.tiles:tiles:1.6.0")
 
     // ListenableFuture
@@ -145,6 +145,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.59.2")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.13.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.14.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }
