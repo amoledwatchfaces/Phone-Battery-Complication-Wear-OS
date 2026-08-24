@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<wearwidget-provider
+    description="@string/phone_battery_widget_label"
+    icon="@mipmap/ic_launcher"
+    label="@string/phone_battery_widget_label"
+    preferredType="SMALL">
+    <container
+        type="SMALL"
+        previewImage="@drawable/widget_preview" />
+    <container
+        type="LARGE"
+        previewImage="@drawable/widget_preview" />
+</wearwidget-provider>

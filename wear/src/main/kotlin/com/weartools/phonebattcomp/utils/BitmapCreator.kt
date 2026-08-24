@@ -125,7 +125,7 @@ object BitmapCreator {
         val centerY = 24F
 
         val paintText = Paint().apply {
-            color = Color.GRAY
+            color = Color.LTGRAY
             textAlign = Paint.Align.CENTER
             textSize = 40f
             typeface = Typeface.DEFAULT_BOLD

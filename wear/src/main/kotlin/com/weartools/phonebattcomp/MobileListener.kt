@@ -3,7 +3,6 @@ package com.weartools.phonebattcomp
 import android.content.ContentValues.TAG
 import android.util.Log
 import androidx.datastore.core.DataStore
-import androidx.wear.tiles.TileService
 import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
@@ -15,10 +14,10 @@ import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.tile.PhoneBatteryTileService
 import com.weartools.phonebattcomp.utils.updateCalendarComplications
 import com.weartools.phonebattcomp.utils.updateComplication
 import com.weartools.phonebattcomp.utils.updateNotificationComplications
+import com.weartools.phonebattcomp.widget.PhoneBatteryWidgetService
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -91,7 +90,7 @@ class MobileListener : WearableListenerService() {
                                     )
                                 }
                                 updateComplication(MobileBatteryComplicationService::class.java)
-                                TileService.getUpdater(applicationContext).requestUpdate(PhoneBatteryTileService::class.java)
+                                PhoneBatteryWidgetService().widget.triggerUpdateAll(applicationContext)
                             }
                         }
                         URI -> {
@@ -173,7 +172,7 @@ class MobileListener : WearableListenerService() {
                 //Log.i("MobileListener", "processDataItem, lastNotificationsUpdateTime: $lastUpdateTime")
                 val updateTime = dataMap.getLong(NOTIFICATIONS_UPDATE_KEY)
                 if (updateTime < lastUpdateTime){
-                    if (lastUpdateTime - updateTime >= 300000L){
+                    if ((lastUpdateTime - updateTime) >= 300000L){
                         // If there is huge positive delay (5 minutes) between lastUpdateTime (in future) and updateTime,
                         // then it may signalize that currently saved lastUpdateTime is wrong, therefore we're resetting it
                         dataStore.updateData { it.copy(lastNotificationsUpdateTime = 0L) }

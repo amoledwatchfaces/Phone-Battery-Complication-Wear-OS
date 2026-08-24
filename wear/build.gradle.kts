@@ -21,8 +21,6 @@ kotlin {
 }
 
 android {
-    val appVersionCode: Int by rootProject.extra
-    val appVersionName: String by rootProject.extra
 
     signingConfigs {
         create("release") {
@@ -40,8 +38,8 @@ android {
 
     defaultConfig {
         applicationId = "com.weartools.phonebattcomp"
-        minSdk = 27
-        targetSdk = 36
+        minSdk = 29
+        targetSdk = 37
         versionCode = rootProject.extra["versionCode"] as Int
         versionName = rootProject.extra["versionName"] as String
 
@@ -85,8 +83,8 @@ dependencies {
     // General compose dependencies
     implementation (composeBom)
     implementation ("androidx.activity:activity-compose:1.13.0")
-    implementation ("androidx.compose.ui:ui:1.11.2")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.11.2")
+    implementation ("androidx.compose.ui:ui:1.12.0")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.12.0")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
 
     // Compose for Wear OS dependencies
@@ -103,16 +101,16 @@ dependencies {
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.3.0")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.11.2")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.11.2")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.11.2")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.12.0")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.12.0")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.12.0")
 
     // Core
-    implementation ("androidx.core:core-ktx:1.18.0")
+    implementation ("androidx.core:core-ktx:1.19.0")
 
     // Lifecycle
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.10.0")
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:2.11.0")
 
     // Coroutines
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.11.0")
@@ -131,20 +129,32 @@ dependencies {
     implementation ("androidx.work:work-runtime-ktx:2.11.2")
 
     // Tile
-    implementation ("androidx.wear.protolayout:protolayout-expression:1.4.0")
-    implementation ("androidx.wear.protolayout:protolayout:1.4.0")
-    implementation ("androidx.wear.protolayout:protolayout-material3:1.4.0")
-    implementation ("androidx.wear.tiles:tiles:1.6.0")
+    implementation ("androidx.wear.protolayout:protolayout-expression:1.4.2")
+    implementation ("androidx.wear.protolayout:protolayout:1.4.2")
+    implementation ("androidx.wear.protolayout:protolayout-material3:1.4.2")
+    implementation ("androidx.wear.tiles:tiles:1.6.2")
 
     // ListenableFuture
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.11.0")
 
+    // Core Wear Widget and Remote Compose libraries
+    implementation ("androidx.compose.remote:remote-creation-compose:1.0.0-alpha17")
+    implementation ("androidx.compose.remote:remote-core:1.0.0-alpha17")
+    implementation ("androidx.glance.wear:wear:1.0.0-alpha16")
+    implementation ("androidx.glance.wear:wear-core:1.0.0-alpha16")
+    implementation ("androidx.wear.compose.remote:remote-material3:1.0.0-alpha09")
+
+    // Tooling for previews (optional, but recommended)
+    implementation ("androidx.compose.remote:remote-tooling-preview:1.0.0-alpha17")
+    implementation ("androidx.wear.tiles:tiles-tooling-preview:1.6.2")
+    debugImplementation ("androidx.wear.tiles:tiles-renderer:1.6.2")
+
     // Hilt
-    implementation ("androidx.hilt:hilt-navigation-compose:1.3.0")
-    implementation ("com.google.dagger:hilt-android:2.59.2")
-    ksp ("com.google.dagger:hilt-compiler:2.59.2")
+    implementation ("androidx.hilt:hilt-navigation-compose:1.4.0")
+    implementation ("com.google.dagger:hilt-android:2.60.1")
+    ksp ("com.google.dagger:hilt-compiler:2.60.1")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.14.0"))
+    implementation (platform("com.google.firebase:firebase-bom:34.18.0"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }

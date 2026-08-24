@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:tools="http://schemas.android.com/tools"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-feature android:name="android.hardware.type.watch" />
@@ -163,19 +162,21 @@
                 android:value="LONG_TEXT, SHORT_TEXT"/>
         </service>
 
-        <!-- Tile -->
-        <service android:name=".tile.PhoneBatteryTileService"
+        <service android:name=".widget.PhoneBatteryWidgetService"
             android:exported="true"
-            android:label="@string/tile_name"
             android:icon="@mipmap/ic_launcher"
+            android:label="@string/phone_battery_widget_label"
             android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
             <intent-filter>
+                <action android:name="androidx.glance.wear.action.BIND_WIDGET_PROVIDER" />
                 <action android:name="androidx.wear.tiles.action.BIND_TILE_PROVIDER" />
             </intent-filter>
             <meta-data
+                android:name="androidx.glance.wear.widget.provider"
+                android:resource="@xml/phone_battery_widget_info" />
+            <meta-data
                 android:name="androidx.wear.tiles.PREVIEW"
-                android:resource="@drawable/tile_round"
-                tools:ignore="SquareAndRoundTilePreviews" />
+                android:resource="@drawable/tile_preview" />
         </service>
 
         <!-- Receivers -->

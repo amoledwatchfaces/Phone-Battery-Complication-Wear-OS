@@ -4,7 +4,9 @@
 <resources lang="en" country="US">
     <!-- Do not translate translatable="false" lines -->
     <string name="app_name">Phone Battery Complication</string> <!-- Does not need to be translated, but it's recommended -->
-    <string name="tile_name">Phone battery</string>
+
+    <!-- Widget -->
+    <string name="phone_battery_widget_label">Phone battery</string>
 
     <string name="settings">Settings</string>
     <string name="install_companion">Install phone companion app!</string>
