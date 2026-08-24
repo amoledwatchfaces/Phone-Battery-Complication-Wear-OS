@@ -19,6 +19,8 @@ import androidx.wear.compose.foundation.lazy.TransformingLazyColumn
 import androidx.wear.compose.foundation.lazy.TransformingLazyColumnState
 import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
 import androidx.wear.compose.foundation.rotary.rotaryScrollable
+import androidx.wear.compose.material3.AlertDialog
+import androidx.wear.compose.material3.AlertDialogDefaults
 import androidx.wear.compose.material3.Button
 import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.ListHeader
@@ -27,6 +29,7 @@ import androidx.wear.compose.material3.SurfaceTransformation
 import androidx.wear.compose.material3.Text
 import androidx.wear.compose.material3.TitleCard
 import androidx.wear.compose.material3.lazy.TransformationSpec
+import androidx.wear.compose.material3.lazy.rememberTransformationSpec
 import androidx.wear.compose.material3.lazy.transformedHeight
 import com.weartools.phonebattcomp.R
 
@@ -177,5 +180,57 @@ fun HowToCard(
             Text(text, fontSize = 12.sp)
         }
     )
+}
+
+@Composable
+fun ConfirmationDialog(
+    showDialog: Boolean,
+    title: String,
+    message: String,
+    onConfirm: () -> Unit,
+    onCancel: () -> Unit,
+) {
+    val transformationSpec = rememberTransformationSpec()
+
+    AlertDialog(
+        visible = showDialog,
+        title = {
+            Text(
+                modifier = Modifier.fillMaxWidth(),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.primary,
+                text = title,
+                style = MaterialTheme.typography.titleMedium
+            )
+        },
+        transformationSpec = transformationSpec,
+        confirmButton = {
+            AlertDialogDefaults.ConfirmButton(
+                onClick = onConfirm
+            )
+        },
+        dismissButton = {
+            AlertDialogDefaults.DismissButton(
+                onClick = onCancel
+            )
+        },
+        onDismissRequest = onCancel
+    ) {
+        item {
+            TitleCard(
+                modifier = Modifier.fillMaxWidth()
+                    .transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                title = {
+                    Text(
+                        text = message,
+                        style = MaterialTheme.typography.bodySmall,
+                        textAlign = TextAlign.Start,
+                        color = MaterialTheme.colorScheme.tertiary
+                    )
+                },
+            )
+        }
+    }
 }
 

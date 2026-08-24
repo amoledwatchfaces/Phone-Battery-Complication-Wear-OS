@@ -3,9 +3,11 @@ package com.weartools.phonebattcomp.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.wear.compose.material3.ColorScheme
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Typography
+import androidx.wear.compose.material3.dynamicColorScheme
 
 
 private val appColorScheme = ColorScheme(
@@ -56,11 +58,12 @@ data class ColorFamily(
 
 @Composable
 fun PhoneBatteryAppTheme(
+    useDynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
-    //val dynamicColorScheme = dynamicColorScheme(LocalContext.current)
+    val context = LocalContext.current
     MaterialTheme(
-        colorScheme = appColorScheme,
+        colorScheme = if (useDynamicColor) dynamicColorScheme(context) ?: appColorScheme else appColorScheme,
         content = content
     )
 }

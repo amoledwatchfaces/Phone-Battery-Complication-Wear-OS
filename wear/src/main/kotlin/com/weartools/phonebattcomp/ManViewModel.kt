@@ -32,7 +32,9 @@ import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchTempComplicationService
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.data.UserPreferencesRepository
+import com.weartools.phonebattcomp.widget.PhoneBatteryWidgetService
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.stateIn
@@ -42,6 +44,7 @@ import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    @ApplicationContext private val context: Context,
     private val dataStore: DataStore<UserPreferences>,
     preferences: UserPreferencesRepository,
 ) : ViewModel(){
@@ -91,6 +94,18 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun setUseDynamicColor(useDynamicColor: Boolean){
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(useDynamicColor = useDynamicColor) }
+            PhoneBatteryWidgetService().widget.triggerUpdateAll(context)
+        }
+    }
+    fun setCrashlytics(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(crashlytics = enabled, crashlyticsNoticeAccepted = true) }
+        }
+    }
+
     fun updateComplication(context: Context, clazz: Class<*>){
         ComplicationDataSourceUpdateRequester.create(
             context.applicationContext,
@@ -109,7 +124,7 @@ class MainViewModel @Inject constructor(
                 RemoteActivityHelper(context).startRemoteActivity(targetIntent = launchIntent,targetNodeId = null).await()
                 Toast.makeText(context,"Check more settings on your phone",Toast.LENGTH_LONG).show()
             } catch (_: CancellationException) {
-                // Request was cancelled normally
+                // Request was canceled normally
             } catch (_: Throwable) {
                 Toast.makeText(context,"Companion app not reachable",Toast.LENGTH_LONG).show()
             }

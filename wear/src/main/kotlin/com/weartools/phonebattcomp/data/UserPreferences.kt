@@ -41,6 +41,9 @@ data class UserPreferences(
     // Common
     val tempUnit: Boolean = true,
     val percentage: Boolean = false,
+    val useDynamicColor: Boolean = false,
+    val crashlytics: Boolean = false,
+    val crashlyticsNoticeAccepted: Boolean = false,
 )
 
 /** REPOSITORY **/

@@ -81,4 +81,9 @@
     <!-- Material Symbols & Charging Symbol -->
     <string name="pbc_material_symbols">Material Symbols</string>
     <string name="charging_symbol_inside_icon">Charging symbol inside icon</string>
+
+    <string name="dynamic_color">Dynamic Colors</string>
+    <string name="crash_reports">Crash Reports</string>
+    <string name="crashlytics_title">Help Improve the App</string>
+    <string name="crashlytics_message">Enable crash reports to help us identify and fix issues. Reports are anonymous and contain no personal information.</string>
 </resources>

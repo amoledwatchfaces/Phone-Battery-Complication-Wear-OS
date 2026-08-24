@@ -9,7 +9,6 @@ import androidx.compose.remote.creation.compose.layout.RemoteColumn
 import androidx.compose.remote.creation.compose.layout.RemoteComposable
 import androidx.compose.remote.creation.compose.layout.RemoteRow
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
-import androidx.compose.remote.creation.compose.modifier.clickable
 import androidx.compose.remote.creation.compose.modifier.fillMaxWidth
 import androidx.compose.remote.creation.compose.modifier.size
 import androidx.compose.remote.creation.compose.state.animateRemoteFloat
@@ -23,7 +22,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.datastore.core.DataStore
 import androidx.glance.wear.AssociateWithGlanceWearWidget
@@ -34,7 +32,6 @@ import androidx.glance.wear.WearWidgetData
 import androidx.glance.wear.WearWidgetDocument
 import androidx.glance.wear.color
 import androidx.glance.wear.core.WearWidgetParams
-import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.remote.material3.RemoteCircularProgressIndicator
 import androidx.wear.compose.remote.material3.RemoteColorScheme
 import androidx.wear.compose.remote.material3.RemoteIcon
@@ -78,6 +75,7 @@ class PhoneBatteryWidget(
         return WearWidgetDocument(background = WearWidgetBrush.color(appColorScheme.surfaceContainerHigh)) {
 
             PhoneBatteryWidgetContent(
+                dynamicColors = preferences.useDynamicColor,
                 appColorScheme =  appColorScheme,
                 batteryLevel = 75,
                 nodeName = "Pixel 9 Pro XL",
@@ -138,6 +136,7 @@ class PhoneBatteryWidget(
 @RemoteComposable
 @Composable
 fun PhoneBatteryWidgetContent(
+    dynamicColors: Boolean,
     appColorScheme: RemoteColorScheme,
     batteryLevel: Int,
     nodeName: String,
@@ -147,76 +146,80 @@ fun PhoneBatteryWidgetContent(
     materialSymbols: Boolean,
     chargingSymbolInside: Boolean
 ) {
-    RemoteColumn(
-        modifier = RemoteModifier.fillMaxWidth(),
-        verticalArrangement = RemoteArrangement.Center,
-        horizontalAlignment = RemoteAlignment.CenterHorizontally,
+    RemoteMaterialTheme(
+        colorScheme = if (dynamicColors) RemoteMaterialTheme.colorScheme else appColorScheme,
     ) {
-        RemoteRow(
-            modifier = RemoteModifier.fillMaxWidth().weight(2.rf),
-            horizontalArrangement = RemoteArrangement.Start,
+        RemoteColumn(
+            modifier = RemoteModifier.fillMaxWidth(),
+            verticalArrangement = RemoteArrangement.Center,
+            horizontalAlignment = RemoteAlignment.CenterHorizontally,
         ) {
-            RemoteText(
-                fontWeight = FontWeight.SemiBold,
-                text = nodeName.rs,
-                color = appColorScheme.onSurfaceVariant
-            )
-        }
-        RemoteRow(
-            modifier = RemoteModifier.fillMaxWidth().weight(4.rf),
-            horizontalArrangement = RemoteArrangement.SpaceBetween,
-            verticalAlignment = RemoteAlignment.CenterVertically
-        ) {
-            RemoteColumn(
-                modifier = RemoteModifier.weight(3.rf),
+            RemoteRow(
+                modifier = RemoteModifier.fillMaxWidth().weight(2.rf),
+                horizontalArrangement = RemoteArrangement.Start,
             ) {
                 RemoteText(
-                    fontSize = 24.rsp,
                     fontWeight = FontWeight.SemiBold,
-                    text = "${batteryLevel}%".rs,
-                    color = appColorScheme.onSecondaryContainer
-                )
-                RemoteText(
-                    fontWeight = FontWeight.SemiBold,
-                    text = chargeRemainingTime.rs,
-                    color = appColorScheme.secondary
+                    text = nodeName.rs,
+                    color = appColorScheme.onSurfaceVariant
                 )
             }
-            RemoteColumn(
-                modifier = RemoteModifier.weight(2.rf),
+            RemoteRow(
+                modifier = RemoteModifier.fillMaxWidth().weight(4.rf),
+                horizontalArrangement = RemoteArrangement.SpaceBetween,
+                verticalAlignment = RemoteAlignment.CenterVertically
             ) {
-                val progressStart = rememberMutableRemoteFloat { 0.rf }
-                val progress = rememberMutableRemoteFloat { (1F * batteryLevel / 100).rf }
-                val animatedProgress = animateRemoteFloat(progress, 0.25f)
+                RemoteColumn(
+                    modifier = RemoteModifier.weight(3.rf),
+                ) {
+                    RemoteText(
+                        fontSize = 24.rsp,
+                        fontWeight = FontWeight.SemiBold,
+                        text = "${batteryLevel}%".rs,
+                        color = appColorScheme.onSecondaryContainer
+                    )
+                    RemoteText(
+                        fontWeight = FontWeight.SemiBold,
+                        text = chargeRemainingTime.rs,
+                        color = appColorScheme.secondary
+                    )
+                }
+                RemoteColumn(
+                    modifier = RemoteModifier.weight(2.rf),
+                ) {
+                    val progressStart = rememberMutableRemoteFloat { 0.rf }
+                    val progress = rememberMutableRemoteFloat { (1F * batteryLevel / 100).rf }
+                    val animatedProgress = animateRemoteFloat(progress, 0.25f)
 
-                RemoteBox(
-                    contentAlignment = RemoteAlignment.Center
-                ){
-                    LaunchedEffect(Unit) {
-                        valueChange(progressStart, (progress))
+                    RemoteBox(
+                        contentAlignment = RemoteAlignment.Center
+                    ){
+                        LaunchedEffect(Unit) {
+                            valueChange(progressStart, (progress))
+                        }
+
+                        RemoteCircularProgressIndicator(
+                            strokeWidth = 6.rdp,
+                            gapSize = RemoteProgressIndicatorDefaults.IndeterminateStrokeWidth,
+                            progress = animatedProgress,
+                            startAngle = 110.rf,
+                            endAngle = 430.rf,
+                            enabled = phoneIsConnected.rb
+                        )
+
+                        RemoteIcon(
+                            modifier = RemoteModifier.size(RemoteIconButtonDefaults.SmallIconSize),
+                            imageVector = ImageVector.vectorResource(
+                                when {
+                                    phoneIsConnected && phoneIsCharging -> R.drawable.mobile_charge_24px
+                                    phoneIsConnected -> R.drawable.mobile_24px
+                                    else -> R.drawable.mobile_cancel_24px
+                                }
+                            ),
+                            contentDescription = "Battery Status".rs,
+                            tint = RemoteMaterialTheme.colorScheme.primary
+                        )
                     }
-
-                    RemoteCircularProgressIndicator(
-                        strokeWidth = 6.rdp,
-                        gapSize = RemoteProgressIndicatorDefaults.IndeterminateStrokeWidth,
-                        progress = animatedProgress,
-                        startAngle = 110.rf,
-                        endAngle = 430.rf,
-                        enabled = phoneIsConnected.rb
-                    )
-
-                    RemoteIcon(
-                        modifier = RemoteModifier.size(RemoteIconButtonDefaults.SmallIconSize),
-                        imageVector = ImageVector.vectorResource(
-                            when {
-                                phoneIsConnected && phoneIsCharging -> R.drawable.mobile_charge_24px
-                                phoneIsConnected -> R.drawable.mobile_24px
-                                else -> R.drawable.mobile_cancel_24px
-                            }
-                        ),
-                        contentDescription = "Battery Status".rs,
-                        tint = RemoteMaterialTheme.colorScheme.primary
-                    )
                 }
             }
         }

@@ -1,6 +1,8 @@
 package com.weartools.phonebattcomp.presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.focus.FocusRequester
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -20,7 +22,11 @@ fun PhoneBatteryApp(
     viewModel: MainViewModel = hiltViewModel(),
     dataClient: DataClient
 ) {
-    PhoneBatteryAppTheme {
+    val preferences by viewModel.preferences.collectAsState()
+
+    PhoneBatteryAppTheme(
+        useDynamicColor = preferences.useDynamicColor
+    ) {
 
         val scrollState = rememberTransformingLazyColumnState()
         val transformationSpec = rememberTransformationSpec()
