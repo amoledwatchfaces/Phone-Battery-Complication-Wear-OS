@@ -10,6 +10,7 @@ import androidx.compose.remote.creation.compose.state.rc
 import androidx.compose.remote.creation.compose.state.rs
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import androidx.datastore.core.DataStore
 import androidx.glance.wear.AssociateWithGlanceWearWidget
 import androidx.glance.wear.GlanceWearWidget
 import androidx.glance.wear.GlanceWearWidgetService
@@ -19,22 +20,38 @@ import androidx.glance.wear.WearWidgetDocument
 import androidx.glance.wear.color
 import androidx.glance.wear.core.WearWidgetParams
 import androidx.wear.compose.remote.material3.RemoteText
+import com.weartools.phonebattcomp.data.UserPreferences
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.first
 import java.util.Locale
+import javax.inject.Inject
 
+@AndroidEntryPoint
 @AssociateWithGlanceWearWidget(PhoneBatteryWidget::class)
 class PhoneBatteryWidgetService : GlanceWearWidgetService() {
-    override val widget: GlanceWearWidget = PhoneBatteryWidget()
+
+    @Inject
+    lateinit var dataStore: DataStore<UserPreferences>
+
+    override val widget: GlanceWearWidget by lazy {
+        PhoneBatteryWidget(dataStore)
+    }
 }
 
-class PhoneBatteryWidget : GlanceWearWidget() {
+class PhoneBatteryWidget(
+    private val dataStore: DataStore<UserPreferences>
+) : GlanceWearWidget() {
 
     override suspend fun provideWidgetData(
         context: Context,
         params: WearWidgetParams,
     ): WearWidgetData {
 
+        // Read the snapshot of user preferences
+        val preferences: UserPreferences = dataStore.data.first()
+
         return WearWidgetDocument(background = WearWidgetBrush.color(WIDGET_COLOR_SCHEME.surfaceContainerHigh)) {
-            PhoneBatteryWidgetContent()
+            PhoneBatteryWidgetContent(preferences)
         }
     }
 
@@ -61,7 +78,7 @@ class PhoneBatteryWidget : GlanceWearWidget() {
 
 @RemoteComposable
 @Composable
-fun PhoneBatteryWidgetContent() {
+fun PhoneBatteryWidgetContent(preferences: UserPreferences) {
     RemoteBox(
         modifier = RemoteModifier.fillMaxSize(),
         contentAlignment = RemoteAlignment.Center,
