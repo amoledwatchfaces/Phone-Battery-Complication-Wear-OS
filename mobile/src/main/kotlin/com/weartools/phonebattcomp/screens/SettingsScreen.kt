@@ -36,6 +36,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -78,6 +79,14 @@ fun SettingsScreen(
     // Calendars
     val allCalendars by viewModel.calendarsStateFlow.collectAsState()
     var openCalendars by remember { mutableStateOf(false) }
+
+    var showCrashlyticsDialog by remember { mutableStateOf(false) }
+
+    LaunchedEffect(preferences.value.crashlyticsNoticeAccepted) {
+        if (!preferences.value.crashlyticsNoticeAccepted) {
+            showCrashlyticsDialog = true
+        }
+    }
 
 
     Column(Modifier.fillMaxSize()) {
@@ -235,6 +244,33 @@ fun SettingsScreen(
                                 }
                             })
                     }
+                    // Crashlytics Toggle
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(0.8f)
+                        ) {
+                            Text(
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                text = stringResource(id = R.string.crash_reports))
+                            Text(
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Gray,
+                                text = "Help us identify and fix issues")
+                        }
+                        Switch(
+                            modifier = Modifier.weight(0.2f),
+                            checked = preferences.value.crashlytics,
+                            onCheckedChange = { viewModel.setCrashlytics(it) }
+                        )
+                    }
                     OutlinedButton(
                         modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
                         enabled = isWearableApiSupported.value && preferences.value.calendarSync && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
@@ -340,4 +376,46 @@ fun SettingsScreen(
         }
     }
 
+    if (showCrashlyticsDialog) {
+        BasicAlertDialog(
+            onDismissRequest = { showCrashlyticsDialog = false }
+        ) {
+            Surface(
+                modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = 3.dp
+            ) {
+                Column(modifier = Modifier.padding(16.dp)) {
+                    Text(
+                        text = stringResource(id = R.string.crashlytics_title),
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = stringResource(id = R.string.crashlytics_message),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = {
+                            viewModel.setCrashlytics(false)
+                            showCrashlyticsDialog = false
+                        }) {
+                            Text("Not now")
+                        }
+                        TextButton(onClick = {
+                            viewModel.setCrashlytics(true)
+                            showCrashlyticsDialog = false
+                        }) {
+                            Text("Enable")
+                        }
+                    }
+                }
+            }
+        }
+    }
 }

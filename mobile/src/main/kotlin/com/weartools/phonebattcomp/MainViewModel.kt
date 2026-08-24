@@ -299,6 +299,12 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    fun setCrashlytics(enabled: Boolean) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(crashlytics = enabled, crashlyticsNoticeAccepted = true) }
+        }
+    }
+
     fun isMyNotificationsServiceRunning(context: Context): Boolean {
         val isServiceRunning = NotificationManagerCompat.getEnabledListenerPackages(context).contains(BuildConfig.APPLICATION_ID)
         viewModelScope.launch {

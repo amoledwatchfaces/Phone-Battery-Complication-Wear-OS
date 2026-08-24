@@ -29,6 +29,9 @@
     <string name="support_us">Support Our Work</string>
     <string name="version">Version</string>
     <string name="calendars">Synced calendars</string>
+    <string name="crash_reports">Crash Reports</string>
+    <string name="crashlytics_title">Help Improve the App</string>
+    <string name="crashlytics_message">Enable crash reports to help us identify and fix issues. Reports are anonymous and contain no personal information.</string>
 
 
     <string name="social_telegram">https://t.me/amoledwatchfaces</string>

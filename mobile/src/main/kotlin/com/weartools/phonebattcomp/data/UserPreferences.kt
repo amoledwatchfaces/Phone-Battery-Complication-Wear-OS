@@ -22,6 +22,10 @@ data class UserPreferences(
     val calendarSync: Boolean = false,
     val notificationsSync: Boolean = true,
 
+    // Crashlytics
+    val crashlytics: Boolean = false,
+    val crashlyticsNoticeAccepted: Boolean = false,
+
     // Calendar Events
     val syncedCalendarsIds: String = "",
     val syncedCalendars: List<CalendarInfo> = emptyList(),
