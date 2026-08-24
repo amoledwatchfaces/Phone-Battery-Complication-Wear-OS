@@ -17,7 +17,7 @@ import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.Wearable
 import com.weartools.phonebattcomp.MobileListener.Companion.sendPhoneBatteryRequest
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.presentation.PhoneBatteryApp
+import com.weartools.phonebattcomp.presentation.MainApp
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -52,7 +52,7 @@ class MainActivity : ComponentActivity(), OnCapabilityChangedListener  {
         }
 
         setContent {
-            PhoneBatteryApp(
+            MainApp(
                 dataClient = dataClient
             )
         }
