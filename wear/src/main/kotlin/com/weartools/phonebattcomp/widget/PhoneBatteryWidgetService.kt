@@ -33,7 +33,7 @@ class PhoneBatteryWidget : GlanceWearWidget() {
         params: WearWidgetParams,
     ): WearWidgetData {
 
-        return WearWidgetDocument(background = WearWidgetBrush.color(Color.Blue.rc)) {
+        return WearWidgetDocument(background = WearWidgetBrush.color(WIDGET_COLOR_SCHEME.surfaceContainerHigh)) {
             PhoneBatteryWidgetContent()
         }
     }
