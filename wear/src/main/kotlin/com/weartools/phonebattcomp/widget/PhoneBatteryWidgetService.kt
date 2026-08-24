@@ -1,6 +1,10 @@
 package com.weartools.phonebattcomp.widget
 
+import android.annotation.SuppressLint
+import android.app.PendingIntent
 import android.content.Context
+import android.content.Intent
+import androidx.compose.remote.creation.compose.action.pendingIntentAction
 import androidx.compose.remote.creation.compose.layout.RemoteAlignment
 import androidx.compose.remote.creation.compose.layout.RemoteArrangement
 import androidx.compose.remote.creation.compose.layout.RemoteBox
@@ -8,11 +12,14 @@ import androidx.compose.remote.creation.compose.layout.RemoteColumn
 import androidx.compose.remote.creation.compose.layout.RemoteComposable
 import androidx.compose.remote.creation.compose.layout.RemoteRow
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
+import androidx.compose.remote.creation.compose.modifier.clickable
+import androidx.compose.remote.creation.compose.modifier.clip
 import androidx.compose.remote.creation.compose.modifier.fillMaxWidth
 import androidx.compose.remote.creation.compose.modifier.padding
 import androidx.compose.remote.creation.compose.modifier.size
 import androidx.compose.remote.creation.compose.shaders.RemoteBrush
 import androidx.compose.remote.creation.compose.shaders.solidColor
+import androidx.compose.remote.creation.compose.shapes.RemoteCircleShape
 import androidx.compose.remote.creation.compose.state.rb
 import androidx.compose.remote.creation.compose.state.rc
 import androidx.compose.remote.creation.compose.state.rdp
@@ -31,6 +38,7 @@ import androidx.glance.wear.WearWidgetBrush
 import androidx.glance.wear.WearWidgetData
 import androidx.glance.wear.WearWidgetDocument
 import androidx.glance.wear.color
+import androidx.glance.wear.core.ActiveWearWidgetHandle
 import androidx.glance.wear.core.WearWidgetParams
 import androidx.wear.compose.material3.dynamicColorScheme
 import androidx.wear.compose.remote.material3.RemoteCircularProgressIndicator
@@ -39,6 +47,7 @@ import androidx.wear.compose.remote.material3.RemoteIcon
 import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteProgressIndicatorDefaults
 import androidx.wear.compose.remote.material3.RemoteText
+import com.weartools.phonebattcomp.MainActivity
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.data.UserPreferences
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,6 +71,9 @@ class PhoneBatteryWidget(
     private val dataStore: DataStore<UserPreferences>
 ) : GlanceWearWidget() {
 
+    override suspend fun onAdded(context: Context, widgetHandle: ActiveWearWidgetHandle) {
+        super.onAdded(context, widgetHandle)
+    }
     override suspend fun provideWidgetData(
         context: Context,
         params: WearWidgetParams,
@@ -72,8 +84,8 @@ class PhoneBatteryWidget(
 
         val appColorScheme = WIDGET_COLOR_SCHEME
 
-        return WearWidgetDocument(background = WearWidgetBrush.color(
-            if (preferences.useDynamicColor) dynamicColorScheme(context)?.surfaceContainerHigh?.rc?:appColorScheme.surfaceContainerHigh else appColorScheme.surfaceContainerHigh)
+        return WearWidgetDocument(
+            background = WearWidgetBrush.color(if (preferences.useDynamicColor) dynamicColorScheme(context)?.surfaceContainerHigh?.rc?:appColorScheme.surfaceContainerHigh else appColorScheme.surfaceContainerHigh)
         ) {
 
             PhoneBatteryWidgetContent(
@@ -116,6 +128,7 @@ class PhoneBatteryWidget(
     }
 }
 
+@SuppressLint("RestrictedApi")
 @RemoteComposable
 @Composable
 fun PhoneBatteryWidgetContent(
@@ -132,7 +145,9 @@ fun PhoneBatteryWidgetContent(
     val colorScheme = if (dynamicColors) RemoteMaterialTheme.colorScheme else appColorScheme
 
     RemoteColumn(
-        modifier = RemoteModifier.fillMaxWidth().padding(horizontal = 4.rdp),
+        modifier = RemoteModifier
+            .fillMaxWidth()
+            .padding(horizontal = 4.rdp),
         verticalArrangement = RemoteArrangement.Center,
         horizontalAlignment = RemoteAlignment.CenterHorizontally,
     ) {
@@ -152,7 +167,7 @@ fun PhoneBatteryWidgetContent(
             verticalAlignment = RemoteAlignment.CenterVertically
         ) {
             RemoteColumn(
-                modifier = RemoteModifier.weight(4.rf),
+                modifier = RemoteModifier.fillMaxWidth(0.7f),
             ) {
                 RemoteText(
                     text = "${batteryLevel}%".rs,
@@ -167,12 +182,19 @@ fun PhoneBatteryWidgetContent(
                     color = colorScheme.onSurfaceVariant
                 )
             }
-            RemoteColumn(
-                modifier = RemoteModifier.weight(2.rf),
-            ) {
+            RemoteColumn() {
                 val progress = rememberMutableRemoteFloat { (1F * batteryLevel / 100).rf }
 
                 RemoteBox(
+                    modifier =
+                        RemoteModifier
+                            .clip(RemoteCircleShape)
+                            .clickable(
+                            pendingIntentAction { context ->
+                                val intent = Intent(context, MainActivity::class.java)
+                                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                            }
+                        ),
                     contentAlignment = RemoteAlignment.Center
                 ){
                     RemoteCircularProgressIndicator(
@@ -184,7 +206,9 @@ fun PhoneBatteryWidgetContent(
                             disabledTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
                             disabledOverflowTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
                         ),
-                        modifier = RemoteModifier.size(160.rdp),
+                        modifier =
+                            RemoteModifier
+                                .size(160.rdp),
                         strokeWidth = 6.rdp,
                         gapSize = RemoteProgressIndicatorDefaults.IndeterminateStrokeWidth,
                         progress = progress,
