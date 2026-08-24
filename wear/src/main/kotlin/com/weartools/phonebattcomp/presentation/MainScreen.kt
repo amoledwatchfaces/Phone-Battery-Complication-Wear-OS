@@ -49,6 +49,7 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
+import com.weartools.phonebattcomp.utils.openPlayStore
 
 @Composable
 fun MainScreen(
@@ -164,12 +165,7 @@ fun MainScreen(
                         imageVector = Icons.Outlined.Info,
                         contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.secondary) },
                 title = BuildConfig.VERSION_NAME,
-                onClick = {
-                    viewModel.openLinkOnPhone("market://details?id=${context.packageName}") { success ->
-                        confirmationState = success
-                        showConfirmation = true
-                    }
-                }
+                onClick = {context.openPlayStore()}
             )
         }
         item {
