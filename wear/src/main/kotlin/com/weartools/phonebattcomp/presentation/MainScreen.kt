@@ -49,8 +49,6 @@ import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.MainViewModel
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
-import com.weartools.phonebattcomp.utils.openAppStoreOnPhone
-import com.weartools.phonebattcomp.utils.openPlayStore
 
 @Composable
 fun MainScreen(
@@ -66,6 +64,9 @@ fun MainScreen(
     val isLoaded by viewModel.isPreferencesLoaded.collectAsState()
     var showCrashlyticsDialog by remember { mutableStateOf(false) }
 
+    var showConfirmation by remember { mutableStateOf(false) }
+    var confirmationState by remember { mutableStateOf(true) }
+
     LaunchedEffect(isLoaded) {
         if (isLoaded && !preferences.crashlyticsNoticeAccepted) {
             showCrashlyticsDialog = true
@@ -80,7 +81,10 @@ fun MainScreen(
                     containerColor = MaterialTheme.colorScheme.tertiary,
                 ),
                 onClick = {
-                    viewModel.openExperimentalSettings(context)
+                    viewModel.openExperimentalSettings { success ->
+                        confirmationState = success
+                        showConfirmation = true
+                    }
                 }
             ) {
                 Text(
@@ -140,7 +144,12 @@ fun MainScreen(
                         contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.secondary) },
                 title = preferences.nodeName,
                 onClick = {
-                    if (preferences.lastUpdate == 0L){ context.openAppStoreOnPhone() }
+                    if (preferences.lastUpdate == 0L){
+                        viewModel.openLinkOnPhone("market://details?id=com.weartools.phonebattcomp") { success ->
+                            confirmationState = success
+                            showConfirmation = true
+                        }
+                    }
                     MobileListener.sendPhoneBatteryRequest(0,dataClient,true)
                 }
             )
@@ -155,7 +164,30 @@ fun MainScreen(
                         imageVector = Icons.Outlined.Info,
                         contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.secondary) },
                 title = BuildConfig.VERSION_NAME,
-                onClick = {context.openPlayStore()}
+                onClick = {
+                    viewModel.openLinkOnPhone("market://details?id=${context.packageName}") { success ->
+                        confirmationState = success
+                        showConfirmation = true
+                    }
+                }
+            )
+        }
+        item {
+            SwitchButton(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                checked = preferences.useDynamicColor,
+                onCheckedChange = { viewModel.setUseDynamicColor(it) },
+                label = { Text(stringResource(id = R.string.dynamic_color)) },
+            )
+        }
+        item {
+            SwitchButton(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                checked = preferences.crashlytics,
+                onCheckedChange = { viewModel.setCrashlytics(it) },
+                label = { Text(stringResource(id = R.string.crash_reports)) },
             )
         }
         item {
@@ -178,7 +210,12 @@ fun MainScreen(
                     colors = ButtonDefaults.outlinedButtonColors(contentColor = MaterialTheme.colorScheme.primary),
                     modifier = Modifier.padding(start = 6.dp),
                     transformation = SurfaceTransformation(transformationSpec),
-                    onClick = { context.openAppStoreOnPhone() }
+                    onClick = {
+                        viewModel.openLinkOnPhone("market://details?id=com.weartools.phonebattcomp") { success ->
+                            confirmationState = success
+                            showConfirmation = true
+                        }
+                    }
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.InstallMobile,
@@ -288,41 +325,6 @@ fun MainScreen(
             )
         }
 
-        // General
-        item {
-            ListSubHeader(
-                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
-                transformation = SurfaceTransformation(transformationSpec),
-                label = {
-                    Text(
-                        modifier = Modifier.fillMaxWidth(),
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colorScheme.tertiary,
-                        text = stringResource(id = R.string.settings),
-                        style = MaterialTheme.typography.labelMedium
-                    )
-                }
-            )
-        }
-        item {
-            SwitchButton(
-                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
-                transformation = SurfaceTransformation(transformationSpec),
-                checked = preferences.useDynamicColor,
-                onCheckedChange = { viewModel.setUseDynamicColor(it) },
-                label = { Text(stringResource(id = R.string.dynamic_color)) },
-            )
-        }
-        item {
-            SwitchButton(
-                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
-                transformation = SurfaceTransformation(transformationSpec),
-                checked = preferences.crashlytics,
-                onCheckedChange = { viewModel.setCrashlytics(it) },
-                label = { Text(stringResource(id = R.string.crash_reports)) },
-            )
-        }
-
         // Phone Notifications Complication
         item {
             ListSubHeader(
@@ -394,5 +396,11 @@ fun MainScreen(
             }
         )
     }
+
+    ConfirmationOverlay(
+        showConfirmation = showConfirmation,
+        confirmationState = confirmationState,
+        onTimeout = { showConfirmation = false }
+    )
     }
 }

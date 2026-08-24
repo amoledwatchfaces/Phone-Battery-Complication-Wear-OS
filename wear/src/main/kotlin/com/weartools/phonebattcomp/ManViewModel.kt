@@ -1,24 +1,8 @@
-/*
- * Copyright 2022 The Android Open Source Project
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.weartools.phonebattcomp
 
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
 import androidx.concurrent.futures.await
 import androidx.core.net.toUri
 import androidx.datastore.core.DataStore
@@ -119,20 +103,37 @@ class MainViewModel @Inject constructor(
         ).run { requestUpdateAll() }
     }
 
-    fun openExperimentalSettings(context: Context) {
+    fun openExperimentalSettings(onOpened: (Boolean) -> Unit) {
         viewModelScope.launch {
-            // Intent to launch your MainActivity
-            val launchIntent = Intent(Intent.ACTION_VIEW)
+            val remoteActivityHelper = RemoteActivityHelper(context)
+            val intent = Intent(Intent.ACTION_VIEW)
                 .addCategory(Intent.CATEGORY_BROWSABLE)
                 .setData("https://amoledwatchfaces.com/phonebattcomp".toUri())
 
             try {
-                RemoteActivityHelper(context).startRemoteActivity(targetIntent = launchIntent,targetNodeId = null).await()
-                Toast.makeText(context,"Check more settings on your phone",Toast.LENGTH_LONG).show()
+                remoteActivityHelper.startRemoteActivity(targetIntent = intent, targetNodeId = null).await()
+                onOpened(true)
             } catch (_: CancellationException) {
                 // Request was canceled normally
             } catch (_: Throwable) {
-                Toast.makeText(context,"Companion app not reachable",Toast.LENGTH_LONG).show()
+                onOpened(false)
+            }
+        }
+    }
+
+    fun openLinkOnPhone(link: String, onOpened: (Boolean) -> Unit) {
+        viewModelScope.launch {
+            val remoteActivityHelper = RemoteActivityHelper(context)
+            val intent = Intent(Intent.ACTION_VIEW)
+                .addCategory(Intent.CATEGORY_BROWSABLE)
+                .setData(link.toUri())
+            try {
+                remoteActivityHelper.startRemoteActivity(targetIntent = intent, targetNodeId = null).await()
+                onOpened(true)
+            } catch (_: CancellationException) {
+                // Request was canceled normally
+            } catch (_: Throwable) {
+                onOpened(false)
             }
         }
     }

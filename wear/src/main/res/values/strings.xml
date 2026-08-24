@@ -86,4 +86,7 @@
     <string name="crash_reports">Crash Reports</string>
     <string name="crashlytics_title">Help Improve the App</string>
     <string name="crashlytics_message">Enable crash reports to help us identify and fix issues. Reports are anonymous and contain no personal information.</string>
+
+    <string name="check_your_phone">Check your phone</string>
+    <string name="check_your_phone_failure">Phone can\'t be reached</string>
 </resources>

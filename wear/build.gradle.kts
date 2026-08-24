@@ -86,6 +86,7 @@ dependencies {
     implementation ("androidx.compose.ui:ui:1.12.0")
     implementation ("androidx.compose.ui:ui-tooling-preview:1.12.0")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
+    implementation ("androidx.compose.animation:animation-graphics-android:1.12.0")
 
     // Compose for Wear OS dependencies
     implementation ("androidx.wear.compose:compose-material3:1.6.2")
