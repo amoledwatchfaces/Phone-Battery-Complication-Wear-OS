@@ -176,7 +176,7 @@
                 android:resource="@xml/phone_battery_widget_info" />
             <meta-data
                 android:name="androidx.wear.tiles.PREVIEW"
-                android:resource="@drawable/tile_preview" />
+                android:resource="@drawable/widget_preview_large" />
         </service>
 
         <!-- Receivers -->

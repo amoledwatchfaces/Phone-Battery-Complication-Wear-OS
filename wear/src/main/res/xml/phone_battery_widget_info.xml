@@ -6,8 +6,8 @@
     preferredType="SMALL">
     <container
         type="SMALL"
-        previewImage="@drawable/widget_preview" />
+        previewImage="@drawable/widget_preview_small" />
     <container
         type="LARGE"
-        previewImage="@drawable/widget_preview" />
+        previewImage="@drawable/widget_preview_large" />
 </wearwidget-provider>
