@@ -1,7 +1,6 @@
 package com.weartools.phonebattcomp.widget
 
 import android.content.Context
-import androidx.compose.remote.creation.compose.action.valueChange
 import androidx.compose.remote.creation.compose.layout.RemoteAlignment
 import androidx.compose.remote.creation.compose.layout.RemoteArrangement
 import androidx.compose.remote.creation.compose.layout.RemoteBox
@@ -10,8 +9,8 @@ import androidx.compose.remote.creation.compose.layout.RemoteComposable
 import androidx.compose.remote.creation.compose.layout.RemoteRow
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
 import androidx.compose.remote.creation.compose.modifier.fillMaxWidth
+import androidx.compose.remote.creation.compose.modifier.padding
 import androidx.compose.remote.creation.compose.modifier.size
-import androidx.compose.remote.creation.compose.state.animateRemoteFloat
 import androidx.compose.remote.creation.compose.state.rb
 import androidx.compose.remote.creation.compose.state.rdp
 import androidx.compose.remote.creation.compose.state.rememberMutableRemoteFloat
@@ -19,10 +18,10 @@ import androidx.compose.remote.creation.compose.state.rf
 import androidx.compose.remote.creation.compose.state.rs
 import androidx.compose.remote.creation.compose.state.rsp
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.datastore.core.DataStore
 import androidx.glance.wear.AssociateWithGlanceWearWidget
 import androidx.glance.wear.GlanceWearWidget
@@ -35,7 +34,6 @@ import androidx.glance.wear.core.WearWidgetParams
 import androidx.wear.compose.remote.material3.RemoteCircularProgressIndicator
 import androidx.wear.compose.remote.material3.RemoteColorScheme
 import androidx.wear.compose.remote.material3.RemoteIcon
-import androidx.wear.compose.remote.material3.RemoteIconButtonDefaults
 import androidx.wear.compose.remote.material3.RemoteMaterialTheme
 import androidx.wear.compose.remote.material3.RemoteProgressIndicatorDefaults
 import androidx.wear.compose.remote.material3.RemoteText
@@ -131,7 +129,7 @@ fun PhoneBatteryWidgetContent(
         colorScheme = if (dynamicColors) RemoteMaterialTheme.colorScheme else appColorScheme,
     ) {
         RemoteColumn(
-            modifier = RemoteModifier.fillMaxWidth(),
+            modifier = RemoteModifier.fillMaxWidth().padding(horizontal = 4.rdp),
             verticalArrangement = RemoteArrangement.Center,
             horizontalAlignment = RemoteAlignment.CenterHorizontally,
         ) {
@@ -151,7 +149,7 @@ fun PhoneBatteryWidgetContent(
                 verticalAlignment = RemoteAlignment.CenterVertically
             ) {
                 RemoteColumn(
-                    modifier = RemoteModifier.weight(3.rf),
+                    modifier = RemoteModifier.weight(4.rf),
                 ) {
                     RemoteText(
                         fontSize = 24.rsp,
@@ -160,7 +158,9 @@ fun PhoneBatteryWidgetContent(
                         color = RemoteMaterialTheme.colorScheme.onSecondaryContainer
                     )
                     RemoteText(
+                        overflow = TextOverflow.Ellipsis,
                         maxLines = 2,
+                        fontSize = 12.rsp,
                         fontWeight = FontWeight.Medium,
                         text = chargeRemainingTime.rs,
                         color = appColorScheme.secondary
@@ -169,28 +169,23 @@ fun PhoneBatteryWidgetContent(
                 RemoteColumn(
                     modifier = RemoteModifier.weight(2.rf),
                 ) {
-                    val progressStart = rememberMutableRemoteFloat { 0.rf }
                     val progress = rememberMutableRemoteFloat { (1F * batteryLevel / 100).rf }
-                    val animatedProgress = animateRemoteFloat(progress, 0.25f)
 
                     RemoteBox(
                         contentAlignment = RemoteAlignment.Center
                     ){
-                        LaunchedEffect(Unit) {
-                            valueChange(progressStart, (progress))
-                        }
-
                         RemoteCircularProgressIndicator(
+                            modifier = RemoteModifier.size(160.rdp),
                             strokeWidth = 6.rdp,
                             gapSize = RemoteProgressIndicatorDefaults.IndeterminateStrokeWidth,
-                            progress = animatedProgress,
+                            progress = progress,
                             startAngle = 110.rf,
                             endAngle = 430.rf,
                             enabled = phoneIsConnected.rb
                         )
 
                         RemoteIcon(
-                            modifier = RemoteModifier.size(RemoteIconButtonDefaults.SmallIconSize),
+                            modifier = RemoteModifier.size(20.rdp),
                             imageVector = ImageVector.vectorResource(
                                 when {
                                     phoneIsConnected && phoneIsCharging -> R.drawable.mobile_charge_24px
