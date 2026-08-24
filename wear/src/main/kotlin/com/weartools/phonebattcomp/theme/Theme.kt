@@ -8,32 +8,42 @@ import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Typography
 
 
-private val darkScheme = ColorScheme(
-    primary = primaryDark,
-    onPrimary = onPrimaryDark,
-    primaryContainer = primaryContainerDark,
-    onPrimaryContainer = onPrimaryContainerDark,
-    secondary = secondaryDark,
-    onSecondary = onSecondaryDark,
-    secondaryContainer = secondaryContainerDark,
-    onSecondaryContainer = onSecondaryContainerDark,
-    tertiary = tertiaryDark,
-    onTertiary = onTertiaryDark,
-    tertiaryContainer = tertiaryContainerDark,
-    onTertiaryContainer = onTertiaryContainerDark,
-    error = errorDark,
-    onError = onErrorDark,
-    errorContainer = errorContainerDark,
-    onErrorContainer = onErrorContainerDark,
-    background = backgroundDark,
-    onBackground = onBackgroundDark,
-    onSurface = onSurfaceDark,
-    onSurfaceVariant = onSurfaceVariantDark,
-    outline = outlineDark,
-    outlineVariant = outlineVariantDark,
-    surfaceContainerLow = surfaceContainerLowDark,
-    surfaceContainer = surfaceContainerDark,
-    surfaceContainerHigh = surfaceContainerHighDark,
+private val appColorScheme = ColorScheme(
+    primary = primary,
+    primaryDim = primaryDim,
+    onPrimary = onPrimary,
+    primaryContainer = primaryContainer,
+    onPrimaryContainer = onPrimaryContainer,
+
+    secondary = secondary,
+    secondaryDim = secondaryDim,
+    onSecondary = onSecondary,
+    secondaryContainer = secondaryContainer,
+    onSecondaryContainer = onSecondaryContainer,
+
+    tertiary = tertiary,
+    tertiaryDim = tertiaryDim,
+    onTertiary = onTertiary,
+    tertiaryContainer = tertiaryContainer,
+    onTertiaryContainer = onTertiaryContainer,
+
+    surfaceContainerHigh = surfaceContainerHigh,
+    surfaceContainer = surfaceContainer,
+    surfaceContainerLow = surfaceContainerLow,
+    onSurface = onSurface,
+    onSurfaceVariant = onSurfaceVariant,
+
+    outline = outline,
+    outlineVariant = outlineVariant,
+
+    background = background,
+    onBackground = onBackground,
+
+    error = error,
+    errorDim = errorDim,
+    onError = onError,
+    errorContainer = errorContainer,
+    onErrorContainer = onErrorContainer,
 )
 
 @Immutable
@@ -50,7 +60,7 @@ fun PhoneBatteryAppTheme(
 ) {
     //val dynamicColorScheme = dynamicColorScheme(LocalContext.current)
     MaterialTheme(
-        colorScheme = darkScheme,
+        colorScheme = appColorScheme,
         content = content
     )
 }
