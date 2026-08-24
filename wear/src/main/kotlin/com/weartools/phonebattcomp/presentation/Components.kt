@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,36 +57,8 @@ fun DialogChip(
             )
         },
         secondaryLabel = {
-            Text(text = title, color = Color.LightGray)
+            Text(text = title)
         },
-    )
-}
-
-@Composable
-fun PreferenceCategory(
-    modifier: Modifier = Modifier,
-    title: String
-) {
-    Text(
-        text = title,
-        modifier = modifier.padding(
-            top = 14.dp,
-            bottom = 4.dp
-        ),
-        color = MaterialTheme.colorScheme.secondary,
-        textAlign = TextAlign.Center,
-        style = MaterialTheme.typography.bodyMedium
-    )
-}
-
-@Composable
-fun SectionText(modifier: Modifier = Modifier, text: String) {
-    Text(
-        modifier = modifier,
-        textAlign = TextAlign.Center,
-        color = MaterialTheme.colorScheme.outlineVariant,
-        text = text,
-        style = MaterialTheme.typography.bodySmall
     )
 }
 

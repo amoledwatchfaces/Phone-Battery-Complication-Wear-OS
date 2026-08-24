@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -40,6 +39,7 @@ import androidx.wear.compose.material3.ButtonDefaults
 import androidx.wear.compose.material3.CompactButton
 import androidx.wear.compose.material3.Icon
 import androidx.wear.compose.material3.ListHeader
+import androidx.wear.compose.material3.ListSubHeader
 import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.OutlinedButton
 import androidx.wear.compose.material3.SurfaceTransformation
@@ -90,9 +90,9 @@ fun PhoneBatteryAppScreen(
         item { ListHeader {
             Text(
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.primary,
+                color = MaterialTheme.colorScheme.secondary,
                 text = stringResource(id = R.string.app_info),
-                style = MaterialTheme.typography.titleSmall
+                style = MaterialTheme.typography.titleMedium
             )
         } }
 
@@ -115,7 +115,7 @@ fun PhoneBatteryAppScreen(
                             else -> R.drawable.ic_phone_disconnected
                         }
                         ),
-                        contentDescription = "Play Store Icon") },
+                        contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.secondary) },
                 title = preferences.nodeName,
                 onClick = {
                     if (preferences.lastUpdate == 0L){ context.openAppStoreOnPhone() }
@@ -131,7 +131,7 @@ fun PhoneBatteryAppScreen(
                 icon = {
                     Icon(
                         imageVector = Icons.Outlined.Info,
-                        contentDescription = "Play Store Icon") },
+                        contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.secondary) },
                 title = BuildConfig.VERSION_NAME,
                 onClick = {context.openPlayStore()}
             )
@@ -149,7 +149,7 @@ fun PhoneBatteryAppScreen(
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Outlined.ContactSupport,
-                        contentDescription = "Play Store Icon")
+                        contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.secondary)
                 }
                 OutlinedButton(
                     border = ButtonDefaults.outlinedButtonBorder(true, MaterialTheme.colorScheme.primaryContainer, borderWidth = 2.dp),
@@ -160,13 +160,27 @@ fun PhoneBatteryAppScreen(
                 ) {
                     Icon(
                         imageVector = Icons.Outlined.InstallMobile,
-                        contentDescription = "Play Store Icon")
+                        contentDescription = "Play Store Icon", tint = MaterialTheme.colorScheme.secondary)
                 }
             }
         }
 
         // Phone / Watch Battery Complications
-        item { PreferenceCategory(title = stringResource(id = R.string.percentage_section)) }
+        item {
+            ListSubHeader(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        text = stringResource(id = R.string.percentage_section),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            )
+        }
         item {
             SwitchButton(
                 modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
@@ -176,9 +190,9 @@ fun PhoneBatteryAppScreen(
                 label = { Text(stringResource(id = R.string.percentage_toggle)) },
                 secondaryLabel = {
                     if (preferences.percentage) {
-                        Text(text = stringResource(id = R.string.percentage_on), color = Color.LightGray)
+                        Text(text = stringResource(id = R.string.percentage_on))
                     } else
-                        Text(text = stringResource(id = R.string.percentage_off), color = Color.LightGray)
+                        Text(text = stringResource(id = R.string.percentage_off))
                 }
             )
         }
@@ -194,7 +208,7 @@ fun PhoneBatteryAppScreen(
                     Icon(
                         painter = if (preferences.materialSymbols){ painterResource(R.drawable.ic_phone_material_symbols) }
                         else {painterResource(R.drawable.ic_phone)},
-                        contentDescription = "Phone Icon", tint = MaterialTheme.colorScheme.primary) },
+                        contentDescription = "Phone Icon", tint = MaterialTheme.colorScheme.secondary) },
             )
         }
         item {
@@ -215,13 +229,27 @@ fun PhoneBatteryAppScreen(
                                 else -> R.drawable.ic_phone_charging
                             }
                         ),
-                        contentDescription = "Phone Icon", tint = MaterialTheme.colorScheme.primary) },
+                        contentDescription = "Phone Icon", tint = MaterialTheme.colorScheme.secondary) },
 
             )
         }
 
         // Watch Battery Temperature Complication
-        item { PreferenceCategory(title = stringResource(id = R.string.setting_preference_category_title)) }
+        item {
+            ListSubHeader(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        text = stringResource(id = R.string.setting_preference_category_title),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            )
+        }
         item {
             SwitchButton(
                 modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
@@ -231,15 +259,29 @@ fun PhoneBatteryAppScreen(
                 label = { Text(stringResource(id = R.string.temp_unit_pref_title)) },
                 secondaryLabel = {
                     if (preferences.tempUnit) {
-                        Text(text = stringResource(id = R.string.temp_unit_C), color = Color.LightGray)
+                        Text(text = stringResource(id = R.string.temp_unit_C))
                     } else
-                        Text(text = stringResource(id = R.string.temp_unit_F), color = Color.LightGray)
+                        Text(text = stringResource(id = R.string.temp_unit_F))
                 }
             )
         }
 
         // General
-        item { PreferenceCategory(title = stringResource(id = R.string.settings)) }
+        item {
+            ListSubHeader(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        text = stringResource(id = R.string.settings),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            )
+        }
         item {
             SwitchButton(
                 modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
@@ -260,7 +302,21 @@ fun PhoneBatteryAppScreen(
         }
 
         // Phone Notifications Complication
-        item { PreferenceCategory(title = stringResource(id = R.string.notifications_section)) }
+        item {
+            ListSubHeader(
+                modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.tertiary,
+                        text = stringResource(id = R.string.notifications_section),
+                        style = MaterialTheme.typography.labelMedium
+                    )
+                }
+            )
+        }
         item {
 
             SwitchButton(
@@ -276,9 +332,9 @@ fun PhoneBatteryAppScreen(
                 label = { Text(stringResource(id = R.string.notif_comp_force_icon_type)) },
                 secondaryLabel = {
                     if (preferences.notificationsIconType == 2) {
-                        Text(text = stringResource(id = R.string.type_icon), color = Color.LightGray)
+                        Text(text = stringResource(id = R.string.type_icon))
                     } else
-                        Text(text = stringResource(id = R.string.type_photo), color = Color.LightGray)
+                        Text(text = stringResource(id = R.string.type_photo))
                 }
             )
         }
@@ -294,7 +350,8 @@ fun PhoneBatteryAppScreen(
                 icon = {
                     Icon(
                         imageVector = Icons.Filled.SettingsSuggest,
-                        contentDescription = "Play Store Icon"
+                        contentDescription = "Play Store Icon",
+                        tint = MaterialTheme.colorScheme.secondary
                     )
                 },
                 onClick = {
@@ -303,11 +360,20 @@ fun PhoneBatteryAppScreen(
             )
         }
         item {
-            SectionText(
-                text = "amoledwatchfaces.com",
+            ListSubHeader(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 12.dp, start = 20.dp, end = 20.dp),
+                    .transformedHeight(this, transformationSpec),
+                transformation = SurfaceTransformation(transformationSpec),
+                label = {
+                    Text(
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colorScheme.outlineVariant,
+                        text = "amoledwatchfaces.com",
+                        style = MaterialTheme.typography.bodySmall
+                    )
+                }
             )
         }
 
