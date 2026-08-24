@@ -17,7 +17,7 @@ import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.utils.updateCalendarComplications
 import com.weartools.phonebattcomp.utils.updateComplication
 import com.weartools.phonebattcomp.utils.updateNotificationComplications
-import com.weartools.phonebattcomp.widget.PhoneBatteryWidgetService
+import com.weartools.phonebattcomp.widget.PhoneBatteryWidget
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -90,7 +90,7 @@ class MobileListener : WearableListenerService() {
                                     )
                                 }
                                 updateComplication(MobileBatteryComplicationService::class.java)
-                                PhoneBatteryWidgetService().widget.triggerUpdateAll(applicationContext)
+                                PhoneBatteryWidget(dataStore).triggerUpdateAll(applicationContext)
                             }
                         }
                         URI -> {

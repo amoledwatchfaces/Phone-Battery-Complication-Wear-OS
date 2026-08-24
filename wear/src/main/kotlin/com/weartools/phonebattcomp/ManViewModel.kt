@@ -32,7 +32,7 @@ import com.weartools.phonebattcomp.complication.WatchBatteryComplicationService
 import com.weartools.phonebattcomp.complication.WatchTempComplicationService
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.data.UserPreferencesRepository
-import com.weartools.phonebattcomp.widget.PhoneBatteryWidgetService
+import com.weartools.phonebattcomp.widget.PhoneBatteryWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.SharingStarted
@@ -56,7 +56,6 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = UserPreferences()
         )
-
 
     fun toggleEnabled(context: Context) {
         viewModelScope.launch {
@@ -97,7 +96,7 @@ class MainViewModel @Inject constructor(
     fun setUseDynamicColor(useDynamicColor: Boolean){
         viewModelScope.launch {
             dataStore.updateData { it.copy(useDynamicColor = useDynamicColor) }
-            PhoneBatteryWidgetService().widget.triggerUpdateAll(context)
+            PhoneBatteryWidget(dataStore).triggerUpdateAll(context)
         }
     }
     fun setCrashlytics(enabled: Boolean) {

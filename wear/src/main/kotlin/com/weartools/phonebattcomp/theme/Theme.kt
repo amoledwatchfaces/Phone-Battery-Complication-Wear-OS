@@ -1,14 +1,10 @@
 package com.weartools.phonebattcomp.theme
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Immutable
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.wear.compose.material3.ColorScheme
-import androidx.wear.compose.material3.MaterialTheme
 import androidx.wear.compose.material3.Typography
 import androidx.wear.compose.material3.dynamicColorScheme
-
 
 private val appColorScheme = ColorScheme(
     primary = primary,
@@ -48,24 +44,17 @@ private val appColorScheme = ColorScheme(
     onErrorContainer = onErrorContainer,
 )
 
-@Immutable
-data class ColorFamily(
-    val color: Color,
-    val onColor: Color,
-    val colorContainer: Color,
-    val onColorContainer: Color
-)
-
 @Composable
 fun PhoneBatteryAppTheme(
     useDynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val context = LocalContext.current
-    MaterialTheme(
+    androidx.wear.compose.material3.MaterialTheme(
         colorScheme = if (useDynamicColor) dynamicColorScheme(context) ?: appColorScheme else appColorScheme,
+        typography = appTypography,
         content = content
     )
 }
 
-val Typography = Typography()
+val appTypography = Typography()

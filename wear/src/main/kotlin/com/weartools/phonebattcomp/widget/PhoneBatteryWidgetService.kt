@@ -161,7 +161,7 @@ fun PhoneBatteryWidgetContent(
                 RemoteText(
                     fontWeight = FontWeight.SemiBold,
                     text = nodeName.rs,
-                    color = appColorScheme.onSurfaceVariant
+                    color = RemoteMaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
             RemoteRow(
@@ -176,7 +176,7 @@ fun PhoneBatteryWidgetContent(
                         fontSize = 24.rsp,
                         fontWeight = FontWeight.SemiBold,
                         text = "${batteryLevel}%".rs,
-                        color = appColorScheme.onSecondaryContainer
+                        color = RemoteMaterialTheme.colorScheme.onSecondaryContainer
                     )
                     RemoteText(
                         fontWeight = FontWeight.SemiBold,
