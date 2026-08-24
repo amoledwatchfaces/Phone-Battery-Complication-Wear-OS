@@ -137,7 +137,7 @@ fun PhoneBatteryWidgetContent(
         horizontalAlignment = RemoteAlignment.CenterHorizontally,
     ) {
         RemoteRow(
-            modifier = RemoteModifier.fillMaxWidth().weight(2.rf),
+            modifier = RemoteModifier.fillMaxWidth().weight((1.8f).rf),
             horizontalArrangement = RemoteArrangement.Start,
         ) {
             RemoteText(
