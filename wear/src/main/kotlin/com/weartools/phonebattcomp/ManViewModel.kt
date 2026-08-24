@@ -35,8 +35,11 @@ import com.weartools.phonebattcomp.data.UserPreferencesRepository
 import com.weartools.phonebattcomp.widget.PhoneBatteryWidget
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -49,8 +52,12 @@ class MainViewModel @Inject constructor(
     preferences: UserPreferencesRepository,
 ) : ViewModel(){
 
+    private val _isPreferencesLoaded = MutableStateFlow(false)
+    val isPreferencesLoaded = _isPreferencesLoaded.asStateFlow()
+
     val preferences: StateFlow<UserPreferences> = preferences
         .getPreferences()
+        .onEach { _isPreferencesLoaded.value = true }
         .stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(),

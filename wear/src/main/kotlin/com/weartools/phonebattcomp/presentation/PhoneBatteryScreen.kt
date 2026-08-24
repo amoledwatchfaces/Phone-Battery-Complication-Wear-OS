@@ -66,10 +66,11 @@ fun PhoneBatteryAppScreen(
 ) {
     val context = LocalContext.current
     val preferences by viewModel.preferences.collectAsState()
+    val isLoaded by viewModel.isPreferencesLoaded.collectAsState()
     var showCrashlyticsDialog by remember { mutableStateOf(false) }
 
-    LaunchedEffect(Unit) {
-        if (!preferences.crashlyticsNoticeAccepted) {
+    LaunchedEffect(isLoaded) {
+        if (isLoaded && !preferences.crashlyticsNoticeAccepted) {
             showCrashlyticsDialog = true
         }
     }
