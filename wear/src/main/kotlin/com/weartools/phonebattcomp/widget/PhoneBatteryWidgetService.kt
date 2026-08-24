@@ -160,6 +160,7 @@ fun PhoneBatteryWidgetContent(
                         color = RemoteMaterialTheme.colorScheme.onSecondaryContainer
                     )
                     RemoteText(
+                        maxLines = 2,
                         fontWeight = FontWeight.Medium,
                         text = chargeRemainingTime.rs,
                         color = appColorScheme.secondary
