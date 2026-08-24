@@ -77,23 +77,6 @@ class PhoneBatteryWidget(
             PhoneBatteryWidgetContent(
                 dynamicColors = preferences.useDynamicColor,
                 appColorScheme =  appColorScheme,
-                batteryLevel = 75,
-                nodeName = "Pixel 9 Pro XL",
-                chargeRemainingTime = formatChargeTimeRemaining(
-                    300000,
-                    true,
-                    true,
-                    75
-                ),
-                phoneIsConnected = true,
-                phoneIsCharging = true,
-                materialSymbols = true,
-                chargingSymbolInside = false
-            )
-            // Original
-            /*
-            PhoneBatteryWidgetContent(
-                appColorScheme =  appColorScheme,
                 batteryLevel = preferences.phoneBatteryLevel,
                 nodeName = preferences.nodeName,
                 chargeRemainingTime = formatChargeTimeRemaining(
@@ -107,8 +90,6 @@ class PhoneBatteryWidget(
                 materialSymbols = preferences.materialSymbols,
                 chargingSymbolInside = preferences.chargingSymbolInsideIcon
             )
-
-             */
         }
     }
 
@@ -159,7 +140,7 @@ fun PhoneBatteryWidgetContent(
                 horizontalArrangement = RemoteArrangement.Start,
             ) {
                 RemoteText(
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Medium,
                     text = nodeName.rs,
                     color = RemoteMaterialTheme.colorScheme.onSurfaceVariant
                 )
@@ -174,12 +155,12 @@ fun PhoneBatteryWidgetContent(
                 ) {
                     RemoteText(
                         fontSize = 24.rsp,
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Medium,
                         text = "${batteryLevel}%".rs,
                         color = RemoteMaterialTheme.colorScheme.onSecondaryContainer
                     )
                     RemoteText(
-                        fontWeight = FontWeight.SemiBold,
+                        fontWeight = FontWeight.Medium,
                         text = chargeRemainingTime.rs,
                         color = appColorScheme.secondary
                     )
