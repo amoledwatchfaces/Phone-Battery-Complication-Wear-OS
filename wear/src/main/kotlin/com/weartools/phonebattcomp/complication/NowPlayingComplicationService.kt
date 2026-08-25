@@ -13,7 +13,6 @@ import com.weartools.phonebattcomp.receiver.MediaTapReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
-import androidx.core.graphics.createBitmap
 
 @AndroidEntryPoint
 class NowPlayingComplicationService : SuspendingComplicationDataSourceService() {
@@ -69,37 +68,28 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
     }
 
     private fun createArtworkIcon(artworkBytes: List<Byte>?, playStatus: Boolean): Icon {
-        if (artworkBytes == null) return Icon.createWithResource(this, R.drawable.music_note_24px)
+        if (artworkBytes.isNullOrEmpty()) return Icon.createWithResource(this, R.drawable.music_note_24px)
 
         return try {
             val array = artworkBytes.toByteArray()
-            var bitmap = BitmapFactory.decodeByteArray(array, 0, array.size)
-            if (bitmap != null) {
-                if (!playStatus) {
-                    val mutableBitmap = createBitmap(bitmap.width, bitmap.height)
-                    val canvas = Canvas(mutableBitmap)
-                    val paint = Paint().apply {
-                        colorFilter = ColorMatrixColorFilter(ColorMatrix().apply {
-                            setScale(0.5f, 0.5f, 0.5f, 1f)
-                        })
-                    }
-                    canvas.drawBitmap(bitmap, 0f, 0f, paint)
+            val options = BitmapFactory.Options().apply { inMutable = !playStatus }
+            var bitmap = BitmapFactory.decodeByteArray(array, 0, array.size, options) ?: return Icon.createWithResource(this, R.drawable.music_note_24px)
 
-                    val playIcon = ContextCompat.getDrawable(this, R.drawable.play_arrow_24px)
-                    playIcon?.let {
-                        val size = (mutableBitmap.width * 0.5f).toInt()
-                        val left = (mutableBitmap.width - size) / 2
-                        val top = (mutableBitmap.height - size) / 2
-                        it.setBounds(left, top, left + size, top + size)
-                        it.setTint(Color.WHITE)
-                        it.draw(canvas)
-                    }
-                    bitmap = mutableBitmap
+            if (!playStatus) {
+                if (!bitmap.isMutable) bitmap = bitmap.copy(Bitmap.Config.ARGB_8888, true)
+                val canvas = Canvas(bitmap)
+                canvas.drawColor(0x99000000.toInt()) // Dim by ~60%
+
+                ContextCompat.getDrawable(this, R.drawable.play_arrow_24px)?.let {
+                    val size = (bitmap.width * 0.5f).toInt()
+                    val left = (bitmap.width - size) / 2
+                    val top = (bitmap.height - size) / 2
+                    it.setBounds(left, top, left + size, top + size)
+                    it.setTint(Color.WHITE)
+                    it.draw(canvas)
                 }
-                Icon.createWithBitmap(bitmap)
-            } else {
-                Icon.createWithResource(this, R.drawable.music_note_24px)
             }
+            Icon.createWithBitmap(bitmap)
         } catch (_: Exception) {
             Icon.createWithResource(this, R.drawable.music_note_24px)
         }
