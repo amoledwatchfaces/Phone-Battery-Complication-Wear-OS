@@ -103,7 +103,6 @@ class MobileListener : WearableListenerService() {
                             val title = dataMap.getString("title", "")
                             val artist = dataMap.getString("artist", "")
                             val status = dataMap.getBoolean("status", false)
-                            Log.d(TAG, "Received Now Playing: $title by $artist (playing: $status)")
 
                             ioScope.launch {
                                 dataStore.updateData {
@@ -115,7 +114,6 @@ class MobileListener : WearableListenerService() {
                                     )
                                 }
                                 try {
-                                    Log.d(TAG, "Requesting complication update for NowPlaying")
                                     updateComplication(NowPlayingComplicationService::class.java)
                                 } catch (_: Exception) {
                                     Log.e(TAG, "NowPlayingComplicationService not found yet")

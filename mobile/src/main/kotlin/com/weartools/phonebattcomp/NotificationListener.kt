@@ -135,13 +135,11 @@ class NotificationListener : NotificationListenerService() {
         }
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
         syncMediaToWatch()
-        Log.d("NotificationListener", "onNotificationPosted")
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
         syncMediaToWatch()
-        Log.d("NotificationListener", "onNotificationRemoved")
     }
 
     private fun updateMediaControllers(controllers: List<MediaController>?) {
@@ -153,30 +151,35 @@ class NotificationListener : NotificationListenerService() {
 
         controllers?.forEach { controller ->
             val callback = object : MediaController.Callback() {
+                private var lastState = controller.playbackState?.state ?: -1
+
                 override fun onMetadataChanged(metadata: MediaMetadata?) {
-                    Log.d("NotificationListener", "onMetadataChanged")
                     syncMediaToWatch()
                 }
 
                 override fun onPlaybackStateChanged(state: PlaybackState?) {
-                    Log.d("NotificationListener", "onPlaybackStateChanged ${state?.state}")
-                    syncMediaToWatch()
+                    val currentState = state?.state ?: -1
+                    if (currentState != lastState) {
+                        lastState = currentState
+                        Log.d("NotificationListener", "onPlaybackStateChanged $currentState")
+                        syncMediaToWatch()
+                    }
                 }
             }
             controller.registerCallback(callback)
             activeMediaControllers[controller] = callback
         }
         syncMediaToWatch()
-        Log.d("NotificationListener", "updateMediaControllers")
     }
 
     private fun syncMediaToWatch() {
         mediaSyncJob?.cancel()
         mediaSyncJob = serviceScope.launch {
-            delay(500.milliseconds)
             if (!isActive) return@launch
             
             if (!mediaSyncEnabled) return@launch
+
+            Log.d("NotificationListener", "syncMediaToWatch")
             
             val controllers = mediaSessionManager.getActiveSessions(ComponentName(this@NotificationListener, NotificationListener::class.java))
 
