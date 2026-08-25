@@ -167,7 +167,7 @@
         </service>
 
         <service android:name=".complication.NowPlayingComplicationService"
-            android:icon="@drawable/ic_notif"
+            android:icon="@drawable/music_note_24px"
             android:label="@string/now_playing_complication"
             android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
             android:exported="true">
@@ -176,7 +176,7 @@
             </intent-filter>
             <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="0"/>
             <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
-                android:value="LONG_TEXT, SMALL_IMAGE, PHOTO_IMAGE"/>
+                android:value="SMALL_IMAGE, PHOTO_IMAGE"/>
         </service>
 
         <service android:name=".widget.PhoneBatteryWidgetService"

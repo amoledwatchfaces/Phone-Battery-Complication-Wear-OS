@@ -175,6 +175,9 @@ class NotificationListener : NotificationListenerService() {
     private fun syncMediaToWatch() {
         mediaSyncJob?.cancel()
         mediaSyncJob = serviceScope.launch {
+
+            delay(300.milliseconds)  // Debounce delay
+
             if (!isActive) return@launch
             
             if (!mediaSyncEnabled) return@launch
