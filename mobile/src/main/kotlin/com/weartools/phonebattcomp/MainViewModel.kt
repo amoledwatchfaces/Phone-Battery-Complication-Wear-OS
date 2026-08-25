@@ -293,6 +293,14 @@ class MainViewModel @Inject constructor(
             ServiceCommunication.sendToWatchFlow.emit(Unit)
         }
     }
+
+    fun setMediaPlaybackSyncState(state: Boolean) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(mediaPlaybackSync = state) }
+            ServiceCommunication.sendToWatchFlow.emit(Unit)
+        }
+    }
+
     fun setBackgroundServiceState(state: Boolean) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(backgroundServiceState = state) }

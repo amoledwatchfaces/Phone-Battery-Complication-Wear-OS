@@ -162,6 +162,19 @@
                 android:value="LONG_TEXT, SHORT_TEXT"/>
         </service>
 
+        <service android:name=".complication.NowPlayingComplicationService"
+            android:icon="@drawable/ic_notif"
+            android:label="@string/now_playing_complication"
+            android:permission="com.google.android.wearable.permission.BIND_COMPLICATION_PROVIDER"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.support.wearable.complications.ACTION_COMPLICATION_UPDATE_REQUEST"/>
+            </intent-filter>
+            <meta-data android:name="android.support.wearable.complications.UPDATE_PERIOD_SECONDS" android:value="0"/>
+            <meta-data android:name="android.support.wearable.complications.SUPPORTED_TYPES"
+                android:value="LONG_TEXT, SMALL_IMAGE, PHOTO_IMAGE"/>
+        </service>
+
         <service android:name=".widget.PhoneBatteryWidgetService"
             android:exported="true"
             android:icon="@mipmap/ic_launcher"
@@ -181,6 +194,7 @@
 
         <!-- Receivers -->
         <receiver android:name=".receiver.ComplicationTapBroadcastReceiver" />
+        <receiver android:name=".receiver.MediaTapReceiver" />
         <receiver android:name=".receiver.PowerConnectionReceiver"
             android:exported="true">
             <intent-filter>

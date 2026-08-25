@@ -21,7 +21,7 @@ buildscript {
     extra.set("versionName", "5.8.7")
 
     dependencies {
-        classpath ("com.android.tools.build:gradle:9.3.2")
+        classpath ("com.android.tools.build:gradle:9.4.0-rc01")
         classpath ("org.jetbrains.kotlin:kotlin-serialization:2.4.0")
     }
     repositories {

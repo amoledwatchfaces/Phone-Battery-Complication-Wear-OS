@@ -19,9 +19,12 @@ package com.weartools.phonebattcomp
 import android.Manifest
 import android.content.ContentValues.TAG
 import android.content.Context
+import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
 import android.os.BatteryManager
 import android.os.Build
 import android.util.Log
+import android.content.ComponentName
 import androidx.core.app.NotificationManagerCompat
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.CapabilityInfo
@@ -29,6 +32,7 @@ import com.google.android.gms.wearable.DataClient
 import com.google.android.gms.wearable.DataEvent
 import com.google.android.gms.wearable.DataEventBuffer
 import com.google.android.gms.wearable.DataMapItem
+import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.data.UserPreferences
@@ -106,6 +110,28 @@ class WearListener : WearableListenerService() {
             }
             /** Release dataEvents after processing them */
             dataEvents.release()
+        }
+    }
+
+    override fun onMessageReceived(messageEvent: MessageEvent) {
+        if (messageEvent.path == "/toggle-playback") {
+            val mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
+            val controllers = try {
+                mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java))
+            } catch (_: SecurityException) {
+                emptyList()
+            }
+            val activeSession = controllers.firstOrNull { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+                ?: controllers.firstOrNull()
+
+            activeSession?.let { controller ->
+                val state = controller.playbackState?.state
+                if (state == PlaybackState.STATE_PLAYING) {
+                    controller.transportControls.pause()
+                } else {
+                    controller.transportControls.play()
+                }
+            }
         }
     }
 

@@ -4,9 +4,15 @@ import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.drawable.Drawable
+import android.media.MediaMetadata
+import android.media.session.MediaController
+import android.media.session.MediaSessionManager
+import android.media.session.PlaybackState
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
+import android.content.ComponentName
+import android.content.Context
 import androidx.core.graphics.createBitmap
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
@@ -42,6 +48,7 @@ class NotificationListener : NotificationListenerService() {
     private val serviceScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     private var syncEnabled = true
+    private var mediaSyncEnabled = true
 
     private val mutex = Mutex()
 
@@ -55,6 +62,13 @@ class NotificationListener : NotificationListenerService() {
     // Store the previous text+title
     private var lastTextTitleSent = ""
 
+    private lateinit var mediaSessionManager: MediaSessionManager
+    private val activeMediaControllers = mutableMapOf<MediaController, MediaController.Callback>()
+
+    private val sessionListener = MediaSessionManager.OnActiveSessionsChangedListener { controllers ->
+        updateMediaControllers(controllers)
+    }
+
     companion object {
         private const val ICON_SIZE = 48
         private const val URI = "/foobar"
@@ -66,6 +80,10 @@ class NotificationListener : NotificationListenerService() {
     override fun onListenerConnected() {
         super.onListenerConnected()
 
+        mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
+        mediaSessionManager.addOnActiveSessionsChangedListener(sessionListener, ComponentName(this, NotificationListener::class.java))
+        updateMediaControllers(mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java)))
+
         BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
 
         serviceScope.launch {
@@ -73,13 +91,19 @@ class NotificationListener : NotificationListenerService() {
             dataStore.updateData { it.copy(backgroundServiceState = true) }
 
             // Send notifications to watch when listener is connected
-            syncEnabled = dataStore.data.first().notificationsSync
+            val prefs = dataStore.data.first()
+            syncEnabled = prefs.notificationsSync
+            mediaSyncEnabled = prefs.mediaPlaybackSync
+            
             if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
+            syncMediaToWatch()
 
             // Send notifications to watch when WearListener requests it using flow collection
             ServiceCommunication.sendToWatchFlow.collect {
 
-                syncEnabled = dataStore.data.first().notificationsSync
+                val currentPrefs = dataStore.data.first()
+                syncEnabled = currentPrefs.notificationsSync
+                mediaSyncEnabled = currentPrefs.mediaPlaybackSync
 
                 if (syncEnabled){
                     debounceSendToWatch(
@@ -87,6 +111,7 @@ class NotificationListener : NotificationListenerService() {
                         forceSend = true
                     )
                 }
+                syncMediaToWatch()
             }
         }
     }
@@ -101,8 +126,86 @@ class NotificationListener : NotificationListenerService() {
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
     }
+
+    private fun updateMediaControllers(controllers: List<MediaController>?) {
+        // Remove old callbacks
+        activeMediaControllers.forEach { (controller, callback) ->
+            controller.unregisterCallback(callback)
+        }
+        activeMediaControllers.clear()
+
+        controllers?.forEach { controller ->
+            val callback = object : MediaController.Callback() {
+                override fun onMetadataChanged(metadata: MediaMetadata?) {
+                    syncMediaToWatch()
+                }
+
+                override fun onPlaybackStateChanged(state: PlaybackState?) {
+                    syncMediaToWatch()
+                }
+            }
+            controller.registerCallback(callback)
+            activeMediaControllers[controller] = callback
+        }
+        syncMediaToWatch()
+    }
+
+    private fun syncMediaToWatch() {
+        serviceScope.launch {
+            val controllers = if (mediaSyncEnabled) {
+                mediaSessionManager.getActiveSessions(ComponentName(this@NotificationListener, NotificationListener::class.java))
+            } else {
+                emptyList()
+            }
+            val activeSession = controllers.firstOrNull { it.playbackState?.state == PlaybackState.STATE_PLAYING }
+                ?: controllers.firstOrNull()
+
+            val putDataMapReq = PutDataMapRequest.create("/now-playing")
+            if (activeSession != null) {
+                val metadata = activeSession.metadata
+                val playbackState = activeSession.playbackState
+
+                putDataMapReq.dataMap.apply {
+                    putString("title", metadata?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: "")
+                    putString("artist", metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: "")
+                    putBoolean("status", playbackState?.state == PlaybackState.STATE_PLAYING)
+
+                    val bitmap = metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+                        ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
+                        ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
+
+                    if (bitmap != null) {
+                        putByteArray("artwork", bitmapToByteArray(bitmap))
+                    } else {
+                        remove("artwork")
+                    }
+                }
+            } else {
+                putDataMapReq.dataMap.apply {
+                    putString("title", "")
+                    putString("artist", "")
+                    putBoolean("status", false)
+                    remove("artwork")
+                }
+            }
+
+            try {
+                dataClient.putDataItem(putDataMapReq.asPutDataRequest().setUrgent()).await()
+            } catch (e: Exception) {
+                Log.e("NotificationListener", "syncMediaToWatch failed: ${e.message}")
+            }
+        }
+    }
+
     override fun onDestroy() {
         super.onDestroy()
+        if (::mediaSessionManager.isInitialized) {
+            mediaSessionManager.removeOnActiveSessionsChangedListener(sessionListener)
+        }
+        activeMediaControllers.forEach { (controller, callback) ->
+            controller.unregisterCallback(callback)
+        }
+        activeMediaControllers.clear()
         serviceScope.cancel()
     }
 

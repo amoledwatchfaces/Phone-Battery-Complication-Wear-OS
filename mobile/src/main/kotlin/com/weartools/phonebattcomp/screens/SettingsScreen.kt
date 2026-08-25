@@ -203,6 +203,40 @@ fun SettingsScreen(
                             }
                         })
                     }
+                    // Media Playback Sync Switch
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(0.8f)
+                        ) {
+                            Text(
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Medium,
+                                text = "Media Playback Sync")
+                            Text(
+                                style = MaterialTheme.typography.bodySmall,
+                                fontWeight = FontWeight.Medium,
+                                color = Color.Gray,
+                                text = "Now Playing Complication support")
+                        }
+                        Switch(
+                            modifier = Modifier.weight(0.2f),
+                            enabled = isWearableApiSupported.value && preferences.value.backgroundServiceState && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                            checked = preferences.value.mediaPlaybackSync,
+                            onCheckedChange = {
+                                if (it){
+                                    viewModel.setMediaPlaybackSyncState(true)
+                                }
+                                else {
+                                    viewModel.setMediaPlaybackSyncState(false)
+                                }
+                            })
+                    }
                     // Calendar Events Sync Switch
                     Row(
                         modifier = Modifier

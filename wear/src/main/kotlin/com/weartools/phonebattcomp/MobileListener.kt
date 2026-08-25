@@ -12,6 +12,7 @@ import com.google.android.gms.wearable.DataMapItem
 import com.google.android.gms.wearable.PutDataMapRequest
 import com.google.android.gms.wearable.WearableListenerService
 import com.weartools.phonebattcomp.complication.MobileBatteryComplicationService
+import com.weartools.phonebattcomp.complication.NowPlayingComplicationService
 import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
 import com.weartools.phonebattcomp.utils.updateCalendarComplications
@@ -36,6 +37,7 @@ private const val FORCE_UPDATE_KEY = "force-update-key"
 private const val IS_CHARGING_KEY = "is-charging-key"
 private const val CHARGE_TIME_REMAINING_KEY = "charge-time-remaining-key"
 private const val URI = "/foobar"
+private const val NOW_PLAYING_PATH = "/now-playing"
 
 private const val CALENDAR_EVENTS_PATH = "/calendar-events"
 private const val CALENDAR_EVENTS_KEY = "events"
@@ -95,6 +97,24 @@ class MobileListener : WearableListenerService() {
                         }
                         URI -> {
                             processDataItem(DataMapItem.fromDataItem(dataEvent.dataItem).dataMap)
+                        }
+                        NOW_PLAYING_PATH -> {
+                            val dataMap = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap
+                            ioScope.launch {
+                                dataStore.updateData {
+                                    it.copy(
+                                        nowPlayingTitle = dataMap.getString("title", ""),
+                                        nowPlayingArtist = dataMap.getString("artist", ""),
+                                        nowPlayingStatus = dataMap.getBoolean("status", false),
+                                        nowPlayingArtwork = dataMap.getByteArray("artwork")
+                                    )
+                                }
+                                try {
+                                    updateComplication(NowPlayingComplicationService::class.java)
+                                } catch (_: Exception) {
+                                    Log.e(TAG, "NowPlayingComplicationService not found yet")
+                                }
+                            }
                         }
                         CALENDAR_EVENTS_PATH -> {
                             val dataMap = dataEvent.dataItem.data?.let { DataMap.fromByteArray(it) }

@@ -1,35 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="DesignSurface">
-    <option name="filePathToZoomLevelMap">
-      <map>
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication2/mobile/src/main/res/layout/activity_main.xml" value="0.1" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication2/mobile/src/main/res/mipmap-anydpi-v26/ic_launcher_round.xml" value="0.2155" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication2/wear/src/main/res/drawable/ic_phone_disconnected.xml" value="0.1" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication2/wear/src/main/res/drawable/ic_phone_icon.xml" value="0.1" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication2/wear/src/main/res/layout/activity_main.xml" value="0.6172839506172839" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication3/mobile/src/main/res/layout/activity_main.xml" value="0.3" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication6/wear/src/main/res/drawable/ic_launcher_background.xml" value="0.254" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication6/wear/src/main/res/drawable/ic_launcher_foreground.xml" value="0.254" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication6/wear/src/main/res/drawable/ic_phone_disconnected.xml" value="0.254" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication6/wear/src/main/res/drawable/ic_phone_icon.xml" value="0.254" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/drawable/ic_charging.xml" value="0.203" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/drawable/ic_launcher_background.xml" value="0.2245" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/drawable/ic_launcher_foreground.xml" value="0.2245" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/drawable/ic_phone_disconnected.xml" value="0.203" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/drawable/ic_phone_icon.xml" value="0.19" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/drawable/ic_svg.xml" value="0.2245" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/drawable/ic_watch.xml" value="0.19" />
-        <entry key="..\:/Users/amoledwatchfaces/AndroidStudioProjects/PhoneBatteryComplication7/wear/src/main/res/layout/activity_main.xml" value="1.28" />
-        <entry key="..\:/Users/amoledwatchfaces/StudioProjects/PhoneBatteryComplication8/mobile/src/main/res/layout/activity_main.xml" value="0.3" />
-        <entry key="..\:/Users/amoledwatchfaces/StudioProjects/PhoneBatteryComplication8/wear/src/main/res/layout/activity_main.xml" value="0.1" />
-      </map>
-    </option>
-  </component>
   <component name="ExternalStorageConfigurationManager" enabled="true" />
-  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="jbr-25" project-jdk-type="JavaSDK">
-    <output url="file://$PROJECT_DIR$/build/classes" />
-  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_25" default="true" project-jdk-name="jbr-25" project-jdk-type="JavaSDK" />
   <component name="ProjectType">
     <option name="id" value="Android" />
   </component>

@@ -38,6 +38,12 @@ data class UserPreferences(
     // Calendar Events
     val calendarEvents: List<CalendarEvent> = emptyList(),
 
+    // Now Playing
+    val nowPlayingTitle: String = "",
+    val nowPlayingArtist: String = "",
+    val nowPlayingStatus: Boolean = false,
+    val nowPlayingArtwork: ByteArray? = null,
+
     // Common
     val tempUnit: Boolean = true,
     val percentage: Boolean = false,

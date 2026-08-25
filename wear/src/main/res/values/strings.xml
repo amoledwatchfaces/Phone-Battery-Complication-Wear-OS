@@ -33,6 +33,10 @@
     <string name="phone_notifications_preview_complication">Phone notifications preview</string>
     <string name="no_notifications">No notifications</string>
 
+    <!-- Now Playing Complication -->
+    <string name="now_playing_complication">Now playing</string>
+    <string name="no_media">No media</string>
+
     <!-- Phone Battery Complication strings -->
     <string name="phone_battery_preview_desc">Phone battery</string>
     <string name="phone_battery_at">Phone battery level at</string>
