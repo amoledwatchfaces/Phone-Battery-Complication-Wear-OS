@@ -1,7 +1,8 @@
 package com.weartools.phonebattcomp.complication
 
-import android.graphics.BitmapFactory
+import android.graphics.*
 import android.graphics.drawable.Icon
+import androidx.core.content.ContextCompat
 import androidx.datastore.core.DataStore
 import androidx.wear.watchface.complications.data.*
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
@@ -12,6 +13,7 @@ import com.weartools.phonebattcomp.receiver.MediaTapReceiver
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
+import androidx.core.graphics.createBitmap
 
 @AndroidEntryPoint
 class NowPlayingComplicationService : SuspendingComplicationDataSourceService() {
@@ -21,20 +23,10 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         return when (type) {
-            /*
-            ComplicationType.LONG_TEXT -> {
-                LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = "Song Title").build(),
-                    contentDescription = ComplicationText.EMPTY)
-                    .setTitle(PlainComplicationText.Builder(text = "Artist Name").build())
-                    .setSmallImage(SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.music_note_24px), type = SmallImageType.PHOTO).build())
-                    .build()
-            }
 
-             */
             ComplicationType.SMALL_IMAGE -> {
                 SmallImageComplicationData.Builder(
-                    smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.music_note_24px), type = SmallImageType.PHOTO).build(),
+                    smallImage = SmallImage.Builder(image = Icon.createWithResource(this, R.drawable.music_note_24px), type = SmallImageType.ICON).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .build()
             }
@@ -50,50 +42,17 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
 
     override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
         val prefs = dataStore.data.first()
-        //val title = prefs.nowPlayingTitle
-        //val artist = prefs.nowPlayingArtist
         val artworkBytes = prefs.nowPlayingArtwork
         val playStatus = prefs.nowPlayingStatus
-
-        //val hasMedia = title.isNotEmpty()
         
         val tapIntent = MediaTapReceiver.getToggleIntent(this)
-        
-        val icon = if (artworkBytes != null) {
-            try {
-                val array = artworkBytes.toByteArray()
-                val bitmap = BitmapFactory.decodeByteArray(array, 0, array.size)
-                if (bitmap != null) Icon.createWithBitmap(bitmap)
-                else Icon.createWithResource(this, R.drawable.music_note_24px)
-            } catch (_: Exception) {
-                Icon.createWithResource(this, R.drawable.music_note_24px)
-            }
-        } else {
-            Icon.createWithResource(this, R.drawable.music_note_24px)
-        }
+        val icon = createArtworkIcon(artworkBytes, playStatus)
 
         return when (request.complicationType) {
-
-            // SMALL IMAGE IN LONG_TEXT IS NOT WORKING PROPERLY IN WFF
-            /*
-            ComplicationType.LONG_TEXT -> {
-                LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = if (hasMedia) title else getString(R.string.no_media)).build(),
-                    contentDescription = ComplicationText.EMPTY)
-                    .setTitle(if (artist.isNotEmpty()) PlainComplicationText.Builder(text = artist).build() else null)
-                    .setSmallImage(SmallImage.Builder(
-                        image = icon,
-                        type = SmallImageType.PHOTO)
-                        .setAmbientImage(icon)
-                        .build())
-                    .setTapAction(tapIntent)
-                    .build()
-            }
-
-             */
             ComplicationType.SMALL_IMAGE -> {
+                val imageType = if (artworkBytes.isNullOrEmpty()) SmallImageType.ICON else SmallImageType.PHOTO
                 SmallImageComplicationData.Builder(
-                    smallImage = SmallImage.Builder(image = icon, type = SmallImageType.PHOTO).build(),
+                    smallImage = SmallImage.Builder(image = icon, type = imageType).build(),
                     contentDescription = ComplicationText.EMPTY)
                     .setTapAction(tapIntent)
                     .build()
@@ -106,6 +65,43 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
                     .build()
             }
             else -> null
+        }
+    }
+
+    private fun createArtworkIcon(artworkBytes: List<Byte>?, playStatus: Boolean): Icon {
+        if (artworkBytes == null) return Icon.createWithResource(this, R.drawable.music_note_24px)
+
+        return try {
+            val array = artworkBytes.toByteArray()
+            var bitmap = BitmapFactory.decodeByteArray(array, 0, array.size)
+            if (bitmap != null) {
+                if (!playStatus) {
+                    val mutableBitmap = createBitmap(bitmap.width, bitmap.height)
+                    val canvas = Canvas(mutableBitmap)
+                    val paint = Paint().apply {
+                        colorFilter = ColorMatrixColorFilter(ColorMatrix().apply {
+                            setScale(0.5f, 0.5f, 0.5f, 1f)
+                        })
+                    }
+                    canvas.drawBitmap(bitmap, 0f, 0f, paint)
+
+                    val playIcon = ContextCompat.getDrawable(this, R.drawable.play_arrow_24px)
+                    playIcon?.let {
+                        val size = (mutableBitmap.width * 0.5f).toInt()
+                        val left = (mutableBitmap.width - size) / 2
+                        val top = (mutableBitmap.height - size) / 2
+                        it.setBounds(left, top, left + size, top + size)
+                        it.setTint(Color.WHITE)
+                        it.draw(canvas)
+                    }
+                    bitmap = mutableBitmap
+                }
+                Icon.createWithBitmap(bitmap)
+            } else {
+                Icon.createWithResource(this, R.drawable.music_note_24px)
+            }
+        } catch (_: Exception) {
+            Icon.createWithResource(this, R.drawable.music_note_24px)
         }
     }
 }
