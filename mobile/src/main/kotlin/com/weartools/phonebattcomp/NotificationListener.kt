@@ -159,7 +159,7 @@ class NotificationListener : NotificationListenerService() {
                 }
 
                 override fun onPlaybackStateChanged(state: PlaybackState?) {
-                    Log.d("NotificationListener", "onPlaybackStateChanged")
+                    Log.d("NotificationListener", "onPlaybackStateChanged ${state?.state}")
                     syncMediaToWatch()
                 }
             }
@@ -183,7 +183,6 @@ class NotificationListener : NotificationListenerService() {
             val activeSession = controllers.firstOrNull { 
                 it.playbackState?.state == PlaybackState.STATE_PLAYING
             } ?: controllers.firstOrNull()
-            Log.d("NotificationListener", "activeSession: $activeSession, $activeMediaControllers")
 
             if (activeSession != null) {
                 val metadata = activeSession.metadata
