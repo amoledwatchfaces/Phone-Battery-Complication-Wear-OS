@@ -18,7 +18,6 @@ package com.weartools.phonebattcomp.complication
 
 import android.graphics.BitmapFactory
 import android.graphics.drawable.Icon
-import android.util.Log
 import androidx.datastore.core.DataStore
 import androidx.wear.watchface.complications.data.*
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
@@ -67,8 +66,6 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
         val title = prefs.nowPlayingTitle
         val artist = prefs.nowPlayingArtist
         val artworkBytes = prefs.nowPlayingArtwork
-        
-        Log.d("NowPlayingComp", "onComplicationRequest: title='$title', artist='$artist', artwork=${artworkBytes?.size}")
 
         val hasMedia = title.isNotEmpty()
         
