@@ -29,6 +29,7 @@ import kotlinx.coroutines.withContext
 import java.util.TimeZone
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 
 class CalendarContentObserver @Inject constructor(
     handler: Handler,
@@ -41,7 +42,7 @@ class CalendarContentObserver @Inject constructor(
 
     // Coroutine job for debouncing
     private var debounceJob: Job? = null
-    private val debounceDelay = 1000L // 1 second debounce delay
+    private val debounceDelay = 1000L // 1-second debounce delay
 
     override fun onChange(selfChange: Boolean) {
         super.onChange(selfChange)
@@ -50,7 +51,7 @@ class CalendarContentObserver @Inject constructor(
 
         // Launch a new coroutine with a debounce delay
         debounceJob = scope.launch {
-            delay(debounceDelay) // Wait for the debounce delay
+            delay(debounceDelay.milliseconds) // Wait for the debounce delay
 
             //Log.d("CalendarContentObserver", "onChange!")
 
