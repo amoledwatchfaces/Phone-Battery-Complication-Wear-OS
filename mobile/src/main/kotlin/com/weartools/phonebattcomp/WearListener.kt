@@ -114,6 +114,7 @@ class WearListener : WearableListenerService() {
     }
 
     override fun onMessageReceived(messageEvent: MessageEvent) {
+        Log.d(TAG, "onMessageReceived: ${messageEvent.path}")
         if (messageEvent.path == "/toggle-playback") {
             val mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
             val controllers = try {

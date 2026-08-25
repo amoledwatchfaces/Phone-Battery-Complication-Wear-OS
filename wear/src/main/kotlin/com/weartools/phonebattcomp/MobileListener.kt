@@ -100,16 +100,22 @@ class MobileListener : WearableListenerService() {
                         }
                         NOW_PLAYING_PATH -> {
                             val dataMap = DataMapItem.fromDataItem(dataEvent.dataItem).dataMap
+                            val title = dataMap.getString("title", "")
+                            val artist = dataMap.getString("artist", "")
+                            val status = dataMap.getBoolean("status", false)
+                            Log.d(TAG, "Received Now Playing: $title by $artist (playing: $status)")
+
                             ioScope.launch {
                                 dataStore.updateData {
                                     it.copy(
-                                        nowPlayingTitle = dataMap.getString("title", ""),
-                                        nowPlayingArtist = dataMap.getString("artist", ""),
-                                        nowPlayingStatus = dataMap.getBoolean("status", false),
+                                        nowPlayingTitle = title,
+                                        nowPlayingArtist = artist,
+                                        nowPlayingStatus = status,
                                         nowPlayingArtwork = dataMap.getByteArray("artwork")?.toList()
                                     )
                                 }
                                 try {
+                                    Log.d(TAG, "Requesting complication update for NowPlaying")
                                     updateComplication(NowPlayingComplicationService::class.java)
                                 } catch (_: Exception) {
                                     Log.e(TAG, "NowPlayingComplicationService not found yet")

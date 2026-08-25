@@ -128,6 +128,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.60.1")
 
     // Firebase
-    //implementation (platform("com.google.firebase:firebase-bom:34.13.0"))
-    //implementation ("com.google.firebase:firebase-crashlytics")
+    implementation (platform("com.google.firebase:firebase-bom:34.18.0"))
+    implementation ("com.google.firebase:firebase-crashlytics")
 }

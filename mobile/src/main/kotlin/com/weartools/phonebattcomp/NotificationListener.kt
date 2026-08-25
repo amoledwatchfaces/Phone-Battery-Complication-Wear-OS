@@ -8,11 +8,14 @@ import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
+import android.media.session.MediaSession
+import android.graphics.ImageDecoder
+import android.os.Build
 import android.service.notification.NotificationListenerService
 import android.service.notification.StatusBarNotification
 import android.util.Log
 import android.content.ComponentName
-import android.content.Context
+import android.provider.MediaStore
 import androidx.core.graphics.createBitmap
 import androidx.datastore.core.DataStore
 import com.google.android.gms.wearable.DataClient
@@ -35,6 +38,9 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.tasks.await
 import java.io.ByteArrayOutputStream
 import javax.inject.Inject
+import androidx.core.graphics.scale
+import androidx.core.net.toUri
+import kotlin.time.Duration.Companion.milliseconds
 
 @AndroidEntryPoint
 class NotificationListener : NotificationListenerService() {
@@ -77,12 +83,24 @@ class NotificationListener : NotificationListenerService() {
         private const val NOTIFICATION_TITLE = "ntitle"
     }
 
+    override fun onCreate() {
+        super.onCreate()
+        Log.d("NotificationListener", "onCreate")
+    }
+
     override fun onListenerConnected() {
         super.onListenerConnected()
+        Log.d("NotificationListener", "onListenerConnected")
 
         mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
-        mediaSessionManager.addOnActiveSessionsChangedListener(sessionListener, ComponentName(this, NotificationListener::class.java))
-        updateMediaControllers(mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java)))
+        try {
+            mediaSessionManager.addOnActiveSessionsChangedListener(sessionListener, ComponentName(this, NotificationListener::class.java))
+            val sessions = mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java))
+            Log.d("NotificationListener", "Initial active sessions: ${sessions.size}")
+            updateMediaControllers(sessions)
+        } catch (e: SecurityException) {
+            Log.e("NotificationListener", "SecurityException: Is Notification Listener permission granted?", e)
+        }
 
         BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
 
@@ -121,13 +139,16 @@ class NotificationListener : NotificationListenerService() {
             BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
         }
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
+        syncMediaToWatch()
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
+        syncMediaToWatch()
     }
 
     private fun updateMediaControllers(controllers: List<MediaController>?) {
+        Log.d("NotificationListener", "updateMediaControllers: ${controllers?.size} controllers found")
         // Remove old callbacks
         activeMediaControllers.forEach { (controller, callback) ->
             controller.unregisterCallback(callback)
@@ -151,32 +172,111 @@ class NotificationListener : NotificationListenerService() {
     }
 
     private fun syncMediaToWatch() {
+        Log.d("NotificationListener", "syncMediaToWatch enabled: $mediaSyncEnabled")
+        if (!mediaSyncEnabled) return
         serviceScope.launch {
-            val controllers = if (mediaSyncEnabled) {
-                mediaSessionManager.getActiveSessions(ComponentName(this@NotificationListener, NotificationListener::class.java))
-            } else {
-                emptyList()
+            val controllers = mediaSessionManager.getActiveSessions(ComponentName(this@NotificationListener, NotificationListener::class.java))
+
+            val activeSession = controllers.firstOrNull { 
+                it.playbackState?.state == PlaybackState.STATE_PLAYING
             }
-            val activeSession = controllers.firstOrNull { it.playbackState?.state == PlaybackState.STATE_PLAYING }
-                ?: controllers.firstOrNull()
+
+            Log.d("NotificationListener", "Selected session: ${activeSession?.packageName}")
 
             val putDataMapReq = PutDataMapRequest.create("/now-playing")
             if (activeSession != null) {
                 val metadata = activeSession.metadata
                 val playbackState = activeSession.playbackState
+                
+                val title = metadata?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: ""
+                val artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: ""
+                val status = playbackState?.state == PlaybackState.STATE_PLAYING
+
+                Log.d("NotificationListener", "Sending Now Playing: $title by $artist (playing: $status)")
 
                 putDataMapReq.dataMap.apply {
-                    putString("title", metadata?.getString(MediaMetadata.METADATA_KEY_TITLE) ?: "")
-                    putString("artist", metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: "")
-                    putBoolean("status", playbackState?.state == PlaybackState.STATE_PLAYING)
+                    putString("title", title)
+                    putString("artist", artist)
+                    putBoolean("status", status)
 
-                    val bitmap = metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
+                    var bitmap = metadata?.getBitmap(MediaMetadata.METADATA_KEY_ALBUM_ART)
                         ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_ART)
                         ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
+                        ?: metadata?.description?.iconBitmap
+                    
+                    if (bitmap != null) Log.d("NotificationListener", "Bitmap found in metadata: ${bitmap.width}x${bitmap.height}")
+                    
+                    // Check URIs if bitmap is still null
+                    if (bitmap == null) {
+                        val uriString = metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
+                            ?: metadata?.getString(MediaMetadata.METADATA_KEY_ART_URI)
+                            ?: metadata?.getString(MediaMetadata.METADATA_KEY_DISPLAY_ICON_URI)
+                            ?: metadata?.description?.iconUri?.toString()
+                        
+                        if (uriString != null) {
+                            Log.d("NotificationListener", "Found artwork URI: $uriString")
+                            try {
+                                val uri = uriString.toUri()
+                                if (uri.scheme == "content" || uri.scheme == "android.resource" || uri.scheme == "file") {
+                                    bitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                                        val source = ImageDecoder.createSource(contentResolver, uri)
+                                        ImageDecoder.decodeBitmap(source)
+                                    } else {
+                                        @Suppress("DEPRECATION")
+                                        MediaStore.Images.Media.getBitmap(contentResolver, uri)
+                                    }
+                                    Log.d("NotificationListener", "Bitmap loaded from URI: ${bitmap?.width}x${bitmap?.height}")
+                                }
+                            } catch (e: Exception) {
+                                Log.e("NotificationListener", "Failed to load bitmap from URI", e)
+                            }
+                        }
+                    }
+
+                    // Fallback to notification large icon if still null
+                    if (bitmap == null) {
+                        Log.d("NotificationListener", "Metadata bitmap/URI null, checking notification fallback...")
+                        val notification = activeNotifications.find { it.packageName == activeSession.packageName }
+                        
+                        // Try android.largeIcon first
+                        val largeIcon = notification?.notification?.getLargeIcon()
+                        if (largeIcon != null) {
+                            val drawable = largeIcon.loadDrawable(this@NotificationListener)
+                            if (drawable != null) {
+                                bitmap = drawableToBitmap(drawable, 256)
+                                Log.d("NotificationListener", "Bitmap found in notification getLargeIcon()")
+                            }
+                        }
+                        
+                        // Extra deep dive into extras
+                        if (bitmap == null && notification != null) {
+                            val extras = notification.notification.extras
+                            @Suppress("DEPRECATION")
+                            val extraBitmap = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                                extras.getParcelable("android.largeIcon.big", Bitmap::class.java)
+                                    ?: extras.getParcelable("android.picture", Bitmap::class.java)
+                            } else {
+                                extras.getParcelable("android.largeIcon.big")
+                                    ?: extras.getParcelable("android.picture")
+                            }
+                            
+                            if (extraBitmap != null) {
+                                bitmap = extraBitmap
+                                Log.d("NotificationListener", "Bitmap found in notification extras deep dive")
+                            }
+                        }
+                    }
 
                     if (bitmap != null) {
-                        putByteArray("artwork", bitmapToByteArray(bitmap))
+                        val scaledBitmap = if (bitmap.width > 256 || bitmap.height > 256) {
+                            Log.d("NotificationListener", "Scaling bitmap down from ${bitmap.width}x${bitmap.height}")
+                            bitmap.scale(256, 256)
+                        } else bitmap
+                        val byteArray = bitmapToByteArray(scaledBitmap, isArtwork = true)
+                        Log.d("NotificationListener", "Sending artwork byte array: ${byteArray.size} bytes")
+                        putByteArray("artwork", byteArray)
                     } else {
+                        Log.d("NotificationListener", "No bitmap found anywhere")
                         remove("artwork")
                     }
                 }
@@ -216,7 +316,7 @@ class NotificationListener : NotificationListenerService() {
         notificationJob?.cancel()
         notificationJob = serviceScope.launch {
 
-            delay(300)  // Debounce delay
+            delay(300.milliseconds)  // Debounce delay
 
             if (isActive) {
                 sendToWatch(updateTime, forceSend)
@@ -322,16 +422,20 @@ class NotificationListener : NotificationListenerService() {
         }
     }
 
-    private fun bitmapToByteArray(bitmap: Bitmap): ByteArray {
+    private fun bitmapToByteArray(bitmap: Bitmap, isArtwork: Boolean = false): ByteArray {
         val stream = ByteArrayOutputStream()
-        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        if (isArtwork) {
+            bitmap.compress(Bitmap.CompressFormat.JPEG, 80, stream)
+        } else {
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream)
+        }
         return stream.toByteArray()
     }
-    private fun drawableToBitmap(drawable: Drawable): Bitmap {
-        val bitmap = createBitmap(ICON_SIZE, ICON_SIZE)
+    private fun drawableToBitmap(drawable: Drawable, size: Int = ICON_SIZE): Bitmap {
+        val bitmap = createBitmap(size, size)
         val canvas = Canvas(bitmap)
         drawable.setBounds(0, 0, canvas.width, canvas.height)
-        drawable.setTint(Color.WHITE)
+        if (size == ICON_SIZE) drawable.setTint(Color.WHITE)
         drawable.draw(canvas)
         return bitmap
     }
