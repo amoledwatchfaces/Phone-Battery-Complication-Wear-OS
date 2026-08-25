@@ -235,7 +235,7 @@ class NotificationListener : NotificationListenerService() {
                     // Fallback to notification large icon if still null
                     if (bitmap == null) {
                         val notification = activeNotifications.find { it.packageName == activeSession.packageName }
-                        
+
                         // Try android.largeIcon first
                         val largeIcon = notification?.notification?.getLargeIcon()
                         if (largeIcon != null) {
@@ -244,7 +244,7 @@ class NotificationListener : NotificationListenerService() {
                                 bitmap = drawableToBitmap(drawable, 256)
                             }
                         }
-                        
+
                         // Extra deep dive into extras
                         if (bitmap == null && notification != null) {
                             val extras = notification.notification.extras
@@ -256,7 +256,7 @@ class NotificationListener : NotificationListenerService() {
                                 extras.getParcelable("android.largeIcon.big")
                                     ?: extras.getParcelable("android.picture")
                             }
-                            
+
                             if (extraBitmap != null) {
                                 bitmap = extraBitmap
                             }
@@ -268,12 +268,12 @@ class NotificationListener : NotificationListenerService() {
                             bitmap.scale(256, 256)
                         } else bitmap
                         val byteArray = bitmapToByteArray(scaledBitmap, isArtwork = true)
-                        
+
                         // Check if artwork has actually changed
                         if (title == lastNowPlayingTitle && artist == lastNowPlayingArtist && status == lastNowPlayingStatus && lastNowPlayingArtwork?.contentEquals(byteArray) == true) {
                             return@apply
                         }
-                        
+
                         putByteArray("artwork", byteArray)
                         lastNowPlayingArtwork = byteArray
                     } else {
@@ -281,7 +281,7 @@ class NotificationListener : NotificationListenerService() {
                         lastNowPlayingArtwork = null
                     }
                 }
-                
+
                 // Update last sent values
                 lastNowPlayingTitle = title
                 lastNowPlayingArtist = artist
@@ -296,7 +296,7 @@ class NotificationListener : NotificationListenerService() {
                 if (lastNowPlayingTitle.isEmpty() && !lastNowPlayingStatus) {
                     return@launch
                 }
-                
+
                 val putDataMapReq = PutDataMapRequest.create("/now-playing")
                 putDataMapReq.dataMap.apply {
                     putString("title", "")
@@ -304,7 +304,7 @@ class NotificationListener : NotificationListenerService() {
                     putBoolean("status", false)
                     remove("artwork")
                 }
-                
+
                 lastNowPlayingTitle = ""
                 lastNowPlayingArtist = ""
                 lastNowPlayingStatus = false
