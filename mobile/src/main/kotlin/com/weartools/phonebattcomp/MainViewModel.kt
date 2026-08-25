@@ -49,6 +49,7 @@ import kotlinx.coroutines.tasks.await
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 import androidx.core.net.toUri
+import kotlin.time.Duration.Companion.milliseconds
 
 
 @HiltViewModel
@@ -120,7 +121,7 @@ class MainViewModel @Inject constructor(
                 message = context.getString(R.string.toast_check_wearable)
                 _isMessageShown.emit(true)
             } catch (_: CancellationException) {
-                // Request was cancelled normally
+                // Request was canceled normally
             } catch (_: Throwable) {
                 message = "Play Store Request Failed. Wear device(s) may not support Play Store"
                 _isMessageShown.emit(true)
@@ -136,11 +137,11 @@ class MainViewModel @Inject constructor(
 
             withContext(Dispatchers.Main) {
                 connectedNodesMutableStateFlow.value = connectedNodes
-                delay(1_000L)
+                delay(1_000L.milliseconds)
                 updateUI()
             }
         } catch (_: CancellationException) {
-            // Request was cancelled normally
+            // Request was canceled normally
             loaderStateMutableStateFlow.value = false
         } catch (t: Throwable) {
             loaderStateMutableStateFlow.value = false

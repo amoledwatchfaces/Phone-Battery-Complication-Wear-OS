@@ -278,6 +278,26 @@ fun SettingsScreen(
                                 }
                             })
                     }
+                    OutlinedButton(
+                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
+                        enabled = isWearableApiSupported.value && preferences.value.calendarSync && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
+                        onClick = {
+                            viewModel.fetchCalendars(context)
+                            openCalendars=openCalendars.not()
+                            view.playSoundEffect(SoundEffectConstants.CLICK)
+                        }
+                    ) {
+                        Icon(
+                            modifier = Modifier.padding(end = 8.dp),
+                            imageVector = Icons.Filled.EditCalendar,
+                            contentDescription = null,
+                        )
+                        Text(
+                            fontWeight = FontWeight.Medium,
+                            style = MaterialTheme.typography.bodyMedium,
+                            text = stringResource(id = R.string.calendars)
+                        )
+                    }
                     // Crashlytics Toggle
                     Row(
                         modifier = Modifier
@@ -303,26 +323,6 @@ fun SettingsScreen(
                             modifier = Modifier.weight(0.2f),
                             checked = preferences.value.crashlytics,
                             onCheckedChange = { viewModel.setCrashlytics(it) }
-                        )
-                    }
-                    OutlinedButton(
-                        modifier = Modifier.padding(start = 16.dp, bottom = 8.dp),
-                        enabled = isWearableApiSupported.value && preferences.value.calendarSync && commonNodesList.value.isNullOrEmpty().not() && isWatchConnected.value,
-                        onClick = {
-                            viewModel.fetchCalendars(context)
-                            openCalendars=openCalendars.not()
-                            view.playSoundEffect(SoundEffectConstants.CLICK)
-                        }
-                    ) {
-                        Icon(
-                            modifier = Modifier.padding(end = 8.dp),
-                            imageVector = Icons.Filled.EditCalendar,
-                            contentDescription = null,
-                        )
-                        Text(
-                            fontWeight = FontWeight.Medium,
-                            style = MaterialTheme.typography.bodyMedium,
-                            text = stringResource(id = R.string.calendars)
                         )
                     }
                 }
