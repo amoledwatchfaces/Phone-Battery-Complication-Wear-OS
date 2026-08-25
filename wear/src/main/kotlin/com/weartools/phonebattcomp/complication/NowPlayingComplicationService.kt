@@ -53,6 +53,7 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
         //val title = prefs.nowPlayingTitle
         //val artist = prefs.nowPlayingArtist
         val artworkBytes = prefs.nowPlayingArtwork
+        val playStatus = prefs.nowPlayingStatus
 
         //val hasMedia = title.isNotEmpty()
         
