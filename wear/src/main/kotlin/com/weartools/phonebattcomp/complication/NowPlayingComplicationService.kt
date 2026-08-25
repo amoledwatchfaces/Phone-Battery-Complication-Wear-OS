@@ -53,14 +53,14 @@ class NowPlayingComplicationService : SuspendingComplicationDataSourceService() 
                 SmallImageComplicationData.Builder(
                     smallImage = SmallImage.Builder(image = icon, type = imageType).build(),
                     contentDescription = ComplicationText.EMPTY)
-                    .setTapAction(tapIntent)
+                    .setTapAction(if(artworkBytes.isNullOrEmpty()) null else tapIntent)
                     .build()
             }
             ComplicationType.PHOTO_IMAGE -> {
                 PhotoImageComplicationData.Builder(
                     photoImage = icon,
                     contentDescription = ComplicationText.EMPTY)
-                    .setTapAction(tapIntent)
+                    .setTapAction(if(artworkBytes.isNullOrEmpty()) null else tapIntent)
                     .build()
             }
             else -> null
