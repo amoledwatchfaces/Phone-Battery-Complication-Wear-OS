@@ -68,6 +68,12 @@ class NotificationListener : NotificationListenerService() {
     // Store the previous text+title
     private var lastTextTitleSent = ""
 
+    private var lastNowPlayingTitle = ""
+    private var lastNowPlayingArtist = ""
+    private var lastNowPlayingStatus = false
+    private var lastNowPlayingArtwork: ByteArray? = null
+    private var mediaSyncJob: Job? = null
+
     private lateinit var mediaSessionManager: MediaSessionManager
     private val activeMediaControllers = mutableMapOf<MediaController, MediaController.Callback>()
 
@@ -85,22 +91,16 @@ class NotificationListener : NotificationListenerService() {
 
     override fun onCreate() {
         super.onCreate()
-        Log.d("NotificationListener", "onCreate")
     }
 
     override fun onListenerConnected() {
         super.onListenerConnected()
-        Log.d("NotificationListener", "onListenerConnected")
 
         mediaSessionManager = getSystemService(MEDIA_SESSION_SERVICE) as MediaSessionManager
         try {
             mediaSessionManager.addOnActiveSessionsChangedListener(sessionListener, ComponentName(this, NotificationListener::class.java))
-            val sessions = mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java))
-            Log.d("NotificationListener", "Initial active sessions: ${sessions.size}")
-            updateMediaControllers(sessions)
-        } catch (e: SecurityException) {
-            Log.e("NotificationListener", "SecurityException: Is Notification Listener permission granted?", e)
-        }
+            updateMediaControllers(mediaSessionManager.getActiveSessions(ComponentName(this, NotificationListener::class.java)))
+        } catch (_: SecurityException) {}
 
         BatteryStatusBroadcastReceiver.subscribeToUpdates(this)
 
@@ -140,15 +140,16 @@ class NotificationListener : NotificationListenerService() {
         }
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
         syncMediaToWatch()
+        Log.d("NotificationListener", "onNotificationPosted")
     }
 
     override fun onNotificationRemoved(sbn: StatusBarNotification) {
         if (syncEnabled) debounceSendToWatch(updateTime = System.currentTimeMillis())
         syncMediaToWatch()
+        Log.d("NotificationListener", "onNotificationRemoved")
     }
 
     private fun updateMediaControllers(controllers: List<MediaController>?) {
-        Log.d("NotificationListener", "updateMediaControllers: ${controllers?.size} controllers found")
         // Remove old callbacks
         activeMediaControllers.forEach { (controller, callback) ->
             controller.unregisterCallback(callback)
@@ -158,10 +159,12 @@ class NotificationListener : NotificationListenerService() {
         controllers?.forEach { controller ->
             val callback = object : MediaController.Callback() {
                 override fun onMetadataChanged(metadata: MediaMetadata?) {
+                    Log.d("NotificationListener", "onMetadataChanged")
                     syncMediaToWatch()
                 }
 
                 override fun onPlaybackStateChanged(state: PlaybackState?) {
+                    Log.d("NotificationListener", "onPlaybackStateChanged")
                     syncMediaToWatch()
                 }
             }
@@ -169,21 +172,23 @@ class NotificationListener : NotificationListenerService() {
             activeMediaControllers[controller] = callback
         }
         syncMediaToWatch()
+        Log.d("NotificationListener", "updateMediaControllers")
     }
 
     private fun syncMediaToWatch() {
-        Log.d("NotificationListener", "syncMediaToWatch enabled: $mediaSyncEnabled")
-        if (!mediaSyncEnabled) return
-        serviceScope.launch {
+        mediaSyncJob?.cancel()
+        mediaSyncJob = serviceScope.launch {
+            delay(500.milliseconds)
+            if (!isActive) return@launch
+            
+            if (!mediaSyncEnabled) return@launch
+            
             val controllers = mediaSessionManager.getActiveSessions(ComponentName(this@NotificationListener, NotificationListener::class.java))
 
             val activeSession = controllers.firstOrNull { 
                 it.playbackState?.state == PlaybackState.STATE_PLAYING
-            }
+            } ?: controllers.firstOrNull()
 
-            Log.d("NotificationListener", "Selected session: ${activeSession?.packageName}")
-
-            val putDataMapReq = PutDataMapRequest.create("/now-playing")
             if (activeSession != null) {
                 val metadata = activeSession.metadata
                 val playbackState = activeSession.playbackState
@@ -192,7 +197,12 @@ class NotificationListener : NotificationListenerService() {
                 val artist = metadata?.getString(MediaMetadata.METADATA_KEY_ARTIST) ?: ""
                 val status = playbackState?.state == PlaybackState.STATE_PLAYING
 
-                Log.d("NotificationListener", "Sending Now Playing: $title by $artist (playing: $status)")
+                // Check if text/status has changed before proceeding to heavy bitmap logic
+                if (title == lastNowPlayingTitle && artist == lastNowPlayingArtist && status == lastNowPlayingStatus) {
+                    return@launch
+                }
+
+                val putDataMapReq = PutDataMapRequest.create("/now-playing")
 
                 putDataMapReq.dataMap.apply {
                     putString("title", title)
@@ -204,8 +214,6 @@ class NotificationListener : NotificationListenerService() {
                         ?: metadata?.getBitmap(MediaMetadata.METADATA_KEY_DISPLAY_ICON)
                         ?: metadata?.description?.iconBitmap
                     
-                    if (bitmap != null) Log.d("NotificationListener", "Bitmap found in metadata: ${bitmap.width}x${bitmap.height}")
-                    
                     // Check URIs if bitmap is still null
                     if (bitmap == null) {
                         val uriString = metadata?.getString(MediaMetadata.METADATA_KEY_ALBUM_ART_URI)
@@ -214,7 +222,6 @@ class NotificationListener : NotificationListenerService() {
                             ?: metadata?.description?.iconUri?.toString()
                         
                         if (uriString != null) {
-                            Log.d("NotificationListener", "Found artwork URI: $uriString")
                             try {
                                 val uri = uriString.toUri()
                                 if (uri.scheme == "content" || uri.scheme == "android.resource" || uri.scheme == "file") {
@@ -225,17 +232,13 @@ class NotificationListener : NotificationListenerService() {
                                         @Suppress("DEPRECATION")
                                         MediaStore.Images.Media.getBitmap(contentResolver, uri)
                                     }
-                                    Log.d("NotificationListener", "Bitmap loaded from URI: ${bitmap?.width}x${bitmap?.height}")
                                 }
-                            } catch (e: Exception) {
-                                Log.e("NotificationListener", "Failed to load bitmap from URI", e)
-                            }
+                            } catch (_: Exception) {}
                         }
                     }
 
                     // Fallback to notification large icon if still null
                     if (bitmap == null) {
-                        Log.d("NotificationListener", "Metadata bitmap/URI null, checking notification fallback...")
                         val notification = activeNotifications.find { it.packageName == activeSession.packageName }
                         
                         // Try android.largeIcon first
@@ -244,7 +247,6 @@ class NotificationListener : NotificationListenerService() {
                             val drawable = largeIcon.loadDrawable(this@NotificationListener)
                             if (drawable != null) {
                                 bitmap = drawableToBitmap(drawable, 256)
-                                Log.d("NotificationListener", "Bitmap found in notification getLargeIcon()")
                             }
                         }
                         
@@ -262,37 +264,62 @@ class NotificationListener : NotificationListenerService() {
                             
                             if (extraBitmap != null) {
                                 bitmap = extraBitmap
-                                Log.d("NotificationListener", "Bitmap found in notification extras deep dive")
                             }
                         }
                     }
 
                     if (bitmap != null) {
                         val scaledBitmap = if (bitmap.width > 256 || bitmap.height > 256) {
-                            Log.d("NotificationListener", "Scaling bitmap down from ${bitmap.width}x${bitmap.height}")
                             bitmap.scale(256, 256)
                         } else bitmap
                         val byteArray = bitmapToByteArray(scaledBitmap, isArtwork = true)
-                        Log.d("NotificationListener", "Sending artwork byte array: ${byteArray.size} bytes")
+                        
+                        // Check if artwork has actually changed
+                        if (title == lastNowPlayingTitle && artist == lastNowPlayingArtist && status == lastNowPlayingStatus && lastNowPlayingArtwork?.contentEquals(byteArray) == true) {
+                            return@apply
+                        }
+                        
                         putByteArray("artwork", byteArray)
+                        lastNowPlayingArtwork = byteArray
                     } else {
-                        Log.d("NotificationListener", "No bitmap found anywhere")
                         remove("artwork")
+                        lastNowPlayingArtwork = null
                     }
                 }
+                
+                // Update last sent values
+                lastNowPlayingTitle = title
+                lastNowPlayingArtist = artist
+                lastNowPlayingStatus = status
+
+                try {
+                    dataClient.putDataItem(putDataMapReq.asPutDataRequest().setUrgent()).await()
+                } catch (e: Exception) {
+                    Log.e("NotificationListener", "syncMediaToWatch failed: ${e.message}")
+                }
             } else {
+                if (lastNowPlayingTitle.isEmpty() && !lastNowPlayingStatus) {
+                    return@launch
+                }
+                
+                val putDataMapReq = PutDataMapRequest.create("/now-playing")
                 putDataMapReq.dataMap.apply {
                     putString("title", "")
                     putString("artist", "")
                     putBoolean("status", false)
                     remove("artwork")
                 }
-            }
+                
+                lastNowPlayingTitle = ""
+                lastNowPlayingArtist = ""
+                lastNowPlayingStatus = false
+                lastNowPlayingArtwork = null
 
-            try {
-                dataClient.putDataItem(putDataMapReq.asPutDataRequest().setUrgent()).await()
-            } catch (e: Exception) {
-                Log.e("NotificationListener", "syncMediaToWatch failed: ${e.message}")
+                try {
+                    dataClient.putDataItem(putDataMapReq.asPutDataRequest().setUrgent()).await()
+                } catch (e: Exception) {
+                    Log.e("NotificationListener", "syncMediaToWatch failed: ${e.message}")
+                }
             }
         }
     }
