@@ -8,7 +8,6 @@ import android.media.MediaMetadata
 import android.media.session.MediaController
 import android.media.session.MediaSessionManager
 import android.media.session.PlaybackState
-import android.media.session.MediaSession
 import android.graphics.ImageDecoder
 import android.os.Build
 import android.service.notification.NotificationListenerService
@@ -87,10 +86,6 @@ class NotificationListener : NotificationListenerService() {
         private const val NOTIFICATIONS_UPDATE_KEY = "ts"
         private const val NOTIFICATION_TEXT = "ntext"
         private const val NOTIFICATION_TITLE = "ntitle"
-    }
-
-    override fun onCreate() {
-        super.onCreate()
     }
 
     override fun onListenerConnected() {
@@ -188,6 +183,7 @@ class NotificationListener : NotificationListenerService() {
             val activeSession = controllers.firstOrNull { 
                 it.playbackState?.state == PlaybackState.STATE_PLAYING
             } ?: controllers.firstOrNull()
+            Log.d("NotificationListener", "activeSession: $activeSession, $activeMediaControllers")
 
             if (activeSession != null) {
                 val metadata = activeSession.metadata

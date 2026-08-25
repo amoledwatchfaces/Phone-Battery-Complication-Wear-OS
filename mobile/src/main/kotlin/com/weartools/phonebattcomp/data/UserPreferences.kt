@@ -21,7 +21,7 @@ data class UserPreferences(
     val activeSync: Boolean = false,
     val calendarSync: Boolean = false,
     val notificationsSync: Boolean = true,
-    val mediaPlaybackSync: Boolean = true,
+    val mediaPlaybackSync: Boolean = false,
 
     // Crashlytics
     val crashlytics: Boolean = false,
