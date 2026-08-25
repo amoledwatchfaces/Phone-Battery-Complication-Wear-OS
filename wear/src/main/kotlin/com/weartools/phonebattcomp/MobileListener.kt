@@ -106,7 +106,7 @@ class MobileListener : WearableListenerService() {
                                         nowPlayingTitle = dataMap.getString("title", ""),
                                         nowPlayingArtist = dataMap.getString("artist", ""),
                                         nowPlayingStatus = dataMap.getBoolean("status", false),
-                                        nowPlayingArtwork = dataMap.getByteArray("artwork")
+                                        nowPlayingArtwork = dataMap.getByteArray("artwork")?.toList()
                                     )
                                 }
                                 try {

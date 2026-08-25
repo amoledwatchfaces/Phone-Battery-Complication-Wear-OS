@@ -42,7 +42,7 @@ data class UserPreferences(
     val nowPlayingTitle: String = "",
     val nowPlayingArtist: String = "",
     val nowPlayingStatus: Boolean = false,
-    val nowPlayingArtwork: ByteArray? = null,
+    val nowPlayingArtwork: List<Byte>? = null,
 
     // Common
     val tempUnit: Boolean = true,
