@@ -1,26 +1,49 @@
-# Phone Battery Complication for Wear OS
+# <img src="icon.svg" width="48" align="center" alt="Icon"> Phone Battery Complication for Wear OS
 
-[![CI Build](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml)
+[![Build & Release](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml)
+[![Platform](https://img.shields.io/badge/Platform-Wear_OS-brightgreen?logo=android&logoColor=white)](https://developer.android.com/wear)
 [![Latest Release](https://img.shields.io/github/v/release/amoledwatchfaces/Phone-Battery-Complication-Wear-OS?logo=github&color=blue)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/releases)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
-[![Platform](https://img.shields.io/badge/Platform-Wear_OS-green.svg?logo=android&logoColor=white)](https://developer.android.com/wear)
+[![Privacy Policy](https://img.shields.io/badge/Privacy--Policy-Read-blue?logo=googleplay&logoColor=white)](https://amoledwatchfaces.github.io/apps/privacy/phonebatterycomplication.html)
 
-A clean, modern Wear OS complication and tile to display your connected Android Phone's battery level (%) on your watch face. 
+Wear OS complication and tile for displaying connected Phone Battery level (%). Add to any watch face!
 
 ---
 
-## Previews
+## 📸 Previews
 
 <p align="center">
-  <img src="https://user-images.githubusercontent.com/92080649/222390961-f3c7017a-7532-455d-be49-23d0e72f5a7c.png" width="23%" alt="Preview 1" />
-  <img src="https://user-images.githubusercontent.com/92080649/222390991-118d5bfc-51c1-464e-826c-e12809d5ab0c.png" width="23%" alt="Preview 2" />
-  <img src="https://user-images.githubusercontent.com/92080649/222391030-450e261b-8b4b-4fbe-8096-68e1d876568d.png" width="23%" alt="Preview 3" />
-  <img src="https://user-images.githubusercontent.com/92080649/222391061-a982e60b-24d2-4866-9015-3cd5b9b89dc4.png" width="23%" alt="Preview 4" />
+  <img src="screenshots/wear (1).png" width="22%" alt="Preview 1" />
+  <img src="screenshots/wear (2).png" width="22%" alt="Preview 2" />
+  <img src="screenshots/wear (3).png" width="22%" alt="Preview 3" />
+  <img src="screenshots/wear (4).png" width="22%" alt="Preview 4" />
+</p>
+
+<details>
+<summary><b>Show more Wear OS previews</b></summary>
+<br>
+<p align="center">
+  <img src="screenshots/wear (5).png" width="22%" alt="Preview 5" />
+  <img src="screenshots/wear (6).png" width="22%" alt="Preview 6" />
+</p>
+</details>
+
+---
+
+## ⚙️ App Settings & Configuration
+
+The companion mobile app allows you to configure sync intervals and connection settings directly from your Android phone.
+
+<p align="center">
+  <img src="screenshots/mobile (1).png" width="22%" alt="Settings 1" />
+  <img src="screenshots/mobile (2).png" width="22%" alt="Settings 2" />
+  <img src="screenshots/mobile (3).png" width="22%" alt="Settings 3" />
+  <img src="screenshots/mobile (4).png" width="22%" alt="Settings 4" />
 </p>
 
 ---
 
-## Installation
+## 🚀 Installation & Releases
 
 ### Google Play Store
 Get the app directly on your Android phone and Wear OS smartwatch from the Google Play Store:
@@ -36,19 +59,19 @@ Alternatively, you can download the compiled `.apk` packages directly from our [
 
 ---
 
-## Tech Stack
+## 🛠️ Tech Stack
 
-This project is built using modern Android development practices:
+This project is built using modern Android and Wear OS development practices:
 * **Jetpack Compose / Wear Compose**: Declarative UI layout for both Mobile companion and Wear OS applications.
 * **Wear Material 3**: Leveraging the latest Material 3 styles and design elements on Wear OS.
-* **Coroutines & Flow**: Asynchronous programming and data streams.
-* **Hilt**: Dependency injection for clean architecture.
-* **DataStore**: Modern, reliable key-value preferences storage.
+* **Coroutines & Flow**: Safe asynchronous data streaming.
+* **Hilt**: Dependency injection architecture.
+* **DataStore**: Modern, transactional preferences storage.
 * **ProtoLayout & Tiles**: Custom Tiles support for quick access to battery complications.
 
 ---
 
-## Development Setup
+## 💻 Development Setup
 
 If you want to build the project locally or contribute changes:
 
@@ -64,7 +87,7 @@ If you want to build the project locally or contribute changes:
    ```
 
 3. **Open in Android Studio:**
-   Import the `Phone_Battery_Complication_AS` folder. Android Studio will automatically sync the Gradle configuration.
+   Import the `Phone_Battery_Complication_AS` folder. Android Studio will sync the Gradle configuration automatically.
 
 4. **Build & Run:**
    * Run the `:wear` target to deploy on a Wear OS device or emulator.
@@ -72,7 +95,7 @@ If you want to build the project locally or contribute changes:
 
 ---
 
-## Help Us Translate
+## 🌐 Help Us Translate
 
 We welcome community translations! You can contribute translations by updating resources:
 
@@ -82,7 +105,7 @@ We welcome community translations! You can contribute translations by updating r
 
 ---
 
-## License
+## 📄 License
 
 ```text
 Phone Battery Complication - Wear OS
