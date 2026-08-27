@@ -1,41 +1,103 @@
-# Phone Battery Complication - Wear OS
+# Phone Battery Complication for Wear OS
 
-Wear OS complication for Phone Battery level (%). Add to any watch face!
+[![CI Build](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build.yml/badge.svg)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build.yml)
+[![Latest Release](https://img.shields.io/github/v/release/amoledwatchfaces/Phone-Battery-Complication-Wear-OS?logo=github&color=blue)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/releases)
+[![License](https://img.shields.io/badge/License-Apache_2.0-orange.svg)](https://opensource.org/licenses/Apache-2.0)
+[![Platform](https://img.shields.io/badge/Platform-Wear_OS-green.svg?logo=android&logoColor=white)](https://developer.android.com/wear)
 
-## Preview
+A clean, modern Wear OS complication and tile to display your connected Android Phone's battery level (%) on your watch face. 
 
-<img src="https://user-images.githubusercontent.com/92080649/222390961-f3c7017a-7532-455d-be49-23d0e72f5a7c.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/92080649/222390991-118d5bfc-51c1-464e-826c-e12809d5ab0c.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/92080649/222391030-450e261b-8b4b-4fbe-8096-68e1d876568d.png" width=25% height=25%><img src="https://user-images.githubusercontent.com/92080649/222391061-a982e60b-24d2-4866-9015-3cd5b9b89dc4.png" width=25% height=25%>
+---
 
-## Release
+## Previews
 
-<a href='https://play.google.com/store/apps/details?id=com.weartools.phonebattcomp'><img alt='Get it on Google Play' src='https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png' width=300/></a>
+<p align="center">
+  <img src="https://user-images.githubusercontent.com/92080649/222390961-f3c7017a-7532-455d-be49-23d0e72f5a7c.png" width="23%" alt="Preview 1" />
+  <img src="https://user-images.githubusercontent.com/92080649/222390991-118d5bfc-51c1-464e-826c-e12809d5ab0c.png" width="23%" alt="Preview 2" />
+  <img src="https://user-images.githubusercontent.com/92080649/222391030-450e261b-8b4b-4fbe-8096-68e1d876568d.png" width="23%" alt="Preview 3" />
+  <img src="https://user-images.githubusercontent.com/92080649/222391061-a982e60b-24d2-4866-9015-3cd5b9b89dc4.png" width="23%" alt="Preview 4" />
+</p>
 
-<b>OR</b>
+---
 
-Download the package (.apk) to side-load from <a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/releases">HERE</a>
+## Installation
 
-## Help us with translations:
+### Google Play Store
+Get the app directly on your Android phone and Wear OS smartwatch from the Google Play Store:
 
-<a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/Store-listings">STORE LISTINGS</a>
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=com.weartools.phonebattcomp">
+    <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="220" />
+  </a>
+</p>
 
-<a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/mobile/src/main/res">MOBILE APP</a>
+### Sideloading
+Alternatively, you can download the compiled `.apk` packages directly from our [GitHub Releases](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/releases) page to side-load.
 
-<a href="https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/wear/src/main/res">WEAR APP</a>
+---
+
+## Tech Stack
+
+This project is built using modern Android development practices:
+* **Jetpack Compose / Wear Compose**: Declarative UI layout for both Mobile companion and Wear OS applications.
+* **Wear Material 3**: Leveraging the latest Material 3 styles and design elements on Wear OS.
+* **Coroutines & Flow**: Asynchronous programming and data streams.
+* **Hilt**: Dependency injection for clean architecture.
+* **DataStore**: Modern, reliable key-value preferences storage.
+* **ProtoLayout & Tiles**: Custom Tiles support for quick access to battery complications.
+
+---
+
+## Development Setup
+
+If you want to build the project locally or contribute changes:
+
+1. **Prerequisites:**
+   * Android Studio (Koala / Ladybug or newer recommended)
+   * JDK 21
+   * Gradle 9.7+
+
+2. **Clone the repository:**
+   ```bash
+   git clone https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS.git
+   cd Phone-Battery-Complication-Wear-OS/Phone_Battery_Complication_AS
+   ```
+
+3. **Open in Android Studio:**
+   Import the `Phone_Battery_Complication_AS` folder. Android Studio will automatically sync the Gradle configuration.
+
+4. **Build & Run:**
+   * Run the `:wear` target to deploy on a Wear OS device or emulator.
+   * Run the `:mobile` target to deploy the companion app on a connected phone.
+
+---
+
+## Help Us Translate
+
+We welcome community translations! You can contribute translations by updating resources:
+
+* **[Store Listings Translations](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/Store-listings)**
+* **[Mobile App Strings](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/mobile/src/main/res)**
+* **[Wear OS App Strings](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/tree/master/wear/src/main/res)**
+
+---
 
 ## License
 
-    Phone Battery Complication - Wear OS
-    Copyright 2022 amoledwatchfaces™
-    support@amoledwatchfaces.com
+```text
+Phone Battery Complication - Wear OS
+Copyright 2022-2026 amoledwatchfaces™
+support@amoledwatchfaces.com
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```

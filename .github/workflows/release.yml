@@ -1,0 +1,75 @@
+name: Android Release Build
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    name: Build & Draft Release
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: wrapper
+
+      - name: Decode Keystore
+        if: ${{ secrets.RELEASE_KEYSTORE != '' }}
+        run: |
+          echo "${{ secrets.RELEASE_KEYSTORE }}" | base64 --decode > release.jks
+
+      - name: Build Release APKs & AABs
+        run: ./gradlew assembleRelease bundleRelease
+        env:
+          KEYSTORE_FILE: ${{ secrets.RELEASE_KEYSTORE != '' && 'release.jks' || '' }}
+          KEYSTORE_PASSWORD: ${{ secrets.RELEASE_STORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
+
+      - name: Clean Up Keystore File
+        if: ${{ always() && secrets.RELEASE_KEYSTORE != '' }}
+        run: rm -f release.jks
+
+      - name: Prepare Release Artifacts
+        run: |
+          mkdir staging
+          
+          # Copy Wear OS binaries if they exist
+          if [ -f wear/build/outputs/apk/release/wear-release.apk ]; then
+            cp wear/build/outputs/apk/release/wear-release.apk staging/phone-battery-complication-wear.apk
+          fi
+          if [ -f wear/build/outputs/bundle/release/wear-release.aab ]; then
+            cp wear/build/outputs/bundle/release/wear-release.aab staging/phone-battery-complication-wear.aab
+          fi
+          
+          # Copy Mobile Companion binaries if they exist
+          if [ -f mobile/build/outputs/apk/release/mobile-release.apk ]; then
+            cp mobile/build/outputs/apk/release/mobile-release.apk staging/phone-battery-complication-mobile.apk
+          fi
+          if [ -f mobile/build/outputs/bundle/release/mobile-release.aab ]; then
+            cp mobile/build/outputs/bundle/release/mobile-release.aab staging/phone-battery-complication-mobile.aab
+          fi
+
+      - name: Create Draft Release
+        uses: softprops/action-gh-release@v2
+        with:
+          draft: true
+          files: |
+            staging/phone-battery-complication-wear.apk
+            staging/phone-battery-complication-wear.aab
+            staging/phone-battery-complication-mobile.apk
+            staging/phone-battery-complication-mobile.aab
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

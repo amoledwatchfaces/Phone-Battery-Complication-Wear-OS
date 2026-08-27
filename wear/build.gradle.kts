@@ -24,13 +24,35 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystoreProperties = Properties().apply{
-                load(FileInputStream(file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.properties")))
+            val keystoreFileEnv = System.getenv("KEYSTORE_FILE")
+            val keystorePasswordEnv = System.getenv("KEYSTORE_PASSWORD")
+            val keyAliasEnv = System.getenv("KEY_ALIAS")
+            val keyPasswordEnv = System.getenv("KEY_PASSWORD")
+
+            if (!keystoreFileEnv.isNullOrEmpty() && !keystorePasswordEnv.isNullOrEmpty() && !keyAliasEnv.isNullOrEmpty() && !keyPasswordEnv.isNullOrEmpty()) {
+                storeFile = file(keystoreFileEnv)
+                storePassword = keystorePasswordEnv
+                keyAlias = keyAliasEnv
+                keyPassword = keyPasswordEnv
+            } else {
+                val localPropertiesFile = file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.properties")
+                val localKeystoreFile = file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.jks")
+                if (localPropertiesFile.exists() && localKeystoreFile.exists()) {
+                    val keystoreProperties = Properties().apply {
+                        load(FileInputStream(localPropertiesFile))
+                    }
+                    storeFile = localKeystoreFile
+                    keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
+                    storePassword = keystoreProperties.getProperty("STORE_PASSWORD")
+                    keyPassword = keystoreProperties.getProperty("KEY_PASSWORD")
+                } else {
+                    val debugConfig = signingConfigs.getByName("debug")
+                    storeFile = debugConfig.storeFile
+                    storePassword = debugConfig.storePassword
+                    keyAlias = debugConfig.keyAlias
+                    keyPassword = debugConfig.keyPassword
+                }
             }
-            storeFile = file("C:\\Users\\amoledwatchfaces\\WatchFaceStudio\\keystore\\keystore.jks")
-            keyAlias = keystoreProperties.getProperty("KEY_ALIAS")
-            storePassword = keystoreProperties.getProperty("STORE_PASSWORD")
-            keyPassword= keystoreProperties.getProperty("KEY_PASSWORD")
         }
     }
 
