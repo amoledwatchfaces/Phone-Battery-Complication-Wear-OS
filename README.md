@@ -1,6 +1,6 @@
 # Phone Battery Complication for Wear OS
 
-[![CI Build](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build.yml/badge.svg)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build.yml)
+[![CI Build](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build.yml/badge.svg)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml)
 [![Latest Release](https://img.shields.io/github/v/release/amoledwatchfaces/Phone-Battery-Complication-Wear-OS?logo=github&color=blue)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/releases)
 [![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Platform](https://img.shields.io/badge/Platform-Wear_OS-green.svg?logo=android&logoColor=white)](https://developer.android.com/wear)
