@@ -51,7 +51,7 @@ This suite provides 10 custom complications for your watch faces:
 
 ## ⚙️ App Settings & Configuration
 
-The companion mobile app allows you to configure sync intervals and connection settings directly from your Android phone.
+The companion mobile app allows you to configure synchronization of different data eg. Calendar Events Sync for Upcoming Event Complication, Notifications Sync for Notification Complications, etc.
 
 <p align="center">
   <img src="screenshots/mobile (2).png" width="25%" alt="Settings 2" />
