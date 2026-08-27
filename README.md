@@ -65,7 +65,7 @@ The companion mobile app allows you to configure sync intervals and connection s
 ### Google Play Store
 Get the app directly on your Android phone and Wear OS smartwatch from the Google Play Store:
 
-<p align="center">
+<p align="left">
   <a href="https://play.google.com/store/apps/details?id=com.weartools.phonebattcomp">
     <img alt="Get it on Google Play" src="https://play.google.com/intl/en_us/badges/images/generic/en_badge_web_generic.png" width="220" />
   </a>
@@ -84,7 +84,6 @@ This project is built using modern Android and Wear OS development practices:
 * **Coroutines & Flow**: Safe asynchronous data streaming.
 * **Hilt**: Dependency injection architecture.
 * **DataStore**: Modern, transactional preferences storage.
-* **ProtoLayout & Tiles**: Custom Tiles support for quick access to battery complications.
 
 ---
 
