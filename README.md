@@ -10,6 +10,25 @@ Wear OS complication and tile for displaying connected Phone Battery level (%). 
 
 ---
 
+## 🧩 Included Complication Services
+
+This suite provides 10 custom complications for your watch faces:
+
+| Complication Service | Supported Wear OS Complication Types | Description |
+|:---|:---|:---|
+| **Phone Battery** | `RANGED_VALUE`, `SHORT_TEXT`, `LONG_TEXT` | Displays the battery percentage of your connected Android phone. |
+| **Watch Battery** | `RANGED_VALUE`, `SHORT_TEXT`, `LONG_TEXT`, `ICON`, `SMALL_IMAGE` | Displays your smartwatch's battery level in multiple layout formats. |
+| **Watch Battery Temperature** | `SHORT_TEXT` | Displays your smartwatch's battery temperature (e.g. °C/°F). |
+| **Watch Battery Voltage** | `SHORT_TEXT` | Displays your smartwatch's battery voltage (V). |
+| **Phone Notifications** | `SMALL_IMAGE`, `LONG_TEXT` | Displays active notification count or custom small icon list from your phone. |
+| **Phone Notifications (Count/Icons)** | `SHORT_TEXT` | Displays a summary or count of pending phone notifications. |
+| **Phone Notifications Preview** | `LONG_TEXT` | Displays a detailed text preview of the latest notification from your phone. |
+| **Upcoming Event** | `LONG_TEXT`, `SHORT_TEXT` | Displays details or title of the next scheduled event on your calendar. |
+| **Event Timer** | `LONG_TEXT`, `SHORT_TEXT` | Displays a countdown timer/time remaining for the current or next calendar event. |
+| **Now Playing** | `SMALL_IMAGE`, `PHOTO_IMAGE` | Displays the media playback artwork or notification icon for the active media stream on your phone. |
+
+---
+
 ## 📸 Previews
 
 <p align="center">
