@@ -1,4 +1,4 @@
-# <img src="icon.svg" width="48" align="center" alt="Icon"> Phone Battery Complication for Wear OS
+# <img src="screenshots/app_icon.png" width="48" align="center" alt="Icon"> Phone Battery Complication for Wear OS
 
 [![Build & Release](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml)
 [![Platform](https://img.shields.io/badge/Platform-Wear_OS-brightgreen?logo=android&logoColor=white)](https://developer.android.com/wear)
