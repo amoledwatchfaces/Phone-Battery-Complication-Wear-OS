@@ -20,11 +20,11 @@ This suite provides 10 custom complications for your watch faces:
 | **Watch Battery** | `RANGED_VALUE`, `SHORT_TEXT`, `LONG_TEXT`, `ICON`, `SMALL_IMAGE` | Displays your smartwatch's battery level in multiple layout formats. |
 | **Watch Battery Temperature** | `SHORT_TEXT` | Displays your smartwatch's battery temperature (e.g. °C/°F). |
 | **Watch Battery Voltage** | `SHORT_TEXT` | Displays your smartwatch's battery voltage (V). |
-| **Phone Notifications** | `SMALL_IMAGE`, `LONG_TEXT` | Displays active notification count or custom small icon list from your phone. |
-| **Phone Notifications (Count/Icons)** | `SHORT_TEXT` | Displays a summary or count of pending phone notifications. |
+| **Phone Notifications** | `SMALL_IMAGE`, `LONG_TEXT` | Displays active notification icons from your phone statusbar. (2x2 / 8x1) |
+| **Phone Notifications (4x)** | `SHORT_TEXT` | Displays maximum 4 active notification icons from your phone statusbar |
 | **Phone Notifications Preview** | `LONG_TEXT` | Displays a detailed text preview of the latest notification from your phone. |
-| **Upcoming Event** | `LONG_TEXT`, `SHORT_TEXT` | Displays details or title of the next scheduled event on your calendar. |
-| **Event Timer** | `LONG_TEXT`, `SHORT_TEXT` | Displays a countdown timer/time remaining for the current or next calendar event. |
+| **Upcoming Event** | `LONG_TEXT`, `SHORT_TEXT` | Displays details or title of the next scheduled event on your phone's calendar. |
+| **Event Timer** | `LONG_TEXT`, `SHORT_TEXT` | Displays time remaining for the current or next calendar event on your phone. |
 | **Now Playing** | `SMALL_IMAGE`, `PHOTO_IMAGE` | Displays the media playback artwork or notification icon for the active media stream on your phone. |
 
 ---
@@ -54,10 +54,8 @@ This suite provides 10 custom complications for your watch faces:
 The companion mobile app allows you to configure sync intervals and connection settings directly from your Android phone.
 
 <p align="center">
-  <img src="screenshots/mobile (1).png" width="22%" alt="Settings 1" />
-  <img src="screenshots/mobile (2).png" width="22%" alt="Settings 2" />
-  <img src="screenshots/mobile (3).png" width="22%" alt="Settings 3" />
-  <img src="screenshots/mobile (4).png" width="22%" alt="Settings 4" />
+  <img src="screenshots/mobile (2).png" width="25%" alt="Settings 2" />
+  <img src="screenshots/mobile (3).png" width="25%" alt="Settings 3" />
 </p>
 
 ---
