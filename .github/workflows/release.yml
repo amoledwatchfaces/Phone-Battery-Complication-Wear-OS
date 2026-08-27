@@ -63,10 +63,10 @@ jobs:
             cp mobile/build/outputs/bundle/release/mobile-release.aab staging/phone-battery-complication-mobile.aab
           fi
 
-      - name: Create Draft Release
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          draft: true
+          draft: false
           files: |
             staging/phone-battery-complication-wear.apk
             staging/phone-battery-complication-wear.aab
