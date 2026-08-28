@@ -43,6 +43,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
@@ -54,6 +55,7 @@ import kotlin.time.Duration.Companion.milliseconds
 
 @HiltViewModel
 class MainViewModel @Inject constructor(
+    @dagger.hilt.android.qualifiers.ApplicationContext private val context: Context,
     private val capabilityClient: CapabilityClient,
     private val nodeClient: NodeClient,
     private val remoteActivityHelper: RemoteActivityHelper,
@@ -311,6 +313,12 @@ class MainViewModel @Inject constructor(
     fun setCrashlytics(enabled: Boolean) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(crashlytics = enabled, crashlyticsNoticeAccepted = true) }
+            runCatching {
+                if (com.google.firebase.FirebaseApp.getApps(context).isNotEmpty()) {
+                    com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+                        .setCrashlyticsCollectionEnabled(enabled)
+                }
+            }
         }
     }
 

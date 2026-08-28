@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -47,6 +48,7 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.WhileSubscribed(),
             initialValue = UserPreferences()
         )
+
 
     fun toggleEnabled(context: Context) {
         viewModelScope.launch {
@@ -93,6 +95,12 @@ class MainViewModel @Inject constructor(
     fun setCrashlytics(enabled: Boolean) {
         viewModelScope.launch {
             dataStore.updateData { it.copy(crashlytics = enabled, crashlyticsNoticeAccepted = true) }
+            runCatching {
+                if (com.google.firebase.FirebaseApp.getApps(context).isNotEmpty()) {
+                    com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
+                        .setCrashlyticsCollectionEnabled(enabled)
+                }
+            }
         }
     }
 

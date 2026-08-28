@@ -10,8 +10,11 @@ plugins {
     id ("com.google.dagger.hilt.android")
     id ("org.jetbrains.kotlin.plugin.compose")
     id ("org.jetbrains.kotlin.plugin.parcelize")
-    id ("com.google.gms.google-services")
-    id ("com.google.firebase.crashlytics")
+}
+
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
 }
 
 kotlin {

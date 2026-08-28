@@ -9,8 +9,11 @@ plugins {
     id ("kotlinx-serialization")
     id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
-    id ("com.google.gms.google-services")
-    id ("com.google.firebase.crashlytics")
+}
+
+if (file("google-services.json").exists()) {
+    apply(plugin = "com.google.gms.google-services")
+    apply(plugin = "com.google.firebase.crashlytics")
 }
 
 kotlin {

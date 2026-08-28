@@ -27,3 +27,6 @@ captures/
 .externalNativeBuild/
 .cxx/
 .artifacts/
+
+# Google Services configuration
+**/google-services.json
