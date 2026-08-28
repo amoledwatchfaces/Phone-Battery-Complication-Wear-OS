@@ -3,7 +3,7 @@
 [![Build & Release](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml/badge.svg)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/actions/workflows/build-and-release.yml)
 [![Platform](https://img.shields.io/badge/Platform-Wear_OS-brightgreen?logo=android&logoColor=white)](https://developer.android.com/wear)
 [![Latest Release](https://img.shields.io/github/v/release/amoledwatchfaces/Phone-Battery-Complication-Wear-OS?logo=github&color=blue)](https://github.com/amoledwatchfaces/Phone-Battery-Complication-Wear-OS/releases)
-[![License](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
+[![License](https://img.shields.io/badge/License-GPLv3-orange.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Privacy Policy](https://img.shields.io/badge/Privacy--Policy-Read-blue?logo=googleplay&logoColor=white)](https://amoledwatchfaces.github.io/apps/privacy/phonebatterycomplication.html)
 
 Wear OS complication and tile for displaying connected Phone Battery level (%). Add to any watch face!
