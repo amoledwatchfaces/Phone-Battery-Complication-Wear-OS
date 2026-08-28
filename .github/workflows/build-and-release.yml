@@ -65,6 +65,13 @@ jobs:
             echo "No release keystore secret found, falling back to debug signature."
           fi
 
+      - name: Decode Google Services Config
+        run: |
+          if [ ! -z "${{ secrets.GOOGLE_SERVICES_JSON }}" ]; then
+            echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > mobile/google-services.json
+            echo "${{ secrets.GOOGLE_SERVICES_JSON }}" | base64 --decode > wear/google-services.json
+          fi
+
       - name: Build Release APKs & AABs
         run: ./gradlew assembleRelease bundleRelease
         env:
@@ -72,8 +79,11 @@ jobs:
           KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
 
-      - name: Clean Up Keystore File
-        run: rm -f "${{ github.workspace }}/release.jks"
+      - name: Clean Up Config and Keystore Files
+        run: |
+          rm -f "${{ github.workspace }}/release.jks"
+          rm -f mobile/google-services.json
+          rm -f wear/google-services.json
 
       - name: Prepare Release Artifacts
         run: |
