@@ -69,7 +69,7 @@ fun MainScreen(
     var confirmationState by remember { mutableStateOf(true) }
 
     LaunchedEffect(isLoaded) {
-        if (isLoaded && !preferences.crashlyticsNoticeAccepted) {
+        if (isLoaded && !preferences.crashlyticsNoticeAccepted && viewModel.isCrashlyticsAvailable) {
             showCrashlyticsDialog = true
         }
     }
@@ -181,7 +181,8 @@ fun MainScreen(
             SwitchButton(
                 modifier = Modifier.fillMaxWidth().transformedHeight(this, transformationSpec),
                 transformation = SurfaceTransformation(transformationSpec),
-                checked = preferences.crashlytics,
+                checked = preferences.crashlytics && viewModel.isCrashlyticsAvailable,
+                enabled = viewModel.isCrashlyticsAvailable &&viewModel.isCrashlyticsAvailable,
                 onCheckedChange = { viewModel.setCrashlytics(it) },
                 label = { Text(stringResource(id = R.string.crash_reports)) },
             )

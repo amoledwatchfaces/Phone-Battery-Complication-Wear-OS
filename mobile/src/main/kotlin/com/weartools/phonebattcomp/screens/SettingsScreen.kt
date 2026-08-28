@@ -83,7 +83,7 @@ fun SettingsScreen(
     var showCrashlyticsDialog by remember { mutableStateOf(false) }
 
     LaunchedEffect(preferences.value.crashlyticsNoticeAccepted) {
-        if (!preferences.value.crashlyticsNoticeAccepted) {
+        if (!preferences.value.crashlyticsNoticeAccepted && viewModel.isCrashlyticsAvailable) {
             showCrashlyticsDialog = true
         }
     }
@@ -321,7 +321,8 @@ fun SettingsScreen(
                         }
                         Switch(
                             modifier = Modifier.weight(0.2f),
-                            checked = preferences.value.crashlytics,
+                            enabled = viewModel.isCrashlyticsAvailable,
+                            checked = preferences.value.crashlytics && viewModel.isCrashlyticsAvailable,
                             onCheckedChange = { viewModel.setCrashlytics(it) }
                         )
                     }

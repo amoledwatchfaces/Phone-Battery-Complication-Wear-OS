@@ -10,11 +10,19 @@ plugins {
     id ("com.google.dagger.hilt.android")
     id ("org.jetbrains.kotlin.plugin.compose")
     id ("org.jetbrains.kotlin.plugin.parcelize")
+
+    // Apply conditionally based on whether google-services.json exists
+    id("com.google.gms.google-services") apply false
+    id("com.google.firebase.crashlytics") apply false
 }
 
-if (file("google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
-    apply(plugin = "com.google.firebase.crashlytics")
+val hasGoogleServices = file("google-services.json").exists()
+
+if (hasGoogleServices) {
+    pluginManager.apply("com.google.gms.google-services")
+    pluginManager.apply("com.google.firebase.crashlytics")
+} else {
+    logger.warn("⚠️ google-services.json not found. Google Services and Crashlytics are disabled for this build.")
 }
 
 kotlin {
@@ -70,6 +78,9 @@ android {
 
         buildConfigField("String", "CAPABILITY_MOBILE_APP", "\"phonebattcomp_mobile_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=$applicationId\"")
+
+        buildConfigField("boolean", "CRASHLYTICS_AVAILABLE", hasGoogleServices.toString())
+
         versionNameSuffix = "-wear"
         versionCode = 20000 + (versionCode ?: 0)
     }
@@ -164,14 +175,14 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.11.0")
 
     // Core Wear Widget and Remote Compose libraries
-    implementation ("androidx.compose.remote:remote-creation-compose:1.0.0-alpha17")
-    implementation ("androidx.compose.remote:remote-core:1.0.0-alpha17")
-    implementation ("androidx.glance.wear:wear:1.0.0-alpha16")
-    implementation ("androidx.glance.wear:wear-core:1.0.0-alpha16")
-    implementation ("androidx.wear.compose.remote:remote-material3:1.0.0-alpha09")
+    implementation ("androidx.compose.remote:remote-creation-compose:1.0.0-alpha18")
+    implementation ("androidx.compose.remote:remote-core:1.0.0-alpha18")
+    implementation ("androidx.glance.wear:wear:1.0.0-alpha17")
+    implementation ("androidx.glance.wear:wear-core:1.0.0-alpha17")
+    implementation ("androidx.wear.compose.remote:remote-material3:1.0.0-alpha10")
 
     // Tooling for previews (optional, but recommended)
-    implementation ("androidx.compose.remote:remote-tooling-preview:1.0.0-alpha17")
+    implementation ("androidx.compose.remote:remote-tooling-preview:1.0.0-alpha18")
     implementation ("androidx.wear.tiles:tiles-tooling-preview:1.6.2")
     debugImplementation ("androidx.wear.tiles:tiles-renderer:1.6.2")
 

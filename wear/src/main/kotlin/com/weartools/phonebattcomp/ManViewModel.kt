@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.copy
 import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
@@ -39,6 +40,8 @@ class MainViewModel @Inject constructor(
 
     private val _isPreferencesLoaded = MutableStateFlow(false)
     val isPreferencesLoaded = _isPreferencesLoaded.asStateFlow()
+
+    val isCrashlyticsAvailable = BuildConfig.CRASHLYTICS_AVAILABLE
 
     val preferences: StateFlow<UserPreferences> = preferences
         .getPreferences()
@@ -93,12 +96,12 @@ class MainViewModel @Inject constructor(
         }
     }
     fun setCrashlytics(enabled: Boolean) {
+        if (!isCrashlyticsAvailable) return
         viewModelScope.launch {
             dataStore.updateData { it.copy(crashlytics = enabled, crashlyticsNoticeAccepted = true) }
             runCatching {
                 if (com.google.firebase.FirebaseApp.getApps(context).isNotEmpty()) {
-                    com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
-                        .setCrashlyticsCollectionEnabled(enabled)
+                    com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = enabled
                 }
             }
         }

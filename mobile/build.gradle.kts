@@ -9,11 +9,19 @@ plugins {
     id ("kotlinx-serialization")
     id ("com.google.devtools.ksp")
     id ("com.google.dagger.hilt.android")
+
+    // Apply conditionally based on whether google-services.json exists
+    id("com.google.gms.google-services") apply false
+    id("com.google.firebase.crashlytics") apply false
 }
 
-if (file("google-services.json").exists()) {
-    apply(plugin = "com.google.gms.google-services")
-    apply(plugin = "com.google.firebase.crashlytics")
+val hasGoogleServices = file("google-services.json").exists()
+
+if (hasGoogleServices) {
+    pluginManager.apply("com.google.gms.google-services")
+    pluginManager.apply("com.google.firebase.crashlytics")
+} else {
+    logger.warn("⚠️ google-services.json not found. Google Services and Crashlytics are disabled for this build.")
 }
 
 kotlin {
@@ -69,6 +77,9 @@ android {
 
         buildConfigField("String", "CAPABILITY_WEAR_APP", "\"phonebattcomp_wear_app\"")
         buildConfigField("String", "PLAY_STORE_APP_URI", "\"market://details?id=$applicationId\"")
+
+        buildConfigField("boolean", "CRASHLYTICS_AVAILABLE", hasGoogleServices.toString())
+
         versionNameSuffix = "-mobile"
         versionCode = 10000 + (versionCode ?: 0)
     }

@@ -74,6 +74,8 @@ class MainViewModel @Inject constructor(
             initialValue = UserPreferences()
         )
 
+    val isCrashlyticsAvailable = BuildConfig.CRASHLYTICS_AVAILABLE
+
     private lateinit var reviewManager: ReviewManager
 
     private var wearNodesWithApp: Set<Node>? = null
@@ -311,12 +313,12 @@ class MainViewModel @Inject constructor(
     }
 
     fun setCrashlytics(enabled: Boolean) {
+        if (!isCrashlyticsAvailable) return
         viewModelScope.launch {
             dataStore.updateData { it.copy(crashlytics = enabled, crashlyticsNoticeAccepted = true) }
             runCatching {
                 if (com.google.firebase.FirebaseApp.getApps(context).isNotEmpty()) {
-                    com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance()
-                        .setCrashlyticsCollectionEnabled(enabled)
+                    com.google.firebase.crashlytics.FirebaseCrashlytics.getInstance().isCrashlyticsCollectionEnabled = enabled
                 }
             }
         }
