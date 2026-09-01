@@ -147,6 +147,9 @@ dependencies {
     // Used for Datastore
     implementation ("androidx.datastore:datastore:1.2.1")
 
+    // Coil
+    implementation("io.coil-kt:coil-compose:2.7.0")
+
     // Permissions
     implementation ("com.google.accompanist:accompanist-permissions:0.37.3")
 
