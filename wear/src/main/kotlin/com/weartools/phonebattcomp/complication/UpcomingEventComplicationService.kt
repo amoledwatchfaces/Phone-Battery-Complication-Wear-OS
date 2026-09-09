@@ -104,7 +104,7 @@ class UpcomingEventComplicationService : SuspendingTimelineComplicationDataSourc
         }.format(Date(utcTime))
     }
 
-    private fun getTodayIcon(time: Long): Int {
+    private fun getCalendarIcon(time: Long): Int {
         val day = Calendar.getInstance().apply { timeInMillis = time }.get(Calendar.DAY_OF_MONTH)
         return when (day) {
             1 -> drawable.ic_cal_01
@@ -210,7 +210,8 @@ class UpcomingEventComplicationService : SuspendingTimelineComplicationDataSourc
 
         val iconRes = when {
             eventIsOngoing -> drawable.ic_today
-            eventIsToday -> getTodayIcon(event.startTime)
+            eventIsTomorrow -> getCalendarIcon(event.startTime)
+            eventIsToday && eventIsAllDay -> drawable.ic_calendar_today
             else -> drawable.ic_event_upcoming_2
         }
         val icon = MonochromaticImage.Builder(image = Icon.createWithResource(this, iconRes)).build()
