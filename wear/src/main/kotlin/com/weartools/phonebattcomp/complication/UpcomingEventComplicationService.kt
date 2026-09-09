@@ -211,7 +211,7 @@ class UpcomingEventComplicationService : SuspendingTimelineComplicationDataSourc
         val iconRes = when {
             eventIsOngoing -> drawable.ic_today
             eventIsToday && eventIsAllDay -> drawable.ic_calendar_today
-            eventIsToday -> drawable.ic_event_upcoming_2
+            eventIsToday || eventIsTomorrow && eventIsAllDay.not() -> drawable.ic_event_upcoming_2
             else -> getCalendarIcon(event.startTime)
         }
         val icon = MonochromaticImage.Builder(image = Icon.createWithResource(this, iconRes)).build()
