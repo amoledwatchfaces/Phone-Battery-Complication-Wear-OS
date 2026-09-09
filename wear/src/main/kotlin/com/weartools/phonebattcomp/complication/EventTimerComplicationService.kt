@@ -18,7 +18,6 @@
 package com.weartools.phonebattcomp.complication
 
 import android.app.PendingIntent
-import android.content.Context
 import android.content.Intent
 import android.graphics.drawable.Icon
 import androidx.datastore.core.DataStore
@@ -28,32 +27,28 @@ import androidx.wear.watchface.complications.data.ComplicationType
 import androidx.wear.watchface.complications.data.CountDownTimeReference
 import androidx.wear.watchface.complications.data.LongTextComplicationData
 import androidx.wear.watchface.complications.data.MonochromaticImage
+import androidx.wear.watchface.complications.data.NoDataComplicationData
 import androidx.wear.watchface.complications.data.PlainComplicationText
 import androidx.wear.watchface.complications.data.ShortTextComplicationData
 import androidx.wear.watchface.complications.data.TimeDifferenceComplicationText
 import androidx.wear.watchface.complications.data.TimeDifferenceStyle
+import androidx.wear.watchface.complications.datasource.ComplicationDataTimeline
 import androidx.wear.watchface.complications.datasource.ComplicationRequest
-import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import androidx.work.CoroutineWorker
-import androidx.work.ExistingWorkPolicy
-import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
-import androidx.work.WorkerParameters
+import androidx.wear.watchface.complications.datasource.SuspendingTimelineComplicationDataSourceService
+import androidx.wear.watchface.complications.datasource.TimeInterval
+import androidx.wear.watchface.complications.datasource.TimelineEntry
 import com.google.android.gms.wearable.DataClient
 import com.weartools.phonebattcomp.MobileListener
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.R.drawable
-import com.weartools.phonebattcomp.data.CalendarEvent
 import com.weartools.phonebattcomp.data.UserPreferences
-import com.weartools.phonebattcomp.utils.updateComplication
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.first
-import java.time.Duration
 import java.time.Instant
 import javax.inject.Inject
 
 @AndroidEntryPoint
-class EventTimerComplicationService : SuspendingComplicationDataSourceService() {
+class EventTimerComplicationService : SuspendingTimelineComplicationDataSourceService() {
 
     @Inject
     lateinit var dataStore: DataStore<UserPreferences>
@@ -61,10 +56,7 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
     @Inject
     lateinit var dataClient: DataClient
 
-    var icon = drawable.ic_event_upcoming_2
-
     private fun openScreen(): PendingIntent? {
-
         val calendarIntent = Intent()
         calendarIntent.action = Intent.ACTION_MAIN
         calendarIntent.addCategory(Intent.CATEGORY_APP_CALENDAR)
@@ -77,11 +69,11 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
 
     override fun getPreviewData(type: ComplicationType): ComplicationData? {
         return when (type) {
-
             ComplicationType.LONG_TEXT -> {
                 LongTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = getString(R.string.preview_meeting)).build(),
-                    contentDescription = ComplicationText.EMPTY)
+                    contentDescription = ComplicationText.EMPTY
+                )
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
                     .setTitle(PlainComplicationText.Builder(text = "1h 30m").build())
                     .build()
@@ -89,107 +81,135 @@ class EventTimerComplicationService : SuspendingComplicationDataSourceService() 
             ComplicationType.SHORT_TEXT -> {
                 ShortTextComplicationData.Builder(
                     text = PlainComplicationText.Builder(text = getString(R.string.preview_meeting)).build(),
-                    contentDescription = ComplicationText.EMPTY)
+                    contentDescription = ComplicationText.EMPTY
+                )
                     .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, drawable.ic_event_upcoming_2)).build())
                     .setTitle(PlainComplicationText.Builder(text = "1h 30m").build())
                     .build()
             }
-
-            else -> {null}
+            else -> null
         }
     }
 
-    fun findClosestEventWithTime(events: List<CalendarEvent>, currentTime: Long): Pair<String, Long>? {
-
-        val closestEventTime = events
-            .filter { event -> event.allDay == 0 }
-            .flatMap { event ->
-            // Use 0L if startTime or endTime is in the past, otherwise use the actual time
-            listOf(
-                event.title to event.startTime,
-                event.title to event.endTime
-            )
-        }.filter { (_, time) ->
-            time >= currentTime // Only consider non-negative times (future or present)
-        }.minByOrNull { (_, time) ->
-            (time - currentTime) // Find the closest time to currentTime
+    private fun buildComplicationData(
+        type: ComplicationType,
+        eventName: String,
+        targetTime: Long?,
+        iconRes: Int
+    ): ComplicationData? {
+        val icon = MonochromaticImage.Builder(image = Icon.createWithResource(this, iconRes)).build()
+        val countdownText = targetTime?.let {
+            TimeDifferenceComplicationText.Builder(
+                TimeDifferenceStyle.SHORT_DUAL_UNIT,
+                CountDownTimeReference(Instant.ofEpochMilli(it))
+            ).build()
         }
 
-        if (events.any { event -> event.endTime == closestEventTime?.second }){
-            icon = drawable.ic_pending_1
+        return when (type) {
+            ComplicationType.LONG_TEXT -> {
+                LongTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = eventName).build(),
+                    contentDescription = ComplicationText.EMPTY
+                )
+                    .setMonochromaticImage(icon)
+                    .setTitle(countdownText)
+                    .setTapAction(openScreen())
+                    .build()
+            }
+            ComplicationType.SHORT_TEXT -> {
+                ShortTextComplicationData.Builder(
+                    text = PlainComplicationText.Builder(text = eventName).build(),
+                    contentDescription = ComplicationText.EMPTY
+                )
+                    .setMonochromaticImage(icon)
+                    .setTitle(countdownText)
+                    .setTapAction(openScreen())
+                    .build()
+            }
+            else -> null
         }
-
-        return closestEventTime
     }
 
-    override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationData? {
-
+    override suspend fun onComplicationRequest(request: ComplicationRequest): ComplicationDataTimeline {
         val currentTime = System.currentTimeMillis()
         val repository = dataStore.data.first()
         val events = repository.calendarEvents
+            .filter { it.allDay == 0 && it.endTime >= currentTime }
+            .sortedBy { it.startTime }
 
-        /** When currently some event is running, show countdown to event endTime
-         *  else, show countdown to next event startTime
-         *  else show 'no upcoming events'
-         */
+        val defaultData = buildComplicationData(
+            type = request.complicationType,
+            eventName = if (request.complicationType == ComplicationType.SHORT_TEXT) {
+                getString(R.string.no_upcoming_events_short_text)
+            } else {
+                getString(R.string.no_upcoming_events)
+            },
+            targetTime = null,
+            iconRes = drawable.ic_no_upcoming_event
+        ) ?: NoDataComplicationData()
 
-        val closestEvent = findClosestEventWithTime(events, currentTime)
-        val closestEventName = closestEvent?.first ?: getString(R.string.no_upcoming_events)
-        val closestEventTime = closestEvent?.second ?: 0L
-        //Log.i("CalendarEventTimerComplication", "Nearest or current event: $closestEventName")
-
-        /** Schedule event update when finished / started **/
-        if (closestEvent != null){
-            val delay = closestEventTime - currentTime
-           // Log.i("CalendarEventTimerComplication", "Scheduling complication update with delay: ${delay/60000}")
-            WorkManager.getInstance(this).enqueueUniqueWork(
-                "events_timer_work",
-                ExistingWorkPolicy.REPLACE,
-                OneTimeWorkRequestBuilder<EventTimerComplicationUpdateWorker>()
-                    .setInitialDelay(Duration.ofMillis(delay))
-                    .build()
+        if (events.isEmpty()) {
+            MobileListener.sendCalendarRequest(currentTime, dataClient)
+            return ComplicationDataTimeline(
+                defaultComplicationData = defaultData,
+                timelineEntries = emptyList()
             )
         }
-        else {
-            // when there is no close event, we want to check phone for new events
-            MobileListener.sendCalendarRequest(currentTime,dataClient)
-            icon = drawable.ic_no_upcoming_event
-        }
 
-        return when (request.complicationType) {
+        val timelineEntries = mutableListOf<TimelineEntry>()
+        var lastEndTime = currentTime
 
-            ComplicationType.LONG_TEXT -> {
-                LongTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = closestEventName).build(),
-                    contentDescription = ComplicationText.EMPTY)
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
-                    .setTitle(
-                        if (closestEvent == null) { null }
-                        else { TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime))).build() })
-                    .setTapAction(openScreen())
-                    .build()
-            }
-            ComplicationType.SHORT_TEXT -> {
-                ShortTextComplicationData.Builder(
-                    text = PlainComplicationText.Builder(text = closestEvent?.first ?: getString(R.string.no_upcoming_events_short_text)).build(),
-                    contentDescription = ComplicationText.EMPTY)
-                    .setMonochromaticImage(MonochromaticImage.Builder(image = Icon.createWithResource(this, icon)).build())
-                    .setTitle(
-                        if (closestEvent == null) { null }
-                        else { TimeDifferenceComplicationText.Builder(TimeDifferenceStyle.SHORT_DUAL_UNIT, CountDownTimeReference(Instant.ofEpochMilli(closestEventTime))).build() })
-                    .setTapAction(openScreen())
-                    .build()
+        for (event in events) {
+            // 1. Upcoming phase (before event start)
+            if (event.startTime > lastEndTime) {
+                val upcomingData = buildComplicationData(
+                    type = request.complicationType,
+                    eventName = event.title,
+                    targetTime = event.startTime,
+                    iconRes = drawable.ic_event_upcoming_2
+                )
+                if (upcomingData != null) {
+                    timelineEntries.add(
+                        TimelineEntry(
+                            validity = TimeInterval(
+                                start = Instant.ofEpochMilli(lastEndTime),
+                                end = Instant.ofEpochMilli(event.startTime)
+                            ),
+                            complicationData = upcomingData
+                        )
+                    )
+                }
             }
 
-            else -> {null}
+            // 2. Ongoing phase (during event)
+            if (event.endTime > event.startTime) {
+                val ongoingStart = maxOf(currentTime, event.startTime)
+                if (event.endTime > ongoingStart) {
+                    val ongoingData = buildComplicationData(
+                        type = request.complicationType,
+                        eventName = event.title,
+                        targetTime = event.endTime,
+                        iconRes = drawable.ic_pending_1
+                    )
+                    if (ongoingData != null) {
+                        timelineEntries.add(
+                            TimelineEntry(
+                                validity = TimeInterval(
+                                    start = Instant.ofEpochMilli(ongoingStart),
+                                    end = Instant.ofEpochMilli(event.endTime)
+                                ),
+                                complicationData = ongoingData
+                            )
+                        )
+                    }
+                }
+            }
+            lastEndTime = maxOf(lastEndTime, event.endTime)
         }
-    }
-}
-class EventTimerComplicationUpdateWorker(private val appContext: Context, workerParams: WorkerParameters) : CoroutineWorker(appContext, workerParams) {
-    override suspend fun doWork(): Result {
-        //Log.i("CalendarEventComplicationUpdateWorker", "Updating Calendar Event Complication")
-        appContext.updateComplication(EventTimerComplicationService::class.java)
-        return Result.success()
-    }
-}
 
+        return ComplicationDataTimeline(
+            defaultComplicationData = defaultData,
+            timelineEntries = timelineEntries
+        )
+    }
+}
