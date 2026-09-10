@@ -9,7 +9,6 @@ import androidx.core.net.toUri
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import androidx.wear.watchface.complications.datasource.SuspendingComplicationDataSourceService
-import androidx.wear.watchface.complications.datasource.SuspendingTimelineComplicationDataSourceService
 import com.weartools.phonebattcomp.BuildConfig
 import com.weartools.phonebattcomp.R
 import com.weartools.phonebattcomp.complication.EventTimerComplicationService
@@ -32,10 +31,6 @@ fun Context.updateComplication(service: Class<out SuspendingComplicationDataSour
     ComplicationDataSourceUpdateRequester.create(this, ComponentName(this, service))
         .run { requestUpdateAll() }
 }
-fun Context.updateTimelineComplication(service: Class<out SuspendingTimelineComplicationDataSourceService>) {
-    ComplicationDataSourceUpdateRequester.create(this, ComponentName(this, service))
-        .run { requestUpdateAll() }
-}
 
 fun Context.updateBatteriesComplications() {
     updateComplication(MobileBatteryComplicationService::class.java)
@@ -43,8 +38,8 @@ fun Context.updateBatteriesComplications() {
 }
 
 fun Context.updateCalendarComplications() {
-    updateTimelineComplication(EventTimerComplicationService::class.java)
-    updateTimelineComplication(UpcomingEventComplicationService::class.java)
+    updateComplication(EventTimerComplicationService::class.java)
+    updateComplication(UpcomingEventComplicationService::class.java)
 }
 fun Context.updateNotificationComplications() {
     updateComplication(NotificationsIconsComplicationService::class.java)
