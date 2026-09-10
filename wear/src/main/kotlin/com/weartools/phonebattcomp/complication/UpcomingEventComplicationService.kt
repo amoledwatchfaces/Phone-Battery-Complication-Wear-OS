@@ -53,7 +53,6 @@ import kotlinx.coroutines.flow.first
 import java.text.SimpleDateFormat
 import java.time.Duration
 import java.time.Instant
-import java.time.LocalDate
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
@@ -68,7 +67,7 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
 
     @Inject lateinit var dataClient: DataClient
 
-    var icon = drawable.ic_calendar_today
+    var icon = drawable.calendar_today_24px
     var eventIsAllDay = false
     var eventIsOngoing = false
     var eventIsToday = true
@@ -116,8 +115,9 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             timeZone = TimeZone.getDefault()
         }.format(Date(utcTime))
     }
-    fun getTodayIcon(): Int {
-        return when (LocalDate.now().dayOfMonth){
+    private fun getCalendarIcon(time: Long): Int {
+        val day = Calendar.getInstance().apply { timeInMillis = time }.get(Calendar.DAY_OF_MONTH)
+        return when (day) {
             1 -> drawable.ic_cal_01
             2 -> drawable.ic_cal_02
             3 -> drawable.ic_cal_03
@@ -202,9 +202,11 @@ class UpcomingEventComplicationService : SuspendingComplicationDataSourceService
             //Log.i("CalendarEventTimerComplication", "Event isToday: $eventIsToday")
 
             icon = when {
-                eventIsOngoing -> drawable.event_24px
-                eventIsToday -> getTodayIcon()
-                else -> drawable.event_upcoming_24px
+                eventIsOngoing && eventIsAllDay.not() -> drawable.event_24px
+                eventIsOngoing && eventIsAllDay -> drawable.calendar_today_24px
+                eventIsToday && eventIsAllDay -> drawable.calendar_today_24px
+                eventIsToday || eventIsTomorrow && eventIsAllDay.not() -> drawable.event_upcoming_24px
+                else -> getCalendarIcon(event.startTime)
             }
         }
 
