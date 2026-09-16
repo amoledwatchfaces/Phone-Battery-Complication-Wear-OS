@@ -75,4 +75,8 @@
     <!-- Material Symbols & Charging Symbol -->
     <string name="pbc_material_symbols">Material Symboly</string>
     <string name="charging_symbol_inside_icon">Stav nabíjania vnútri ikony</string>
+
+    <!-- Now Playing Complication -->
+    <string name="now_playing_complication">Práve hraje</string>
+    <string name="no_media">Žiadna hudba</string>
 </resources>

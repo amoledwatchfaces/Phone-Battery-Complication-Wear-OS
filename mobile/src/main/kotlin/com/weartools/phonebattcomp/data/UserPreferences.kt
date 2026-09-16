@@ -30,6 +30,9 @@ data class UserPreferences(
     // Calendar Events
     val syncedCalendarsIds: String = "",
     val syncedCalendars: List<CalendarInfo> = emptyList(),
+
+    // Notifications Filtering
+    val disabledAppPackages: Set<String> = emptySet(),
 )
 
 /** REPOSITORY **/

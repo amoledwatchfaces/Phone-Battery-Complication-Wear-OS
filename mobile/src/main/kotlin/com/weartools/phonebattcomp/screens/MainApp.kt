@@ -164,7 +164,7 @@ fun MainApp(
             composable(
                 deepLinks = listOf(
                     navDeepLink{
-                    uriPattern = "https://amoledwatchfaces.com/phonebattcomp"
+                    uriPattern = "https://amoledwatchfaces.com/apps/phonebattcomp"
                     action = Intent.ACTION_VIEW
                 }),
                 route = Screen.Settings.route) {

@@ -371,10 +371,12 @@ class NotificationListener : NotificationListenerService() {
             var notificationText = ""
             var notificationTitle = ""
 
+            // Get disabled app packages
+            val disabledPackages = dataStore.data.first().disabledAppPackages
+
             // Get activeNotifications bitmaps and add unique ones to currentBitmaps.
             for (notification in notifications) {
-
-
+                if (disabledPackages.contains(notification.packageName)) { continue }
                 if (notification.isOngoing) { continue }
                 if (currentBitmaps.size >= 9) { break } // Break the loop when we have 9 distinct icons (...)
 

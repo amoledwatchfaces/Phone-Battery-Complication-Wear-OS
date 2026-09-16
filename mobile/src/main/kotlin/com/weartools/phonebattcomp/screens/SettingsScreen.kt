@@ -3,6 +3,9 @@ package com.weartools.phonebattcomp.screens
 import android.content.Context
 import android.view.SoundEffectConstants
 import android.view.View
+import android.graphics.Canvas
+import android.graphics.drawable.Drawable
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -10,8 +13,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -20,6 +25,9 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.BluetoothConnected
 import androidx.compose.material.icons.filled.EditCalendar
+import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.core.graphics.createBitmap
 import androidx.compose.material3.BasicAlertDialog
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -79,6 +87,9 @@ fun SettingsScreen(
     // Calendars
     val allCalendars by viewModel.calendarsStateFlow.collectAsState()
     var openCalendars by remember { mutableStateOf(false) }
+
+    // App Filter
+    var openAppFilter by remember { mutableStateOf(false) }
 
     var showCrashlyticsDialog by remember { mutableStateOf(false) }
 
@@ -202,6 +213,31 @@ fun SettingsScreen(
                                 viewModel.setNotificationsSyncState(false)
                             }
                         })
+                    }
+                    if (preferences.value.notificationsSync) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 2.dp),
+                            horizontalArrangement = Arrangement.Start,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            OutlinedButton(
+                                onClick = {
+                                    viewModel.fetchInstalledApps(context)
+                                    openAppFilter = true
+                                },
+                                enabled = isWearableApiSupported.value && preferences.value.backgroundServiceState && isWatchConnected.value
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.FilterList,
+                                    contentDescription = "Filter Apps",
+                                    modifier = Modifier.size(18.dp)
+                                )
+                                Spacer(modifier = Modifier.width(8.dp))
+                                Text("Filter Apps")
+                            }
+                        }
                     }
                     // Media Playback Sync Switch
                     Row(
@@ -452,5 +488,148 @@ fun SettingsScreen(
                 }
             }
         }
+    }
+
+    if (openAppFilter) {
+        val installedApps by viewModel.installedAppsStateFlow.collectAsState()
+        var tempDisabledApps by remember(preferences.value.disabledAppPackages) {
+            mutableStateOf(preferences.value.disabledAppPackages)
+        }
+        val allSelected = installedApps.isNotEmpty() && installedApps.none { tempDisabledApps.contains(it.packageName) }
+
+        BasicAlertDialog(
+            onDismissRequest = { openAppFilter = false }
+        ) {
+            Surface(
+                modifier = Modifier.wrapContentWidth().wrapContentHeight(),
+                shape = MaterialTheme.shapes.large,
+                tonalElevation = 3.dp
+            ) {
+                Column(
+                    modifier = Modifier.padding(16.dp).fillMaxWidth()
+                ) {
+                    // Fixed Title
+                    Text(
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium,
+                        text = "Filter App Notifications"
+                    )
+                    HorizontalDivider(color = Color.DarkGray)
+
+                    // Fixed Select All Row
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = if (allSelected) "Unselect All" else "Select All",
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                        Checkbox(
+                            checked = allSelected,
+                            onCheckedChange = { selectAll ->
+                                tempDisabledApps = if (selectAll) {
+                                    emptySet()
+                                } else {
+                                    installedApps.map { it.packageName }.toSet()
+                                }
+                            }
+                        )
+                    }
+                    HorizontalDivider(color = Color.DarkGray)
+
+                    // Scrollable App List
+                    LazyColumn(
+                        modifier = Modifier
+                            .weight(1f, fill = false)
+                            .heightIn(max = 350.dp)
+                    ) {
+                        items(installedApps.size) { index ->
+                            val app = installedApps[index]
+                            val isEnabled = !tempDisabledApps.contains(app.packageName)
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 4.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    modifier = Modifier.weight(0.8f)
+                                ) {
+                                    AppDrawableImage(drawable = app.icon, appName = app.appName)
+                                    Text(
+                                        text = app.appName,
+                                        style = MaterialTheme.typography.bodyMedium,
+                                        maxLines = 1
+                                    )
+                                }
+                                Checkbox(
+                                    checked = isEnabled,
+                                    onCheckedChange = { checked ->
+                                        tempDisabledApps = if (checked) {
+                                            tempDisabledApps - app.packageName
+                                        } else {
+                                            tempDisabledApps + app.packageName
+                                        }
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Fixed Action Buttons
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        TextButton(
+                            onClick = { openAppFilter = false }
+                        ) {
+                            Text("Dismiss")
+                        }
+                        Spacer(modifier = Modifier.width(8.dp))
+                        TextButton(
+                            onClick = {
+                                viewModel.setDisabledAppPackages(tempDisabledApps)
+                                openAppFilter = false
+                            }
+                        ) {
+                            Text("Confirm")
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun AppDrawableImage(drawable: Drawable?, appName: String) {
+    val imageBitmap = remember(drawable) {
+        drawable?.run {
+            val bitmap = createBitmap(48, 48)
+            val canvas = Canvas(bitmap)
+            setBounds(0, 0, 48, 48)
+            draw(canvas)
+            bitmap.asImageBitmap()
+        }
+    }
+    imageBitmap?.let {
+        Image(
+            bitmap = it,
+            contentDescription = appName,
+            modifier = Modifier.padding(end = 8.dp).size(24.dp)
+        )
     }
 }

@@ -6,6 +6,7 @@ import android.app.Activity
 import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.Intent
+import android.graphics.drawable.Drawable
 import android.os.BatteryManager
 import android.os.Build
 import android.util.Log
@@ -391,5 +392,58 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private val _installedAppsStateFlow = MutableStateFlow<List<AppInfo>>(emptyList())
+    val installedAppsStateFlow: StateFlow<List<AppInfo>> = _installedAppsStateFlow
+
+    fun fetchInstalledApps(context: Context) {
+        viewModelScope.launch {
+            val apps = withContext(Dispatchers.IO) {
+                val pm = context.packageManager
+                val mainIntent = Intent(Intent.ACTION_MAIN, null).apply {
+                    addCategory(Intent.CATEGORY_LAUNCHER)
+                }
+                val resolveInfos = pm.queryIntentActivities(mainIntent, 0)
+                resolveInfos.mapNotNull { resolveInfo ->
+                    try {
+                        val pkg = resolveInfo.activityInfo.packageName
+                        if (pkg == context.packageName) return@mapNotNull null
+                        val appName = resolveInfo.loadLabel(pm).toString()
+                        val icon = resolveInfo.loadIcon(pm)
+                        AppInfo(packageName = pkg, appName = appName, icon = icon)
+                    } catch (_: Exception) {
+                        null
+                    }
+                }.distinctBy { it.packageName }.sortedBy { it.appName.lowercase() }
+            }
+            _installedAppsStateFlow.value = apps
+        }
+    }
+
+    fun toggleDisabledAppPackage(packageName: String) {
+        viewModelScope.launch {
+            val currentSet = preferences.value.disabledAppPackages
+            val updatedSet = if (currentSet.contains(packageName)) {
+                currentSet - packageName
+            } else {
+                currentSet + packageName
+            }
+            dataStore.updateData { it.copy(disabledAppPackages = updatedSet) }
+            ServiceCommunication.sendToWatchFlow.emit(Unit)
+        }
+    }
+
+    fun setDisabledAppPackages(disabledPackages: Set<String>) {
+        viewModelScope.launch {
+            dataStore.updateData { it.copy(disabledAppPackages = disabledPackages) }
+            ServiceCommunication.sendToWatchFlow.emit(Unit)
+        }
+    }
+
 
 }
+
+data class AppInfo(
+    val packageName: String,
+    val appName: String,
+    val icon: Drawable?
+)
