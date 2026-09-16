@@ -23,12 +23,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import kotlin.collections.copy
 import kotlin.coroutines.cancellation.CancellationException
 
 @HiltViewModel
@@ -119,7 +117,7 @@ class MainViewModel @Inject constructor(
             val remoteActivityHelper = RemoteActivityHelper(context)
             val intent = Intent(Intent.ACTION_VIEW)
                 .addCategory(Intent.CATEGORY_BROWSABLE)
-                .setData("https://amoledwatchfaces.com/phonebattcomp".toUri())
+                .setData("https://amoledwatchfaces.com/apps/phonebattcomp".toUri())
 
             try {
                 remoteActivityHelper.startRemoteActivity(targetIntent = intent, targetNodeId = null).await()

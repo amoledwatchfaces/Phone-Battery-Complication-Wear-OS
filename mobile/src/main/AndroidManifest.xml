@@ -39,8 +39,7 @@
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data android:scheme="https"
                     android:host="amoledwatchfaces.com"
-                    android:path="/phonebattcomp" />
-
+                    android:path="/apps/phonebattcomp" />
             </intent-filter>
         </activity>
 
