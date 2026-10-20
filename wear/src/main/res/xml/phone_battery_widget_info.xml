@@ -6,5 +6,5 @@
     preferredType="SMALL">
     <container
         type="SMALL"
-        previewImage="@drawable/widget_preview_small" />
+        previewImage="@drawable/widget_preview_small_phone_battery" />
 </wearwidget-provider>

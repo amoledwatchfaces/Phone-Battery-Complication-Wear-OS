@@ -4,7 +4,6 @@ import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.graphics.Color
 import androidx.compose.remote.creation.compose.action.pendingIntentAction
 import androidx.compose.remote.creation.compose.capture.RemoteImageVector
 import androidx.compose.remote.creation.compose.capture.vectorResource
@@ -15,23 +14,13 @@ import androidx.compose.remote.creation.compose.layout.RemoteColumn
 import androidx.compose.remote.creation.compose.layout.RemoteComposable
 import androidx.compose.remote.creation.compose.layout.RemoteRow
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
-import androidx.compose.remote.creation.compose.modifier.background
 import androidx.compose.remote.creation.compose.modifier.clickable
 import androidx.compose.remote.creation.compose.modifier.clip
-import androidx.compose.remote.creation.compose.modifier.fillMaxHeight
 import androidx.compose.remote.creation.compose.modifier.fillMaxSize
-import androidx.compose.remote.creation.compose.modifier.fillMaxWidth
-import androidx.compose.remote.creation.compose.modifier.fillParentMaxSize
-import androidx.compose.remote.creation.compose.modifier.fillParentMaxWidth
-import androidx.compose.remote.creation.compose.modifier.padding
 import androidx.compose.remote.creation.compose.modifier.size
-import androidx.compose.remote.creation.compose.modifier.wrapContentHeight
-import androidx.compose.remote.creation.compose.modifier.wrapContentSize
-import androidx.compose.remote.creation.compose.modifier.wrapContentWidth
 import androidx.compose.remote.creation.compose.shaders.RemoteBrush
 import androidx.compose.remote.creation.compose.shaders.solidColor
 import androidx.compose.remote.creation.compose.shapes.RemoteCircleShape
-import androidx.compose.remote.creation.compose.state.RemoteColor
 import androidx.compose.remote.creation.compose.state.rb
 import androidx.compose.remote.creation.compose.state.rc
 import androidx.compose.remote.creation.compose.state.rdp
@@ -160,14 +149,14 @@ fun PhoneBatteryWidgetContent(
     val colorScheme = if (dynamicColors) RemoteMaterialTheme.colorScheme else appColorScheme
 
     RemoteRow(
-        modifier = RemoteModifier.fillParentMaxWidth(),
-        horizontalArrangement = RemoteArrangement.Start,
+        modifier = RemoteModifier
+            .fillMaxSize(),
+        horizontalArrangement = RemoteArrangement.spacedBy(8.rdp),
         verticalAlignment = RemoteAlignment.CenterVertically
     ){
         RemoteBox(
             modifier = RemoteModifier
-                .background(RemoteColor(Color.DKGRAY))
-                .wrapContentSize()
+                .size(48.rdp)
                 .clip(RemoteCircleShape)
                 .clickable(
                     pendingIntentAction { context ->
@@ -179,9 +168,6 @@ fun PhoneBatteryWidgetContent(
         ){
             val progress = rememberMutableRemoteFloat { (1F * batteryLevel / 100).rf }
             RemoteCircularProgressIndicator(
-                modifier = RemoteModifier
-                    .fillMaxHeight()
-                    .background(RemoteColor(Color.BLUE)),
                 colors = RemoteProgressIndicatorDefaults.colors(
                     indicatorBrush = RemoteBrush.solidColor(colorScheme.tertiary),
                     trackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
@@ -190,7 +176,7 @@ fun PhoneBatteryWidgetContent(
                     disabledTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
                     disabledOverflowTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
                 ),
-                strokeWidth = 6.rdp,
+                strokeWidth = 5f.rdp,
                 gapSize = RemoteProgressIndicatorDefaults.IndeterminateStrokeWidth,
                 progress = progress,
                 startAngle = 110.rf,
@@ -218,21 +204,20 @@ fun PhoneBatteryWidgetContent(
             // Row 1: Device Name
             RemoteText(
                 text = nodeName.rs,
-                style = RemoteMaterialTheme.typography.titleMedium,
-                color = colorScheme.secondary
+                style = RemoteMaterialTheme.typography.titleSmall,
+                color = colorScheme.secondaryDim
             )
             // Row 2: Percentage + Status
             RemoteRow(
                 modifier = RemoteModifier,
-                horizontalArrangement = RemoteArrangement.Start,
+                horizontalArrangement = RemoteArrangement.spacedBy(4.rdp),
                 verticalAlignment = RemoteAlignment.CenterVertically
             ) {
                 RemoteText(
                     text = "${batteryLevel}%".rs,
-                    style = RemoteMaterialTheme.typography.numeralExtraSmall,
+                    style = RemoteMaterialTheme.typography.titleLarge,
                     color = colorScheme.tertiary
                 )
-                RemoteBox(modifier = RemoteModifier.size(6.rdp))
                 RemoteText(
                     overflow = TextOverflow.Ellipsis,
                     maxLines = 2,
