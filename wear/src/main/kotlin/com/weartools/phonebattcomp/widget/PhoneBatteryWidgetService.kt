@@ -151,7 +151,7 @@ fun PhoneBatteryWidgetContent(
     RemoteRow(
         modifier = RemoteModifier
             .fillMaxSize(),
-        horizontalArrangement = RemoteArrangement.spacedBy(8.rdp),
+        horizontalArrangement = RemoteArrangement.spacedBy(12.rdp),
         verticalAlignment = RemoteAlignment.CenterVertically
     ){
         RemoteBox(
@@ -208,24 +208,18 @@ fun PhoneBatteryWidgetContent(
                 color = colorScheme.secondaryDim
             )
             // Row 2: Percentage + Status
-            RemoteRow(
-                modifier = RemoteModifier,
-                horizontalArrangement = RemoteArrangement.spacedBy(4.rdp),
-                verticalAlignment = RemoteAlignment.CenterVertically
-            ) {
-                RemoteText(
-                    text = "${batteryLevel}%".rs,
-                    style = RemoteMaterialTheme.typography.titleLarge,
-                    color = colorScheme.tertiary
-                )
-                RemoteText(
-                    overflow = TextOverflow.Ellipsis,
-                    maxLines = 2,
-                    text = chargeRemainingTime.rs,
-                    style = RemoteMaterialTheme.typography.bodySmall,
-                    color = colorScheme.onSurfaceVariant
-                )
-            }
+            RemoteText(
+                text = "${batteryLevel}%".rs,
+                style = RemoteMaterialTheme.typography.titleLarge,
+                color = colorScheme.tertiary
+            )
+            RemoteText(
+                overflow = TextOverflow.Ellipsis,
+                maxLines = 1,
+                text = chargeRemainingTime.rs,
+                style = RemoteMaterialTheme.typography.bodySmall,
+                color = colorScheme.onSurfaceVariant
+            )
         }
     }
 }

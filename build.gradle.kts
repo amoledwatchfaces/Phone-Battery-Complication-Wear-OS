@@ -14,8 +14,8 @@ plugins {
 buildscript {
 
     /** Set version for wear & mobile modules **/
-    extra.set("versionCode", 10000601)
-    extra.set("versionName", "6.0.1")
+    extra.set("versionCode", 10000602)
+    extra.set("versionName", "6.0.2")
 
     dependencies {
         classpath ("com.android.tools.build:gradle:9.4.1")
