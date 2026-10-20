@@ -5,6 +5,8 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import androidx.compose.remote.creation.compose.action.pendingIntentAction
+import androidx.compose.remote.creation.compose.capture.RemoteImageVector
+import androidx.compose.remote.creation.compose.capture.vectorResource
 import androidx.compose.remote.creation.compose.layout.RemoteAlignment
 import androidx.compose.remote.creation.compose.layout.RemoteArrangement
 import androidx.compose.remote.creation.compose.layout.RemoteBox
@@ -14,6 +16,7 @@ import androidx.compose.remote.creation.compose.layout.RemoteRow
 import androidx.compose.remote.creation.compose.modifier.RemoteModifier
 import androidx.compose.remote.creation.compose.modifier.clickable
 import androidx.compose.remote.creation.compose.modifier.clip
+import androidx.compose.remote.creation.compose.modifier.fillMaxSize
 import androidx.compose.remote.creation.compose.modifier.fillMaxWidth
 import androidx.compose.remote.creation.compose.modifier.padding
 import androidx.compose.remote.creation.compose.modifier.size
@@ -27,8 +30,6 @@ import androidx.compose.remote.creation.compose.state.rememberMutableRemoteFloat
 import androidx.compose.remote.creation.compose.state.rf
 import androidx.compose.remote.creation.compose.state.rs
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.datastore.core.DataStore
 import androidx.glance.wear.AssociateWithGlanceWearWidget
@@ -68,7 +69,7 @@ class PhoneBatteryWidgetService : GlanceWearWidgetService() {
 }
 
 class PhoneBatteryWidget(
-    private val dataStore: DataStore<UserPreferences>
+    private val dataStore: DataStore<UserPreferences>? = null
 ) : GlanceWearWidget() {
 
     override suspend fun onAdded(context: Context, widgetHandle: ActiveWearWidgetHandle) {
@@ -79,8 +80,13 @@ class PhoneBatteryWidget(
         params: WearWidgetParams,
     ): WearWidgetData {
 
-        // Read the snapshot of user preferences
-        val preferences: UserPreferences = dataStore.data.first()
+        // Read the snapshot of user preferences or fallback to preview defaults when dataStore is null
+        val preferences: UserPreferences = dataStore?.data?.first() ?: UserPreferences(
+            phoneBatteryLevel = 85,
+            nodeName = "Pixel 8 Pro",
+            phoneIsConnected = true,
+            phoneIsCharging = false
+        )
 
         val appColorScheme = WIDGET_COLOR_SCHEME
 
@@ -144,30 +150,70 @@ fun PhoneBatteryWidgetContent(
 ) {
     val colorScheme = if (dynamicColors) RemoteMaterialTheme.colorScheme else appColorScheme
 
-    RemoteColumn(
+    RemoteRow(
         modifier = RemoteModifier
-            .fillMaxWidth()
-            .padding(horizontal = 4.rdp),
-        verticalArrangement = RemoteArrangement.Center,
-        horizontalAlignment = RemoteAlignment.CenterHorizontally,
-    ) {
-        RemoteRow(
-            modifier = RemoteModifier.fillMaxWidth().weight((1.8f).rf),
-            horizontalArrangement = RemoteArrangement.Start,
+            .fillMaxSize(),
+        horizontalArrangement = RemoteArrangement.Start,
+        verticalAlignment = RemoteAlignment.CenterVertically
+    ){
+        RemoteBox(
+            modifier = RemoteModifier
+                .clip(RemoteCircleShape)
+                .clickable(
+                    pendingIntentAction { context ->
+                        val intent = Intent(context, MainActivity::class.java)
+                        PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
+                    }
+                ),
+            contentAlignment = RemoteAlignment.Center
+        ){
+            val progress = rememberMutableRemoteFloat { (1F * batteryLevel / 100).rf }
+            RemoteCircularProgressIndicator(
+                colors = RemoteProgressIndicatorDefaults.colors(
+                    indicatorBrush = RemoteBrush.solidColor(colorScheme.tertiary),
+                    trackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
+                    overflowTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
+                    disabledIndicatorBrush = RemoteBrush.solidColor(colorScheme.tertiaryDim),
+                    disabledTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
+                    disabledOverflowTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
+                ),
+                modifier =
+                    RemoteModifier
+                        .size(160.rdp),
+                strokeWidth = 6.rdp,
+                gapSize = RemoteProgressIndicatorDefaults.IndeterminateStrokeWidth,
+                progress = progress,
+                startAngle = 110.rf,
+                endAngle = 430.rf,
+                enabled = phoneIsConnected.rb
+            )
+            RemoteIcon(
+                modifier = RemoteModifier.size(20.rdp),
+                imageVector = RemoteImageVector.vectorResource(
+                    when {
+                        phoneIsConnected && phoneIsCharging -> R.drawable.mobile_charge_24px
+                        phoneIsConnected -> R.drawable.mobile_24px
+                        else -> R.drawable.mobile_cancel_24px
+                    }
+                ),
+                contentDescription = "Battery Status".rs,
+                tint = colorScheme.secondary
+            )
+        }
+        RemoteColumn(
+            modifier = RemoteModifier,
+            verticalArrangement = RemoteArrangement.Center,
+            horizontalAlignment = RemoteAlignment.CenterHorizontally,
         ) {
             RemoteText(
                 text = nodeName.rs,
                 style = RemoteMaterialTheme.typography.titleMedium,
                 color = colorScheme.secondary
             )
-        }
-        RemoteRow(
-            modifier = RemoteModifier.fillMaxWidth().weight(4.rf),
-            horizontalArrangement = RemoteArrangement.SpaceBetween,
-            verticalAlignment = RemoteAlignment.CenterVertically
-        ) {
-            RemoteColumn(
-                modifier = RemoteModifier.fillMaxWidth(0.7f),
+            RemoteRow(
+                modifier = RemoteModifier,
+                horizontalArrangement = RemoteArrangement.SpaceBetween,
+                verticalAlignment = RemoteAlignment.CenterVertically
             ) {
                 RemoteText(
                     text = "${batteryLevel}%".rs,
@@ -181,55 +227,6 @@ fun PhoneBatteryWidgetContent(
                     style = RemoteMaterialTheme.typography.bodySmall,
                     color = colorScheme.onSurfaceVariant
                 )
-            }
-            RemoteColumn() {
-                val progress = rememberMutableRemoteFloat { (1F * batteryLevel / 100).rf }
-
-                RemoteBox(
-                    modifier =
-                        RemoteModifier
-                            .clip(RemoteCircleShape)
-                            .clickable(
-                            pendingIntentAction { context ->
-                                val intent = Intent(context, MainActivity::class.java)
-                                PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
-                            }
-                        ),
-                    contentAlignment = RemoteAlignment.Center
-                ){
-                    RemoteCircularProgressIndicator(
-                        colors = RemoteProgressIndicatorDefaults.colors(
-                            indicatorBrush = RemoteBrush.solidColor(colorScheme.tertiary),
-                            trackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
-                            overflowTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
-                            disabledIndicatorBrush = RemoteBrush.solidColor(colorScheme.tertiaryDim),
-                            disabledTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
-                            disabledOverflowTrackBrush = RemoteBrush.solidColor(colorScheme.surfaceContainer),
-                        ),
-                        modifier =
-                            RemoteModifier
-                                .size(160.rdp),
-                        strokeWidth = 6.rdp,
-                        gapSize = RemoteProgressIndicatorDefaults.IndeterminateStrokeWidth,
-                        progress = progress,
-                        startAngle = 110.rf,
-                        endAngle = 430.rf,
-                        enabled = phoneIsConnected.rb
-                    )
-
-                    RemoteIcon(
-                        modifier = RemoteModifier.size(20.rdp),
-                        imageVector = ImageVector.vectorResource(
-                            when {
-                                phoneIsConnected && phoneIsCharging -> R.drawable.mobile_charge_24px
-                                phoneIsConnected -> R.drawable.mobile_24px
-                                else -> R.drawable.mobile_cancel_24px
-                            }
-                        ),
-                        contentDescription = "Battery Status".rs,
-                        tint = colorScheme.secondary
-                    )
-                }
             }
         }
     }

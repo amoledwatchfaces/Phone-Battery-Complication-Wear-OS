@@ -119,31 +119,31 @@ dependencies {
     // General compose dependencies
     implementation (composeBom)
     implementation ("androidx.activity:activity-compose:1.13.0")
-    implementation ("androidx.compose.ui:ui:1.12.0")
-    implementation ("androidx.compose.ui:ui-tooling-preview:1.12.0")
+    implementation ("androidx.compose.ui:ui:1.12.1")
+    implementation ("androidx.compose.ui:ui-tooling-preview:1.12.1")
     implementation ("androidx.compose.material:material-icons-extended:1.7.8")
-    implementation ("androidx.compose.animation:animation-graphics-android:1.12.0")
+    implementation ("androidx.compose.animation:animation-graphics-android:1.12.1")
 
     // Compose for Wear OS dependencies
-    implementation ("androidx.wear.compose:compose-material3:1.6.2")
-    implementation ("androidx.wear.compose:compose-navigation:1.6.2")
+    implementation ("androidx.wear.compose:compose-material3:1.7.1")
+    implementation ("androidx.wear.compose:compose-navigation:1.7.1")
 
     // Foundation is additive, so you can use the mobile version in your Wear OS app.
-    implementation ("androidx.wear.compose:compose-foundation:1.6.2")
+    implementation ("androidx.wear.compose:compose-foundation:1.7.1")
 
     // Wear OS preview annotations
-    implementation ("androidx.wear.compose:compose-ui-tooling:1.6.2")
+    implementation ("androidx.wear.compose:compose-ui-tooling:1.7.1")
 
     // Testing
     testImplementation ("junit:junit:4.13.2")
     androidTestImplementation ("androidx.test.ext:junit:1.3.0")
     androidTestImplementation ("androidx.test.espresso:espresso-core:3.7.0")
-    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.12.0")
-    debugImplementation ("androidx.compose.ui:ui-tooling:1.12.0")
-    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.12.0")
+    androidTestImplementation ("androidx.compose.ui:ui-test-junit4:1.12.1")
+    debugImplementation ("androidx.compose.ui:ui-tooling:1.12.1")
+    debugImplementation ("androidx.compose.ui:ui-test-manifest:1.12.1")
 
     // Core
-    implementation ("androidx.core:core-ktx:1.19.0")
+    implementation ("androidx.core:core-ktx:1.19.1")
 
     // Lifecycle
     implementation ("androidx.lifecycle:lifecycle-viewmodel-compose:2.11.0")
@@ -157,13 +157,13 @@ dependencies {
     implementation ("androidx.datastore:datastore:1.2.1")
 
     // Serialization
-    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-serialization-json:1.12.0")
 
     // Splash Screen
     implementation ("androidx.core:core-splashscreen:1.2.0")
 
     // WorkManager
-    implementation ("androidx.work:work-runtime-ktx:2.11.2")
+    implementation ("androidx.work:work-runtime-ktx:2.12.0")
 
     // Tile
     implementation ("androidx.wear.protolayout:protolayout-expression:1.4.2")
@@ -174,15 +174,16 @@ dependencies {
     // ListenableFuture
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-guava:1.11.0")
 
-    // Core Wear Widget and Remote Compose libraries
-    implementation ("androidx.compose.remote:remote-creation-compose:1.0.0-alpha18")
-    implementation ("androidx.compose.remote:remote-core:1.0.0-alpha18")
-    implementation ("androidx.glance.wear:wear:1.0.0-alpha17")
-    implementation ("androidx.glance.wear:wear-core:1.0.0-alpha17")
-    implementation ("androidx.wear.compose.remote:remote-material3:1.0.0-alpha10")
+    // Wear OS Widgets & Remote Compose
+    implementation ("androidx.compose.remote:remote-creation-compose:1.0.0-alpha21")
+    implementation ("androidx.compose.remote:remote-core:1.0.0-alpha21")
+    implementation ("androidx.glance.wear:wear:1.0.0-alpha20")
+    implementation ("androidx.glance.wear:wear-core:1.0.0-alpha20")
+    implementation ("androidx.wear.compose.remote:remote-material3:1.0.0-alpha13")
 
     // Tooling for previews (optional, but recommended)
-    implementation ("androidx.compose.remote:remote-tooling-preview:1.0.0-alpha18")
+    implementation ("androidx.glance.wear:wear-tooling-preview:1.0.0-alpha20")
+    implementation ("androidx.compose.remote:remote-tooling-preview:1.0.0-alpha21")
     implementation ("androidx.wear.tiles:tiles-tooling-preview:1.6.2")
     debugImplementation ("androidx.wear.tiles:tiles-renderer:1.6.2")
 
@@ -192,6 +193,6 @@ dependencies {
     ksp ("com.google.dagger:hilt-compiler:2.60.1")
 
     // Firebase
-    implementation (platform("com.google.firebase:firebase-bom:34.18.0"))
+    implementation (platform("com.google.firebase:firebase-bom:35.0.2"))
     implementation ("com.google.firebase:firebase-crashlytics")
 }
